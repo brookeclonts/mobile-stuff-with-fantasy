@@ -1,0 +1,175 @@
+class Book {
+  const Book({
+    required this.id,
+    required this.title,
+    required this.authorName,
+    required this.imageUrl,
+    required this.subgenres,
+    required this.tropes,
+    required this.spiceLevel,
+    required this.ageCategory,
+    this.description = '',
+    this.purchaseLink = '',
+    this.alternatePurchaseLink = '',
+    this.audiobookLink = '',
+    this.amazonAsin = '',
+    this.representations = const [],
+    this.languageLevel = LanguageLevel.clean,
+    this.kindleUnlimited = false,
+    this.hasAudiobook = false,
+    this.userId,
+    this.favoritedBy = const [],
+  });
+
+  /// Parse a book from the catalog list response.
+  ///
+  /// Taxonomy fields come as raw ObjectId strings from `/api/filter/books/all`.
+  /// Pass [nameIndex] (from [TaxonomyData.nameIndex]) to resolve them to
+  /// display names. If omitted, the raw IDs are used as-is.
+  factory Book.fromJson(
+    Map<String, Object?> json, {
+    Map<String, String> nameIndex = const {},
+  }) {
+    String resolve(Object? id) {
+      final key = id is String ? id : '';
+      return nameIndex[key] ?? key;
+    }
+
+    List<String> resolveList(Object? raw) {
+      if (raw is! List) return const [];
+      return raw.map((e) => resolve(e)).toList();
+    }
+
+    final audiobookLink = json['audiobook_link'] as String? ?? '';
+
+    return Book(
+      id: json['_id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      authorName: json['author_name'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      imageUrl: json['image_url'] as String? ?? '',
+      purchaseLink: json['purchase_link'] as String? ?? '',
+      alternatePurchaseLink: json['alternate_purchase_link'] as String? ?? '',
+      audiobookLink: audiobookLink,
+      amazonAsin: json['amazonASIN'] as String? ?? '',
+      subgenres: resolveList(json['subgenres']),
+      tropes: resolveList(json['tropes']),
+      spiceLevel: _parseSpiceLevel(resolve(json['spiceLevel'])),
+      ageCategory: resolve(json['ageCategory']),
+      representations: resolveList(json['representations']),
+      languageLevel: _parseLanguageLevel(json['languageLevel']),
+      kindleUnlimited: json['kindleUnlimited'] as bool? ?? false,
+      hasAudiobook: audiobookLink.isNotEmpty,
+      userId: json['user'] as String?,
+      favoritedBy: (json['favoritedBy'] as List?)?.cast<String>() ?? const [],
+    );
+  }
+
+  /// Parse a fully-populated book from `/api/books/[id]`.
+  ///
+  /// Taxonomy fields arrive as `{ _id, name }` objects instead of bare IDs.
+  factory Book.fromDetailJson(Map<String, Object?> json) {
+    String nameFrom(Object? obj) {
+      if (obj is Map<String, Object?>) return obj['name'] as String? ?? '';
+      return obj as String? ?? '';
+    }
+
+    List<String> namesFromList(Object? raw) {
+      if (raw is! List) return const [];
+      return raw.map(nameFrom).toList();
+    }
+
+    final audiobookLink = json['audiobook_link'] as String? ?? '';
+
+    return Book(
+      id: json['_id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      authorName: json['author_name'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      imageUrl: json['image_url'] as String? ?? '',
+      purchaseLink: json['purchase_link'] as String? ?? '',
+      alternatePurchaseLink: json['alternate_purchase_link'] as String? ?? '',
+      audiobookLink: audiobookLink,
+      amazonAsin: json['amazonASIN'] as String? ?? '',
+      subgenres: namesFromList(json['subgenres']),
+      tropes: namesFromList(json['tropes']),
+      spiceLevel: _parseSpiceLevel(nameFrom(json['spiceLevel'])),
+      ageCategory: nameFrom(json['ageCategory']),
+      representations: namesFromList(json['representations']),
+      languageLevel: _parseLanguageLevel(json['languageLevel']),
+      kindleUnlimited: json['kindleUnlimited'] as bool? ?? false,
+      hasAudiobook: audiobookLink.isNotEmpty,
+      userId: _extractUserId(json['userId']),
+      favoritedBy: (json['favoritedBy'] as List?)?.cast<String>() ?? const [],
+    );
+  }
+
+  final String id;
+  final String title;
+  final String authorName;
+  final String description;
+  final String imageUrl;
+  final String purchaseLink;
+  final String alternatePurchaseLink;
+  final String audiobookLink;
+  final String amazonAsin;
+  final List<String> subgenres;
+  final List<String> tropes;
+  final SpiceLevel spiceLevel;
+  final String ageCategory;
+  final List<String> representations;
+  final LanguageLevel languageLevel;
+  final bool kindleUnlimited;
+  final bool hasAudiobook;
+  final String? userId;
+  final List<String> favoritedBy;
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  static SpiceLevel _parseSpiceLevel(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('scorching')) return SpiceLevel.scorching;
+    if (lower.contains('hot')) return SpiceLevel.hot;
+    if (lower.contains('medium')) return SpiceLevel.medium;
+    if (lower.contains('mild')) return SpiceLevel.mild;
+    return SpiceLevel.none;
+  }
+
+  static LanguageLevel _parseLanguageLevel(Object? raw) {
+    final value = (raw as String?)?.toLowerCase() ?? '';
+    return switch (value) {
+      'strong' => LanguageLevel.strong,
+      'moderate' => LanguageLevel.moderate,
+      'mild' => LanguageLevel.mild,
+      _ => LanguageLevel.clean,
+    };
+  }
+
+  static String? _extractUserId(Object? raw) {
+    if (raw is Map<String, Object?>) return raw['_id'] as String?;
+    return raw as String?;
+  }
+}
+
+enum SpiceLevel {
+  none('No Spice'),
+  mild('Mild Spice'),
+  medium('Medium Spice'),
+  hot('Hot'),
+  scorching('Scorching');
+
+  const SpiceLevel(this.label);
+  final String label;
+}
+
+enum LanguageLevel {
+  clean('Clean'),
+  mild('Mild Language'),
+  moderate('Moderate Language'),
+  strong('Strong Language');
+
+  const LanguageLevel(this.label);
+  final String label;
+}
