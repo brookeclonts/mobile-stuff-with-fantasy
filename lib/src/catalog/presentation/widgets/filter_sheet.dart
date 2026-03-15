@@ -1,55 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
+import 'package:swf_app/src/catalog/models/taxonomy.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/filter_bar.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
-
-const List<String> _allSubgenres = [
-  'Epic Fantasy',
-  'Urban Fantasy',
-  'Dark Fantasy',
-  'Romantic Fantasy',
-  'High Fantasy',
-  'Low Fantasy',
-  'Sword & Sorcery',
-  'Mythological Fantasy',
-  'Portal Fantasy',
-  'Cozy Fantasy',
-];
-
-const List<String> _allTropes = [
-  'Chosen One',
-  'Enemies to Lovers',
-  'Found Family',
-  'Slow Burn',
-  'Revenge Quest',
-  'Hidden Royalty',
-  'Forbidden Love',
-  'Anti-Hero',
-  'Magic Academy',
-  'Fated Mates',
-  'Morally Grey',
-  'Forced Proximity',
-  'Quest Narrative',
-  'Prophecy',
-  'Heist',
-];
-
-const List<String> _allAgeCategories = ['Adult', 'New Adult', 'Young Adult'];
-
-const List<String> _allRepresentations = [
-  'LGBTQ+',
-  'BIPOC',
-  'Disability',
-  'Neurodivergent',
-];
 
 class FilterSheet extends StatefulWidget {
   const FilterSheet({
     super.key,
+    required this.taxonomy,
     required this.filters,
     required this.onApply,
   });
 
+  final TaxonomyData taxonomy;
   final ActiveFilters filters;
   final ValueChanged<ActiveFilters> onApply;
 
@@ -91,10 +54,19 @@ class _FilterSheetState extends State<FilterSheet> {
                   children: [
                     Text('Filters', style: theme.textTheme.titleLarge),
                     const Spacer(),
-                    if (_draft.hasActiveFilters)
+                    if (_draft.hasSheetFilters)
                       TextButton(
                         onPressed: () => setState(
-                          () => _draft = const ActiveFilters(),
+                          () => _draft = _draft.copyWith(
+                            subgenreIds: const {},
+                            tropeIds: const {},
+                            spiceLevelIds: const {},
+                            ageCategoryIds: const {},
+                            representationIds: const {},
+                            languageLevels: const {},
+                            kindleUnlimitedOnly: false,
+                            audiobookOnly: false,
+                          ),
                         ),
                         child: const Text('Reset'),
                       ),
@@ -119,14 +91,15 @@ class _FilterSheetState extends State<FilterSheet> {
                         Wrap(
                           spacing: 8,
                           runSpacing: 4,
-                          children: _allSubgenres.map((s) {
-                            final selected = _draft.subgenres.contains(s);
+                          children: widget.taxonomy.subgenres.map((subgenre) {
+                            final selected =
+                                _draft.subgenreIds.contains(subgenre.id);
                             return FilterChip(
-                              label: Text(s),
+                              label: Text(subgenre.name),
                               selected: selected,
                               selectedColor: SwfColors.tropePill,
                               checkmarkColor: SwfColors.color3,
-                              onSelected: (v) => _toggleSubgenre(s, v),
+                              onSelected: (v) => _toggleSubgenre(subgenre.id, v),
                             );
                           }).toList(),
                         ),
@@ -138,14 +111,14 @@ class _FilterSheetState extends State<FilterSheet> {
                         Wrap(
                           spacing: 8,
                           runSpacing: 4,
-                          children: _allTropes.map((t) {
-                            final selected = _draft.tropes.contains(t);
+                          children: widget.taxonomy.tropes.map((trope) {
+                            final selected = _draft.tropeIds.contains(trope.id);
                             return FilterChip(
-                              label: Text(t),
+                              label: Text(trope.name),
                               selected: selected,
                               selectedColor: SwfColors.tropePill,
                               checkmarkColor: SwfColors.color3,
-                              onSelected: (v) => _toggleTrope(t, v),
+                              onSelected: (v) => _toggleTrope(trope.id, v),
                             );
                           }).toList(),
                         ),
@@ -157,15 +130,15 @@ class _FilterSheetState extends State<FilterSheet> {
                         Wrap(
                           spacing: 8,
                           runSpacing: 4,
-                          children: SpiceLevel.values.map((level) {
+                          children: widget.taxonomy.spiceLevels.map((level) {
                             final selected =
-                                _draft.spiceLevels.contains(level);
+                                _draft.spiceLevelIds.contains(level.id);
                             return FilterChip(
-                              label: Text(level.label),
+                              label: Text(level.name),
                               selected: selected,
                               selectedColor: SwfColors.spicinessPill,
                               checkmarkColor: SwfColors.color4,
-                              onSelected: (v) => _toggleSpice(level, v),
+                              onSelected: (v) => _toggleSpice(level.id, v),
                             );
                           }).toList(),
                         ),
@@ -177,15 +150,15 @@ class _FilterSheetState extends State<FilterSheet> {
                         Wrap(
                           spacing: 8,
                           runSpacing: 4,
-                          children: _allAgeCategories.map((a) {
+                          children: widget.taxonomy.ageCategories.map((age) {
                             final selected =
-                                _draft.ageCategories.contains(a);
+                                _draft.ageCategoryIds.contains(age.id);
                             return FilterChip(
-                              label: Text(a),
+                              label: Text(age.name),
                               selected: selected,
                               selectedColor: SwfColors.representationPill,
                               checkmarkColor: SwfColors.color7,
-                              onSelected: (v) => _toggleAge(a, v),
+                              onSelected: (v) => _toggleAge(age.id, v),
                             );
                           }).toList(),
                         ),
@@ -197,15 +170,16 @@ class _FilterSheetState extends State<FilterSheet> {
                         Wrap(
                           spacing: 8,
                           runSpacing: 4,
-                          children: _allRepresentations.map((r) {
+                          children: widget.taxonomy.representations.map((rep) {
                             final selected =
-                                _draft.representations.contains(r);
+                                _draft.representationIds.contains(rep.id);
                             return FilterChip(
-                              label: Text(r),
+                              label: Text(rep.name),
                               selected: selected,
                               selectedColor: SwfColors.representationPill,
                               checkmarkColor: SwfColors.color7,
-                              onSelected: (v) => _toggleRepresentation(r, v),
+                              onSelected: (v) =>
+                                  _toggleRepresentation(rep.id, v),
                             );
                           }).toList(),
                         ),
@@ -257,8 +231,8 @@ class _FilterSheetState extends State<FilterSheet> {
                       Navigator.pop(context);
                     },
                     child: Text(
-                      _draft.hasActiveFilters
-                          ? 'Apply Filters (${_draft.activeFilterCount})'
+                      _draft.hasSheetFilters
+                          ? 'Apply Filters (${_draft.activeSheetFilterCount})'
                           : 'Apply Filters',
                     ),
                   ),
@@ -273,41 +247,41 @@ class _FilterSheetState extends State<FilterSheet> {
 
   void _toggleSubgenre(String value, bool selected) {
     setState(() {
-      final updated = Set<String>.of(_draft.subgenres);
+      final updated = Set<String>.of(_draft.subgenreIds);
       selected ? updated.add(value) : updated.remove(value);
-      _draft = _draft.copyWith(subgenres: updated);
+      _draft = _draft.copyWith(subgenreIds: updated);
     });
   }
 
   void _toggleTrope(String value, bool selected) {
     setState(() {
-      final updated = Set<String>.of(_draft.tropes);
+      final updated = Set<String>.of(_draft.tropeIds);
       selected ? updated.add(value) : updated.remove(value);
-      _draft = _draft.copyWith(tropes: updated);
+      _draft = _draft.copyWith(tropeIds: updated);
     });
   }
 
-  void _toggleSpice(SpiceLevel value, bool selected) {
+  void _toggleSpice(String value, bool selected) {
     setState(() {
-      final updated = Set<SpiceLevel>.of(_draft.spiceLevels);
+      final updated = Set<String>.of(_draft.spiceLevelIds);
       selected ? updated.add(value) : updated.remove(value);
-      _draft = _draft.copyWith(spiceLevels: updated);
+      _draft = _draft.copyWith(spiceLevelIds: updated);
     });
   }
 
   void _toggleAge(String value, bool selected) {
     setState(() {
-      final updated = Set<String>.of(_draft.ageCategories);
+      final updated = Set<String>.of(_draft.ageCategoryIds);
       selected ? updated.add(value) : updated.remove(value);
-      _draft = _draft.copyWith(ageCategories: updated);
+      _draft = _draft.copyWith(ageCategoryIds: updated);
     });
   }
 
   void _toggleRepresentation(String value, bool selected) {
     setState(() {
-      final updated = Set<String>.of(_draft.representations);
+      final updated = Set<String>.of(_draft.representationIds);
       selected ? updated.add(value) : updated.remove(value);
-      _draft = _draft.copyWith(representations: updated);
+      _draft = _draft.copyWith(representationIds: updated);
     });
   }
 

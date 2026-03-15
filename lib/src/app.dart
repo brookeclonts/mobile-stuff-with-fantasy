@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:swf_app/src/catalog/presentation/catalog_page.dart';
+import 'package:swf_app/src/auth/presentation/sign_up_flow.dart';
 import 'package:swf_app/src/theme/app_theme.dart';
 
 class SwfApp extends StatelessWidget {
@@ -13,7 +13,7 @@ class SwfApp extends StatelessWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.system,
-      home: const CatalogPage(),
+      home: const SignUpFlow(),
     );
   }
 }

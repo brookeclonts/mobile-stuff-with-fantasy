@@ -30,14 +30,17 @@ class Book {
     Map<String, Object?> json, {
     Map<String, String> nameIndex = const {},
   }) {
-    String resolve(Object? id) {
+    /// Resolve an ObjectId to its display name via the taxonomy index.
+    /// Returns null if the ID is unresolvable (missing from taxonomy).
+    String? resolve(Object? id) {
       final key = id is String ? id : '';
-      return nameIndex[key] ?? key;
+      if (key.isEmpty) return null;
+      return nameIndex[key] ?? (RegExp(r'^[0-9a-f]{24}$').hasMatch(key) ? null : key);
     }
 
     List<String> resolveList(Object? raw) {
       if (raw is! List) return const [];
-      return raw.map((e) => resolve(e)).toList();
+      return raw.map((e) => resolve(e)).whereType<String>().toList();
     }
 
     final audiobookLink = json['audiobook_link'] as String? ?? '';
@@ -54,8 +57,8 @@ class Book {
       amazonAsin: json['amazonASIN'] as String? ?? '',
       subgenres: resolveList(json['subgenres']),
       tropes: resolveList(json['tropes']),
-      spiceLevel: _parseSpiceLevel(resolve(json['spiceLevel'])),
-      ageCategory: resolve(json['ageCategory']),
+      spiceLevel: _parseSpiceLevel(resolve(json['spiceLevel']) ?? ''),
+      ageCategory: resolve(json['ageCategory']) ?? '',
       representations: resolveList(json['representations']),
       languageLevel: _parseLanguageLevel(json['languageLevel']),
       kindleUnlimited: json['kindleUnlimited'] as bool? ?? false,

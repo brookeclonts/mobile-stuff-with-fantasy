@@ -90,6 +90,7 @@ class BookRepository {
     List<String>? ageCategoryIds,
     List<String>? representationIds,
     List<String>? languageLevels,
+    bool? kindleUnlimited,
     bool? hasAudiobook,
   }) {
     final body = <String, Object?>{
@@ -107,6 +108,7 @@ class BookRepository {
         'representations': representationIds,
       if (languageLevels != null && languageLevels.isNotEmpty)
         'languageLevel': languageLevels,
+      if (kindleUnlimited == true) 'kindleUnlimited': true,
       if (hasAudiobook == true) 'hasAudiobook': true,
     };
 

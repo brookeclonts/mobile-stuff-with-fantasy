@@ -26,10 +26,16 @@ class ApiClient {
 
   final String baseUrl;
   final http.Client _http;
+  String? _sessionToken;
+
+  /// Set (or clear) the better-auth session token for authenticated requests.
+  void setSessionToken(String? token) => _sessionToken = token;
 
   Map<String, String> get _defaultHeaders => {
         HttpHeaders.contentTypeHeader: 'application/json',
         HttpHeaders.acceptHeader: 'application/json',
+        if (_sessionToken != null)
+          HttpHeaders.cookieHeader: 'better-auth.session_token=$_sessionToken',
       };
 
   // ---------------------------------------------------------------------------

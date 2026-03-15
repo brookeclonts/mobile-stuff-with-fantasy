@@ -1,4 +1,4 @@
-package com.stuffwithfantasy.swf_app
+package com.zora.stuffwithfantasy
 
 import io.flutter.embedding.android.FlutterActivity
 

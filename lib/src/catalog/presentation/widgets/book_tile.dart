@@ -11,7 +11,6 @@ class BookTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
     return GestureDetector(
@@ -21,123 +20,71 @@ class BookTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Cover image placeholder
-            AspectRatio(
-              aspectRatio: 2 / 3,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: _coverGradient(book.id.hashCode),
-                      ),
-                    ),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          book.title,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  // KU badge
-                  if (book.kindleUnlimited)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: SwfColors.color6,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          'KU',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  // Audiobook badge
-                  if (book.hasAudiobook)
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.black45,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: const Icon(
-                          Icons.headphones_rounded,
-                          color: Colors.white,
-                          size: 14,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
+            // ── Cover image ──
+            Expanded(child: _CoverImage(book: book)),
 
-            // Book info
+            // ── Info section ──
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Title
                   Text(
                     book.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: isDark ? SwfColors.color8 : SwfColors.gray,
+                      height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
+
+                  // Author
                   Text(
                     book.authorName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark ? SwfColors.lightGray : SwfColors.mediumGray,
+                      color:
+                          isDark ? SwfColors.lightGray : SwfColors.mediumGray,
                     ),
                   ),
-                ],
-              ),
-            ),
+                  const SizedBox(height: 6),
 
-            // Spice + subgenre row
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-              child: Row(
-                children: [
-                  _SpiceIndicator(level: book.spiceLevel),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      book.subgenres.first,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.primary,
-                      ),
-                    ),
+                  // Spice + primary subgenre
+                  Row(
+                    children: [
+                      _SpiceIndicator(level: book.spiceLevel),
+                      if (book.subgenres.isNotEmpty) ...[
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            book.subgenres.first,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
+
+                  // Trope chips (show first 2)
+                  if (book.tropes.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children: book.tropes
+                          .take(2)
+                          .map((trope) => _TropeChip(label: trope))
+                          .toList(),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -146,17 +93,192 @@ class BookTile extends StatelessWidget {
       ),
     );
   }
+}
 
-  List<Color> _coverGradient(int hash) {
-    const palettes = [
-      [SwfColors.color2, SwfColors.color3],
-      [SwfColors.color7, SwfColors.color3],
-      [SwfColors.darkNavy, SwfColors.color4],
-      [SwfColors.color3, SwfColors.violet],
-      [SwfColors.color7, SwfColors.blue],
-      [SwfColors.color2, SwfColors.color6],
-    ];
-    return palettes[hash.abs() % palettes.length];
+// ─────────────────────────────────────────────────────────────────────────────
+// Cover image with badges and gradient overlay
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _CoverImage extends StatelessWidget {
+  const _CoverImage({required this.book});
+
+  final Book book;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Cover image or gradient fallback
+        if (book.imageUrl.isNotEmpty)
+          Image.network(
+            book.imageUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => _GradientFallback(book: book),
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) return child; // fully loaded
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  _GradientFallback(book: book),
+                  Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      value: progress.expectedTotalBytes != null
+                          ? progress.cumulativeBytesLoaded /
+                              progress.expectedTotalBytes!
+                          : null,
+                      color: Colors.white54,
+                    ),
+                  ),
+                ],
+              );
+            },
+          )
+        else
+          _GradientFallback(book: book),
+
+        // Bottom gradient for readability
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 48,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Colors.black.withAlpha(90)],
+              ),
+            ),
+          ),
+        ),
+
+        // Badges
+        if (book.hasAudiobook)
+          Positioned(
+            top: 6,
+            left: 6,
+            child: _Badge(
+              child: Icon(Icons.headphones_rounded,
+                  color: Colors.white, size: 13),
+            ),
+          ),
+        if (book.kindleUnlimited)
+          Positioned(
+            top: 6,
+            right: 6,
+            child: _Badge(
+              color: SwfColors.color6,
+              child: Text(
+                'KU',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 10,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Small building-block widgets
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _GradientFallback extends StatelessWidget {
+  const _GradientFallback({required this.book});
+
+  final Book book;
+
+  static const _palettes = [
+    [SwfColors.color2, SwfColors.color3],
+    [SwfColors.color7, SwfColors.color3],
+    [SwfColors.darkNavy, SwfColors.color4],
+    [SwfColors.color3, SwfColors.violet],
+    [SwfColors.color7, SwfColors.blue],
+    [SwfColors.color2, SwfColors.color6],
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = _palettes[book.id.hashCode.abs() % _palettes.length];
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: colors,
+        ),
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            book.title,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Badge extends StatelessWidget {
+  const _Badge({required this.child, this.color});
+
+  final Widget child;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+      decoration: BoxDecoration(
+        color: color ?? Colors.black45,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _TropeChip extends StatelessWidget {
+  const _TropeChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: isDark
+            ? SwfColors.tropePill.withAlpha(40)
+            : SwfColors.tropePill,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.labelSmall?.copyWith(
+          fontSize: 10,
+          color: isDark ? SwfColors.tropePill : SwfColors.color3,
+        ),
+      ),
+    );
   }
 }
 

@@ -1,23 +1,31 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:swf_app/src/api/api_result.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/catalog/data/book_repository.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/catalog/models/taxonomy.dart';
+import 'package:swf_app/src/catalog/presentation/book_detail_page.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/book_tile.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/filter_bar.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/filter_sheet.dart';
+import 'package:swf_app/src/theme/swf_colors.dart';
 
 class CatalogPage extends StatefulWidget {
-  const CatalogPage({super.key});
+  const CatalogPage({super.key, this.repository});
+
+  final BookRepository? repository;
 
   @override
   State<CatalogPage> createState() => _CatalogPageState();
 }
 
 class _CatalogPageState extends State<CatalogPage> {
-  final BookRepository _repo = ServiceLocator.bookRepository;
+  late final BookRepository _repo;
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
 
   ActiveFilters _filters = const ActiveFilters();
   List<Book> _books = [];
@@ -27,53 +35,82 @@ class _CatalogPageState extends State<CatalogPage> {
   bool _isLoading = true;
   bool _isLoadingMore = false;
   String? _error;
+  Timer? _searchDebounce;
+  int _requestToken = 0;
 
   @override
   void initState() {
     super.initState();
+    _repo = widget.repository ?? ServiceLocator.bookRepository;
     _scrollController.addListener(_onScroll);
-    _init();
+    _initializeCatalog();
   }
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
-  Future<void> _init() async {
-    // Load taxonomy first so we can resolve ObjectId → name in book responses.
-    await _repo.loadTaxonomy();
+  Future<void> _initializeCatalog() async {
+    final taxonomyResult = await _repo.loadTaxonomy();
+    if (!mounted) return;
+
+    if (taxonomyResult is Failure<TaxonomyData>) {
+      setState(() {
+        _error = taxonomyResult.message;
+        _isLoading = false;
+        _isLoadingMore = false;
+      });
+      return;
+    }
+
     await _fetchBooks(page: 1);
   }
 
   Future<void> _fetchBooks({required int page}) async {
+    final requestToken = ++_requestToken;
+
     if (page == 1) {
       setState(() {
         _isLoading = true;
         _error = null;
+        _isLoadingMore = false;
+        _books = [];
+        _totalBooks = 0;
+        _currentPage = 1;
+        _hasNextPage = false;
       });
     } else {
       setState(() => _isLoadingMore = true);
     }
 
+    final trimmedSearch = _filters.searchQuery.trim();
     final result = await _repo.getBooks(
       page: page,
-      search: _filters.searchQuery.isNotEmpty ? _filters.searchQuery : null,
-      subgenreIds: _resolveIds(_filters.subgenres, _repo.taxonomy.subgenres),
-      tropeIds: _resolveIds(_filters.tropes, _repo.taxonomy.tropes),
-      spiceLevelIds: _resolveSpiceLevelIds(_filters.spiceLevels),
-      ageCategoryIds:
-          _resolveIds(_filters.ageCategories, _repo.taxonomy.ageCategories),
-      representationIds:
-          _resolveIds(_filters.representations, _repo.taxonomy.representations),
+      search: trimmedSearch.isNotEmpty ? trimmedSearch : null,
+      subgenreIds:
+          _filters.subgenreIds.isNotEmpty ? _filters.subgenreIds.toList() : null,
+      tropeIds: _filters.tropeIds.isNotEmpty ? _filters.tropeIds.toList() : null,
+      spiceLevelIds: _filters.spiceLevelIds.isNotEmpty
+          ? _filters.spiceLevelIds.toList()
+          : null,
+      ageCategoryIds: _filters.ageCategoryIds.isNotEmpty
+          ? _filters.ageCategoryIds.toList()
+          : null,
+      representationIds: _filters.representationIds.isNotEmpty
+          ? _filters.representationIds.toList()
+          : null,
       languageLevels: _filters.languageLevels.isNotEmpty
           ? _filters.languageLevels.map((l) => l.name).toList()
           : null,
+      kindleUnlimited: _filters.kindleUnlimitedOnly ? true : null,
       hasAudiobook: _filters.audiobookOnly ? true : null,
     );
 
-    if (!mounted) return;
+    if (!mounted || requestToken != _requestToken) return;
 
     result.when(
       success: (paginated) {
@@ -97,13 +134,34 @@ class _CatalogPageState extends State<CatalogPage> {
           _isLoading = false;
           _isLoadingMore = false;
         });
+
+        if (_books.isNotEmpty && page != 1) {
+          _showMessage(message);
+        }
       },
     );
   }
 
   void _onFiltersChanged(ActiveFilters newFilters) {
+    _searchDebounce?.cancel();
+    _syncSearchField(newFilters.searchQuery);
     setState(() => _filters = newFilters);
     _fetchBooks(page: 1);
+  }
+
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    setState(() => _filters = _filters.copyWith(searchQuery: value));
+    _searchDebounce = Timer(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      _fetchBooks(page: 1);
+    });
+  }
+
+  void _clearFilters() {
+    _searchDebounce?.cancel();
+    _searchController.clear();
+    _onFiltersChanged(const ActiveFilters());
   }
 
   void _onScroll() {
@@ -115,50 +173,65 @@ class _CatalogPageState extends State<CatalogPage> {
   }
 
   Future<void> _onRefresh() async {
-    await _repo.loadTaxonomy();
+    final taxonomyResult = await _repo.loadTaxonomy();
+    if (!mounted) return;
+
+    if (taxonomyResult is Failure<TaxonomyData>) {
+      _showMessage(taxonomyResult.message);
+      return;
+    }
+
     await _fetchBooks(page: 1);
   }
 
-  // ---------------------------------------------------------------------------
-  // Filter name → ObjectId resolution
-  // ---------------------------------------------------------------------------
+  Future<void> _retry() async {
+    if (_repo.taxonomy.isEmpty) {
+      await _initializeCatalog();
+      return;
+    }
 
-  /// Given a set of display names, find matching taxonomy ObjectIds.
-  List<String>? _resolveIds(
-    Set<String> names,
-    List<TaxonomyItem> items,
-  ) {
-    if (names.isEmpty) return null;
-    return items.where((i) => names.contains(i.name)).map((i) => i.id).toList();
+    await _fetchBooks(page: 1);
   }
 
-  /// Special handling for spice levels — match by label substring.
-  List<String>? _resolveSpiceLevelIds(Set<SpiceLevel> levels) {
-    if (levels.isEmpty) return null;
-    final labels = levels.map((l) => l.label.toLowerCase()).toSet();
-    return _repo.taxonomy.spiceLevels
-        .where((item) => labels.any((l) => item.name.toLowerCase().contains(l)))
-        .map((item) => item.id)
-        .toList();
+  void _syncSearchField(String value) {
+    if (_searchController.text == value) return;
+    _searchController.value = TextEditingValue(
+      text: value,
+      selection: TextSelection.collapsed(offset: value.length),
+    );
   }
 
-  // ---------------------------------------------------------------------------
-  // Build
-  // ---------------------------------------------------------------------------
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            SvgPicture.asset('assets/images/sykfantasylogo.svg', height: 38),
+        title: ColorFiltered(
+          colorFilter: const ColorFilter.mode(
+            SwfColors.color8,
+            BlendMode.srcIn,
+          ),
+          child: SvgPicture.asset(
+            'assets/images/sykfantasylogo.svg',
+            height: 38,
+          ),
+        ),
       ),
       body: Column(
         children: [
           FilterBar(
             filters: _filters,
+            taxonomy: _repo.taxonomy,
+            searchController: _searchController,
             resultCount: _totalBooks,
             onFiltersChanged: _onFiltersChanged,
+            onSearchChanged: _onSearchChanged,
+            onClearAll: _clearFilters,
             onOpenFilterSheet: _showFilterSheet,
           ),
           const SizedBox(height: 8),
@@ -176,14 +249,14 @@ class _CatalogPageState extends State<CatalogPage> {
     if (_error != null && _books.isEmpty) {
       return _ErrorState(
         message: _error!,
-        onRetry: () => _fetchBooks(page: 1),
+        onRetry: _retry,
       );
     }
 
     if (_books.isEmpty) {
       return _EmptyState(
         hasFilters: _filters.hasActiveFilters,
-        onClear: () => _onFiltersChanged(const ActiveFilters()),
+        onClear: _clearFilters,
       );
     }
 
@@ -203,7 +276,7 @@ class _CatalogPageState extends State<CatalogPage> {
               crossAxisCount: crossAxisCount,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: 0.52,
+              childAspectRatio: 0.48,
             ),
             itemCount: _books.length + (_isLoadingMore ? 1 : 0),
             itemBuilder: (context, index) {
@@ -215,9 +288,15 @@ class _CatalogPageState extends State<CatalogPage> {
                   ),
                 );
               }
+              final book = _books[index];
               return BookTile(
-                book: _books[index],
-                onTap: () {},
+                book: book,
+                onTap: () => Navigator.push<void>(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => BookDetailPage(book: book),
+                  ),
+                ),
               );
             },
           );
@@ -227,11 +306,17 @@ class _CatalogPageState extends State<CatalogPage> {
   }
 
   void _showFilterSheet() {
+    if (_repo.taxonomy.isEmpty) {
+      _showMessage('Filters are unavailable until taxonomy loads successfully.');
+      return;
+    }
+
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => FilterSheet(
+        taxonomy: _repo.taxonomy,
         filters: _filters,
         onApply: _onFiltersChanged,
       ),
