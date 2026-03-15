@@ -11,7 +11,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: SvgPicture.asset('assets/images/sykfantasylogo.svg', height: 38),
+        title: SvgPicture.asset('assets/images/swf_logo_cream.svg', height: 38),
       ),
       body: DecoratedBox(
         decoration: BoxDecoration(
@@ -114,7 +114,7 @@ class HomePage extends StatelessWidget {
                       child: Column(
                         children: [
                           SvgPicture.asset(
-                            'assets/images/sykfantasylogo.svg',
+                            'assets/images/swf_logo_cream.svg',
                             height: 100,
                           ),
                           const SizedBox(height: 24),

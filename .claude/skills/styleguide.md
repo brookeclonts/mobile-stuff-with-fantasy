@@ -250,11 +250,11 @@ LinearGradient(
 
 ## Logo
 
-- File: `assets/images/sykfantasylogo.svg`
+- Cream (transparent bg): `assets/images/swf_logo_cream.svg`
+- Plum background: `assets/images/swf_logo_plum.svg`
 - Render with `SvgPicture.asset` from `flutter_svg`
-- App bar: height `38`, use original SVG colors (mauve crest + plum wordmark)
+- App bar: height `38`
 - Splash/hero usage: height `100-120`
-- On dark backgrounds where the original colors don't have enough contrast, apply a `ColorFilter.mode(SwfColors.color8, BlendMode.srcIn)` to make it cream-colored
 
 ---
 

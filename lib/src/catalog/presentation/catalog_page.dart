@@ -279,7 +279,7 @@ class _CatalogPageState extends State<CatalogPage> {
             BlendMode.srcIn,
           ),
           child: SvgPicture.asset(
-            'assets/images/sykfantasylogo.svg',
+            'assets/images/swf_logo_cream.svg',
             height: 38,
           ),
         ),

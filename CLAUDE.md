@@ -12,7 +12,8 @@ Key files:
 - `lib/src/theme/swf_colors.dart` — all brand color constants
 - `lib/src/theme/swf_typography.dart` — font stack (Playfair Display + Inter via google_fonts)
 - `lib/src/theme/app_theme.dart` — light/dark ThemeData
-- `assets/images/sykfantasylogo.svg` — brand logo
+- `assets/images/swf_logo_cream.svg` — brand logo (cream, transparent background)
+- `assets/images/swf_logo_plum.svg` — brand logo (cream on plum background)
 
 ## Architecture
 
