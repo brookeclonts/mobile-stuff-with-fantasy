@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:swf_app/src/api/api_result.dart';
 import 'package:swf_app/src/api/service_locator.dart';
+import 'package:swf_app/src/auth/data/auth_repository.dart';
+import 'package:swf_app/src/auth/data/session_store.dart';
+import 'package:swf_app/src/auth/models/user.dart';
 import 'package:swf_app/src/catalog/data/book_repository.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/catalog/models/taxonomy.dart';
@@ -11,12 +14,23 @@ import 'package:swf_app/src/catalog/presentation/book_detail_page.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/book_tile.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/filter_bar.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/filter_sheet.dart';
+import 'package:swf_app/src/profile/data/profile_repository.dart';
+import 'package:swf_app/src/profile/presentation/profile_page.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
 class CatalogPage extends StatefulWidget {
-  const CatalogPage({super.key, this.repository});
+  const CatalogPage({
+    super.key,
+    this.repository,
+    this.authRepository,
+    this.sessionStore,
+    this.profileRepository,
+  });
 
   final BookRepository? repository;
+  final AuthRepository? authRepository;
+  final SessionStore? sessionStore;
+  final ProfileRepository? profileRepository;
 
   @override
   State<CatalogPage> createState() => _CatalogPageState();
@@ -91,9 +105,12 @@ class _CatalogPageState extends State<CatalogPage> {
     final result = await _repo.getBooks(
       page: page,
       search: trimmedSearch.isNotEmpty ? trimmedSearch : null,
-      subgenreIds:
-          _filters.subgenreIds.isNotEmpty ? _filters.subgenreIds.toList() : null,
-      tropeIds: _filters.tropeIds.isNotEmpty ? _filters.tropeIds.toList() : null,
+      subgenreIds: _filters.subgenreIds.isNotEmpty
+          ? _filters.subgenreIds.toList()
+          : null,
+      tropeIds: _filters.tropeIds.isNotEmpty
+          ? _filters.tropeIds.toList()
+          : null,
       spiceLevelIds: _filters.spiceLevelIds.isNotEmpty
           ? _filters.spiceLevelIds.toList()
           : null,
@@ -202,13 +219,58 @@ class _CatalogPageState extends State<CatalogPage> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  AuthRepository? _resolveAuthRepository() {
+    if (widget.authRepository != null) return widget.authRepository;
+    try {
+      return ServiceLocator.authRepository;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  SessionStore? _resolveSessionStore() {
+    if (widget.sessionStore != null) return widget.sessionStore;
+    try {
+      return ServiceLocator.sessionStore;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _openProfile() {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => ProfilePage(
+          authRepository: _resolveAuthRepository(),
+          profileRepository:
+              widget.profileRepository ?? _resolveProfileRepository(),
+          sessionStore: _resolveSessionStore(),
+        ),
+      ),
     );
+  }
+
+  User? _currentUser() => _resolveSessionStore()?.user;
+
+  ProfileRepository? _resolveProfileRepository() {
+    if (widget.profileRepository != null) return widget.profileRepository;
+    try {
+      return ServiceLocator.profileRepository;
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = _currentUser();
+
     return Scaffold(
       appBar: AppBar(
         title: ColorFiltered(
@@ -221,6 +283,43 @@ class _CatalogPageState extends State<CatalogPage> {
             height: 38,
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Tooltip(
+              message: 'Profile',
+              child: InkWell(
+                borderRadius: BorderRadius.circular(999),
+                onTap: _openProfile,
+                child: Ink(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(18),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white.withAlpha(24)),
+                  ),
+                  child: Center(
+                    child: user != null
+                        ? Text(
+                            _initialsFor(user),
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                          )
+                        : const Icon(
+                            Icons.person_outline_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -247,10 +346,7 @@ class _CatalogPageState extends State<CatalogPage> {
     }
 
     if (_error != null && _books.isEmpty) {
-      return _ErrorState(
-        message: _error!,
-        onRetry: _retry,
-      );
+      return _ErrorState(message: _error!, onRetry: _retry);
     }
 
     if (_books.isEmpty) {
@@ -307,7 +403,9 @@ class _CatalogPageState extends State<CatalogPage> {
 
   void _showFilterSheet() {
     if (_repo.taxonomy.isEmpty) {
-      _showMessage('Filters are unavailable until taxonomy loads successfully.');
+      _showMessage(
+        'Filters are unavailable until taxonomy loads successfully.',
+      );
       return;
     }
 
@@ -321,6 +419,19 @@ class _CatalogPageState extends State<CatalogPage> {
         onApply: _onFiltersChanged,
       ),
     );
+  }
+
+  String _initialsFor(User user) {
+    final source = user.name?.trim().isNotEmpty == true
+        ? user.name!.trim()
+        : user.email.split('@').first;
+    final parts = source
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .take(2)
+        .toList();
+    if (parts.isEmpty) return '?';
+    return parts.map((part) => part.substring(0, 1)).join().toUpperCase();
   }
 }
 

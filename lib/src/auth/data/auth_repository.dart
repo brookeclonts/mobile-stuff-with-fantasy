@@ -22,10 +22,15 @@ class AuthRepository {
     required ApiClient apiClient,
     required SessionStore sessionStore,
     http.Client? httpClient,
-  })  : _baseUrl = baseUrl,
-        _apiClient = apiClient,
-        _sessionStore = sessionStore,
-        _http = httpClient ?? http.Client();
+  }) : _baseUrl = baseUrl,
+       _apiClient = apiClient,
+       _sessionStore = sessionStore,
+       _http = httpClient ?? http.Client() {
+    final token = sessionStore.token;
+    if (token != null && token.isNotEmpty) {
+      _apiClient.setSessionToken(token);
+    }
+  }
 
   final String _baseUrl;
   final ApiClient _apiClient;
@@ -38,6 +43,30 @@ class AuthRepository {
   };
 
   SessionStore get sessionStore => _sessionStore;
+
+  Future<ApiResult<User>> getCurrentUser() async {
+    final result = await _apiClient.get<User>(
+      '/api/auth/me',
+      fromJson: (json) {
+        final data = json as Map<String, Object?>;
+        return User.fromJson(data['user'] ?? json);
+      },
+    );
+
+    if (result is Success<User>) {
+      final token = _sessionStore.token;
+      if (token != null && token.isNotEmpty) {
+        _sessionStore.save(token: token, user: result.value);
+      }
+      return result;
+    }
+
+    if (result is Failure<User> && result.statusCode == 401) {
+      _clearSession();
+    }
+
+    return result;
+  }
 
   /// Create a new account via better-auth and set the chosen role.
   ///
@@ -94,11 +123,9 @@ class AuthRepository {
       final roleResult = await _setRole(role, token);
       if (roleResult is Failure<void>) {
         if (previousToken != null && previousUser != null) {
-          _sessionStore.save(token: previousToken, user: previousUser);
-          _apiClient.setSessionToken(previousToken);
+          _restoreSession(previousToken, previousUser);
         } else {
-          _sessionStore.clear();
-          _apiClient.setSessionToken(null);
+          _clearSession();
         }
         return Failure(roleResult.message, statusCode: roleResult.statusCode);
       }
@@ -152,6 +179,51 @@ class AuthRepository {
     }
   }
 
+  Future<ApiResult<void>> signOut() async {
+    final token = _sessionStore.token;
+    if (token == null || token.isEmpty) {
+      _clearSession();
+      return const Success<void>(null);
+    }
+
+    try {
+      final response = await _http.post(
+        Uri.parse('$_baseUrl/api/auth/sign-out'),
+        headers: {
+          ..._jsonHeaders,
+          HttpHeaders.cookieHeader: 'better-auth.session_token=$token',
+        },
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        _clearSession();
+        return const Success<void>(null);
+      }
+
+      if (response.statusCode == 401) {
+        _clearSession();
+        return const Success<void>(null);
+      }
+
+      return Failure(
+        _parseErrorResponse(response) ?? 'Failed to sign out',
+        statusCode: response.statusCode,
+      );
+    } catch (e) {
+      debugPrint('AuthRepository.signOut error: $e');
+      if (e is SocketException) {
+        return const Failure('No internet connection');
+      }
+      if (e is HttpException) {
+        return const Failure('Server unreachable');
+      }
+      if (e is FormatException) {
+        return const Failure('Invalid response from server');
+      }
+      return Failure('Unexpected error: $e');
+    }
+  }
+
   /// Pull a human-readable error from various response shapes.
   String? _parseError(Map<String, Object?> body) {
     // better-auth: { message: "..." }
@@ -159,6 +231,31 @@ class AuthRepository {
     // Standard envelope: { error: "..." }
     if (body['error'] is String) return body['error'] as String;
     return null;
+  }
+
+  String? _parseErrorResponse(http.Response response) {
+    if (response.body.isEmpty) return null;
+
+    try {
+      final body = jsonDecode(response.body);
+      if (body is Map<String, Object?>) {
+        return _parseError(body);
+      }
+    } on FormatException {
+      return null;
+    }
+
+    return null;
+  }
+
+  void _restoreSession(String token, User user) {
+    _sessionStore.save(token: token, user: user);
+    _apiClient.setSessionToken(token);
+  }
+
+  void _clearSession() {
+    _sessionStore.clear();
+    _apiClient.setSessionToken(null);
   }
 
   void dispose() => _http.close();

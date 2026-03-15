@@ -3,6 +3,7 @@ import 'package:swf_app/src/api/api_config.dart';
 import 'package:swf_app/src/auth/data/auth_repository.dart';
 import 'package:swf_app/src/auth/data/session_store.dart';
 import 'package:swf_app/src/catalog/data/book_repository.dart';
+import 'package:swf_app/src/profile/data/profile_repository.dart';
 
 /// Simple service locator for shared singletons.
 ///
@@ -16,11 +17,13 @@ abstract final class ServiceLocator {
   static late final BookRepository _bookRepository;
   static late final SessionStore _sessionStore;
   static late final AuthRepository _authRepository;
+  static late final ProfileRepository _profileRepository;
 
   static ApiClient get apiClient => _apiClient;
   static BookRepository get bookRepository => _bookRepository;
   static SessionStore get sessionStore => _sessionStore;
   static AuthRepository get authRepository => _authRepository;
+  static ProfileRepository get profileRepository => _profileRepository;
 
   /// Initialize all shared services. Call from `main()` before `runApp`.
   static void init({String? baseUrl}) {
@@ -33,6 +36,7 @@ abstract final class ServiceLocator {
       apiClient: _apiClient,
       sessionStore: _sessionStore,
     );
+    _profileRepository = ProfileRepository(apiClient: _apiClient);
   }
 
   /// Tear down. Useful in tests.

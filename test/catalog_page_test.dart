@@ -1,8 +1,16 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:swf_app/src/api/api_client.dart';
 import 'package:swf_app/src/api/api_result.dart';
 import 'package:swf_app/src/api/paginated.dart';
+import 'package:swf_app/src/auth/data/auth_repository.dart';
+import 'package:swf_app/src/auth/data/session_store.dart';
+import 'package:swf_app/src/auth/models/user.dart';
 import 'package:swf_app/src/catalog/data/book_repository.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/catalog/models/taxonomy.dart';
@@ -19,8 +27,9 @@ void main() {
     expect(filters.activeFilterCount, 1);
   });
 
-  testWidgets('book tile handles books without subgenres',
-      (WidgetTester tester) async {
+  testWidgets('book tile handles books without subgenres', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -41,8 +50,9 @@ void main() {
     expect(find.text('Author Name'), findsOneWidget);
   });
 
-  testWidgets('filter sheet renders backend taxonomy options',
-      (WidgetTester tester) async {
+  testWidgets('filter sheet renders backend taxonomy options', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -67,17 +77,16 @@ void main() {
     expect(find.text('LGBTQ+'), findsOneWidget);
   });
 
-  testWidgets('clear all resets the visible search field',
-      (WidgetTester tester) async {
+  testWidgets('clear all resets the visible search field', (
+    WidgetTester tester,
+  ) async {
     final repository = FakeBookRepository(
       taxonomy: _taxonomy,
       onGetBooks: (_) async => Success(_page(const <Book>[])),
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: CatalogPage(repository: repository),
-      ),
+      MaterialApp(home: CatalogPage(repository: repository)),
     );
     await tester.pumpAndSettle();
 
@@ -99,8 +108,9 @@ void main() {
     );
   });
 
-  testWidgets('latest search response wins when older requests finish later',
-      (WidgetTester tester) async {
+  testWidgets('latest search response wins when older requests finish later', (
+    WidgetTester tester,
+  ) async {
     final repository = FakeBookRepository(
       taxonomy: _taxonomy,
       onGetBooks: (call) async {
@@ -119,9 +129,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: CatalogPage(repository: repository),
-      ),
+      MaterialApp(home: CatalogPage(repository: repository)),
     );
     await tester.pumpAndSettle();
 
@@ -140,8 +148,9 @@ void main() {
     expect(find.text('Darkwater'), findsNothing);
   });
 
-  testWidgets('page-one failure does not leave stale results visible',
-      (WidgetTester tester) async {
+  testWidgets('page-one failure does not leave stale results visible', (
+    WidgetTester tester,
+  ) async {
     final repository = FakeBookRepository(
       taxonomy: _taxonomy,
       onGetBooks: (call) async {
@@ -154,9 +163,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: CatalogPage(repository: repository),
-      ),
+      MaterialApp(home: CatalogPage(repository: repository)),
     );
     await tester.pumpAndSettle();
 
@@ -168,6 +175,82 @@ void main() {
 
     expect(find.text('Starter Book'), findsNothing);
     expect(find.text('Search failed'), findsOneWidget);
+  });
+
+  testWidgets('profile button opens the dedicated profile page', (
+    WidgetTester tester,
+  ) async {
+    final repository = FakeBookRepository(
+      taxonomy: _taxonomy,
+      onGetBooks: (_) async =>
+          Success(_page(<Book>[_book('1', 'Starter Book')])),
+    );
+    final sessionStore = SessionStore()
+      ..save(
+        token: 'token-123',
+        user: const User(
+          id: 'user-1',
+          email: 'reader@example.com',
+          name: 'Reader',
+          role: 'reader',
+        ),
+      );
+    final httpClient = MockClient((request) async {
+      if (request.url.path == '/api/auth/me') {
+        expect(
+          request.headers[HttpHeaders.cookieHeader],
+          'better-auth.session_token=token-123',
+        );
+        return http.Response(
+          jsonEncode({
+            'success': true,
+            'data': {
+              'user': {
+                'id': 'user-1',
+                'email': 'reader@example.com',
+                'name': 'Reader',
+                'role': 'reader',
+              },
+            },
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      }
+
+      throw UnimplementedError('Unexpected request: ${request.url}');
+    });
+    final apiClient = ApiClient(
+      baseUrl: 'http://localhost',
+      httpClient: httpClient,
+    )..setSessionToken('token-123');
+    final authRepository = AuthRepository(
+      baseUrl: 'http://localhost',
+      apiClient: apiClient,
+      sessionStore: sessionStore,
+      httpClient: httpClient,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CatalogPage(
+          repository: repository,
+          authRepository: authRepository,
+          sessionStore: sessionStore,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Profile'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Profile'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Field Journal'), findsWidgets);
+    expect(find.text('Reader Field Journal'), findsOneWidget);
+    expect(find.text('reader@example.com'), findsWidgets);
+    expect(find.text('Character Sheet'), findsOneWidget);
   });
 }
 
@@ -250,17 +333,17 @@ class FakeBookRepository extends BookRepository {
   FakeBookRepository({
     required TaxonomyData taxonomy,
     required Future<ApiResult<Paginated<Book>>> Function(GetBooksCall call)
-        onGetBooks,
+    onGetBooks,
     ApiResult<TaxonomyData>? taxonomyResult,
-  })  : _taxonomyData = taxonomyResult is Success<TaxonomyData>
-            ? taxonomyResult.value
-            : taxonomy,
-        _taxonomyResult = taxonomyResult ?? Success(taxonomy),
-        _onGetBooks = onGetBooks,
-        super(apiClient: ApiClient(baseUrl: 'http://localhost'));
+  }) : _taxonomyData = taxonomyResult is Success<TaxonomyData>
+           ? taxonomyResult.value
+           : taxonomy,
+       _taxonomyResult = taxonomyResult ?? Success(taxonomy),
+       _onGetBooks = onGetBooks,
+       super(apiClient: ApiClient(baseUrl: 'http://localhost'));
 
   final Future<ApiResult<Paginated<Book>>> Function(GetBooksCall call)
-      _onGetBooks;
+  _onGetBooks;
   final ApiResult<TaxonomyData> _taxonomyResult;
   final List<GetBooksCall> calls = <GetBooksCall>[];
   TaxonomyData _taxonomyData;
