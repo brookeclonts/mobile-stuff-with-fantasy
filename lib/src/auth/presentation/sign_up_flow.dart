@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/auth/models/user.dart';
-import 'package:swf_app/src/auth/presentation/widgets/role_picker.dart';
+import 'package:swf_app/src/auth/presentation/widgets/interest_step.dart';
 import 'package:swf_app/src/auth/presentation/widgets/sign_up_form.dart';
 import 'package:swf_app/src/auth/presentation/widgets/welcome_step.dart';
 import 'package:swf_app/src/catalog/presentation/catalog_page.dart';
@@ -9,8 +9,8 @@ import 'package:swf_app/src/theme/swf_colors.dart';
 
 /// Full-screen, 3-step sign-up flow.
 ///
-///  1. Pick a role (Reader / Influencer / Author)
-///  2. Enter name, email, password
+///  1. Enter name, email, password (everyone signs up as a reader)
+///  2. Optional interest capture (author / influencer)
 ///  3. Personalised welcome
 ///
 /// Uses a [PageView] with programmatic navigation for smooth transitions.
@@ -27,12 +27,12 @@ class _SignUpFlowState extends State<SignUpFlow> {
   int _currentStep = 0;
 
   // Step 1 state
-  UserRole? _selectedRole;
-
-  // Step 2 state
   bool _isLoading = false;
   String? _errorMessage;
   String _signedUpName = '';
+
+  // Step 2 state
+  final Set<String> _interests = <String>{};
 
   @override
   void dispose() {
@@ -49,15 +49,11 @@ class _SignUpFlowState extends State<SignUpFlow> {
     setState(() => _currentStep = step);
   }
 
-  void _onRoleSelected(UserRole role) {
-    setState(() => _selectedRole = role);
-  }
-
-  void _onRoleContinue() {
-    _goToStep(1);
-  }
-
-  Future<void> _onFormSubmit(String name, String email, String password) async {
+  Future<void> _onFormSubmit(
+    String name,
+    String email,
+    String password,
+  ) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -67,7 +63,7 @@ class _SignUpFlowState extends State<SignUpFlow> {
       name: name,
       email: email,
       password: password,
-      role: _selectedRole!,
+      role: UserRole.reader,
     );
 
     if (!mounted) return;
@@ -78,7 +74,7 @@ class _SignUpFlowState extends State<SignUpFlow> {
           _isLoading = false;
           _signedUpName = name;
         });
-        _goToStep(2);
+        _goToStep(1);
       },
       failure: (message, _) {
         setState(() {
@@ -87,6 +83,21 @@ class _SignUpFlowState extends State<SignUpFlow> {
         });
       },
     );
+  }
+
+  void _toggleInterest(String interest) {
+    setState(() {
+      if (_interests.contains(interest)) {
+        _interests.remove(interest);
+      } else {
+        _interests.add(interest);
+      }
+    });
+  }
+
+  void _onInterestContinue() {
+    // TODO: send _interests to backend when endpoint exists
+    _goToStep(2);
   }
 
   void _onGetStarted() {
@@ -110,13 +121,11 @@ class _SignUpFlowState extends State<SignUpFlow> {
       body: SafeArea(
         child: Column(
           children: [
-            // ── Top bar: back button, logo, step dots ──
+            // ── Top bar: back button, step dots, skip ──
             _TopBar(
               currentStep: _currentStep,
               totalSteps: _totalSteps,
-              onBack: _currentStep > 0 && _currentStep < 2
-                  ? () => _goToStep(_currentStep - 1)
-                  : null,
+              onBack: _currentStep == 1 ? () => _goToStep(0) : null,
               onSkip: _currentStep < 2 ? _skipToCatalog : null,
             ),
             // ── Pages ──
@@ -125,19 +134,19 @@ class _SignUpFlowState extends State<SignUpFlow> {
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  RolePicker(
-                    selected: _selectedRole,
-                    onChanged: _onRoleSelected,
-                    onContinue: _onRoleContinue,
-                  ),
                   SignUpForm(
                     onSubmit: _onFormSubmit,
                     isLoading: _isLoading,
                     errorMessage: _errorMessage,
                   ),
+                  InterestStep(
+                    selectedInterests: _interests,
+                    onToggle: _toggleInterest,
+                    onContinue: _onInterestContinue,
+                  ),
                   WelcomeStep(
                     name: _signedUpName,
-                    role: _selectedRole ?? UserRole.reader,
+                    role: UserRole.reader,
                     onGetStarted: _onGetStarted,
                   ),
                 ],
@@ -151,7 +160,7 @@ class _SignUpFlowState extends State<SignUpFlow> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Top bar with back, logo, step indicator, and skip
+// Top bar with back, step indicator, and skip
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _TopBar extends StatelessWidget {
@@ -197,9 +206,7 @@ class _TopBar extends StatelessWidget {
                 height: 8,
                 margin: const EdgeInsets.symmetric(horizontal: 3),
                 decoration: BoxDecoration(
-                  color: isActive
-                      ? SwfColors.color4
-                      : SwfColors.color5,
+                  color: isActive ? SwfColors.color4 : SwfColors.color5,
                   borderRadius: BorderRadius.circular(4),
                 ),
               );

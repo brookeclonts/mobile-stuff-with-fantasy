@@ -79,9 +79,6 @@ class AuthRepository {
     required UserRole role,
   }) async {
     try {
-      final previousToken = _sessionStore.token;
-      final previousUser = _sessionStore.user;
-
       // ── Step 1: better-auth sign-up ──
       final url = '$_baseUrl/api/auth/sign-up/email';
       debugPrint('AuthRepository.signUp: POST $url');
@@ -319,11 +316,6 @@ class AuthRepository {
     }
 
     return null;
-  }
-
-  void _restoreSession(String token, User user) {
-    _sessionStore.save(token: token, user: user);
-    _apiClient.setSessionToken(token);
   }
 
   void _clearSession() {
