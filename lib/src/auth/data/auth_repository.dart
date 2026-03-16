@@ -83,8 +83,11 @@ class AuthRepository {
       final previousUser = _sessionStore.user;
 
       // ── Step 1: better-auth sign-up ──
+      final url = '$_baseUrl/api/auth/sign-up/email';
+      debugPrint('AuthRepository.signUp: POST $url');
+
       final response = await _http.post(
-        Uri.parse('$_baseUrl/api/auth/sign-up/email'),
+        Uri.parse(url),
         headers: _jsonHeaders,
         body: jsonEncode({
           'email': email.toLowerCase().trim(),
@@ -93,16 +96,71 @@ class AuthRepository {
         }),
       );
 
-      final body = jsonDecode(response.body) as Map<String, Object?>;
+      debugPrint(
+        'AuthRepository.signUp: ${response.statusCode} '
+        '(${response.body.length} bytes)',
+      );
+
+      if (response.body.isEmpty) {
+        return Failure(
+          'Server returned an empty response (${response.statusCode})',
+          statusCode: response.statusCode,
+        );
+      }
+
+      final Object? decoded;
+      try {
+        decoded = jsonDecode(response.body);
+      } on FormatException {
+        debugPrint(
+          'AuthRepository.signUp: non-JSON response: '
+          '${response.body.substring(0, response.body.length.clamp(0, 500))}',
+        );
+        return Failure(
+          'Server returned a non-JSON response (${response.statusCode})',
+          statusCode: response.statusCode,
+        );
+      }
+
+      if (decoded is! Map<String, Object?>) {
+        return Failure(
+          'Unexpected response format (${response.statusCode})',
+          statusCode: response.statusCode,
+        );
+      }
+
+      final body = decoded;
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
         final error = _parseError(body) ?? 'Sign up failed';
         return Failure(error, statusCode: response.statusCode);
       }
 
-      // better-auth returns { user: {...}, session: { token, ... } }
-      final sessionData = body['session'] as Map<String, Object?>?;
-      final token = sessionData?['token'] as String?;
+      // The full session token lives in the set-cookie header as
+      // __Secure-better-auth.session_token=TOKEN.HASH
+      // The body only has the short token (without the hash), which
+      // won't authenticate on subsequent requests.
+      String? token;
+
+      final cookies = response.headers['set-cookie'] ?? '';
+      final cookieMatch = RegExp(
+        r'(?:__Secure-)?better-auth\.session_token=([^;]+)',
+      ).firstMatch(cookies);
+      if (cookieMatch != null) {
+        token = Uri.decodeFull(cookieMatch.group(1)!);
+      }
+
+      // Fallback: try body (session.token or top-level token)
+      if (token == null || token.isEmpty) {
+        final sessionData = body['session'] as Map<String, Object?>?;
+        token = sessionData?['token'] as String?;
+        token ??= body['token'] as String?;
+      }
+
+      debugPrint(
+        'AuthRepository.signUp response keys: ${body.keys.toList()}, '
+        'token found: ${token != null && token.isNotEmpty}',
+      );
 
       final userData = body['user'] as Map<String, Object?>?;
       final user = User(
@@ -113,21 +171,24 @@ class AuthRepository {
       );
 
       if (token == null || token.isEmpty) {
+        debugPrint(
+          'AuthRepository.signUp: no token found. '
+          'Full response body: ${response.body}',
+        );
         return const Failure('Sign up succeeded, but no session was returned');
       }
 
       _sessionStore.save(token: token, user: user);
       _apiClient.setSessionToken(token);
 
-      // ── Step 2: set chosen role ──
+      // ── Step 2: set chosen role (best-effort — don't fail sign-up) ──
       final roleResult = await _setRole(role, token);
       if (roleResult is Failure<void>) {
-        if (previousToken != null && previousUser != null) {
-          _restoreSession(previousToken, previousUser);
-        } else {
-          _clearSession();
-        }
-        return Failure(roleResult.message, statusCode: roleResult.statusCode);
+        debugPrint(
+          'AuthRepository.signUp: role-setting failed '
+          '(${roleResult.statusCode}): ${roleResult.message} — '
+          'proceeding with sign-up anyway',
+        );
       }
 
       return Success(user);
@@ -146,24 +207,38 @@ class AuthRepository {
   /// Call POST /api/user/role to persist the selected role.
   Future<ApiResult<void>> _setRole(UserRole role, String token) async {
     try {
+      final url = '$_baseUrl/api/user/role';
+      debugPrint('AuthRepository._setRole: POST $url');
+
       final response = await _http.post(
-        Uri.parse('$_baseUrl/api/user/role'),
+        Uri.parse(url),
         headers: {
           ..._jsonHeaders,
-          HttpHeaders.cookieHeader: 'better-auth.session_token=$token',
+          HttpHeaders.cookieHeader:
+              '__Secure-better-auth.session_token=$token',
         },
         body: jsonEncode({'role': role.apiValue}),
+      );
+
+      debugPrint(
+        'AuthRepository._setRole: ${response.statusCode} '
+        '(${response.body.length} bytes)',
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return const Success<void>(null);
       }
 
-      final body = jsonDecode(response.body) as Map<String, Object?>;
-      return Failure(
-        _parseError(body) ?? 'Failed to set account role',
-        statusCode: response.statusCode,
-      );
+      // Try to parse JSON error, but don't crash on non-JSON (e.g. HTML 404)
+      String errorMessage = 'Failed to set account role (${response.statusCode})';
+      try {
+        final body = jsonDecode(response.body) as Map<String, Object?>;
+        errorMessage = _parseError(body) ?? errorMessage;
+      } on FormatException {
+        // Response wasn't JSON — use the default error message
+      }
+
+      return Failure(errorMessage, statusCode: response.statusCode);
     } catch (e) {
       debugPrint('AuthRepository._setRole error: $e');
       if (e is SocketException) {
@@ -172,10 +247,7 @@ class AuthRepository {
       if (e is HttpException) {
         return const Failure('Server unreachable');
       }
-      if (e is FormatException) {
-        return const Failure('Invalid response from server');
-      }
-      return Failure('Unexpected error: $e');
+      return Failure('Failed to set role: $e');
     }
   }
 
@@ -191,7 +263,8 @@ class AuthRepository {
         Uri.parse('$_baseUrl/api/auth/sign-out'),
         headers: {
           ..._jsonHeaders,
-          HttpHeaders.cookieHeader: 'better-auth.session_token=$token',
+          HttpHeaders.cookieHeader:
+              '__Secure-better-auth.session_token=$token',
         },
       );
 

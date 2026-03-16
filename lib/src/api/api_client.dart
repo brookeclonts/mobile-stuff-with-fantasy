@@ -35,7 +35,8 @@ class ApiClient {
         HttpHeaders.contentTypeHeader: 'application/json',
         HttpHeaders.acceptHeader: 'application/json',
         if (_sessionToken != null)
-          HttpHeaders.cookieHeader: 'better-auth.session_token=$_sessionToken',
+          HttpHeaders.cookieHeader:
+              '__Secure-better-auth.session_token=$_sessionToken',
       };
 
   // ---------------------------------------------------------------------------

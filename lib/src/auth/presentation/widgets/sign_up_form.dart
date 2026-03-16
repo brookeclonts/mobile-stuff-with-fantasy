@@ -44,6 +44,7 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   void _submit() {
+    if (widget.isLoading) return;
     if (!_formKey.currentState!.validate()) return;
     widget.onSubmit(
       _nameController.text.trim(),
