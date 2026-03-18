@@ -16,6 +16,7 @@ import 'package:swf_app/src/catalog/presentation/widgets/filter_bar.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/filter_sheet.dart';
 import 'package:swf_app/src/profile/data/profile_repository.dart';
 import 'package:swf_app/src/profile/presentation/profile_page.dart';
+import 'package:swf_app/src/reader/presentation/library_page.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
 class CatalogPage extends StatefulWidget {
@@ -284,6 +285,17 @@ class _CatalogPageState extends State<CatalogPage> {
           ),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.auto_stories_outlined, size: 22),
+            tooltip: 'Library',
+            color: SwfColors.color8,
+            onPressed: () => Navigator.push<void>(
+              context,
+              MaterialPageRoute<void>(
+                builder: (_) => const LibraryPage(),
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: Tooltip(

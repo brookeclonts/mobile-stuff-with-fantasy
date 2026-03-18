@@ -49,6 +49,9 @@ abstract final class SwfColors {
   static const violet = Color(0xFF7C54C5);
   static const orange = Color(0xFFF3BD75);
 
+  /// Bright teal — high-contrast variant of blue for dark surfaces
+  static const blueBright = Color(0xFFA8D4C4);
+
   // -- Derived / dark navy --
 
   /// Very dark navy (used in gradients)

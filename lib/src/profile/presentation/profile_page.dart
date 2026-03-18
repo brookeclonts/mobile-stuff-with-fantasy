@@ -6,6 +6,7 @@ import 'package:swf_app/src/auth/data/auth_repository.dart';
 import 'package:swf_app/src/auth/data/session_store.dart';
 import 'package:swf_app/src/auth/models/user.dart';
 import 'package:swf_app/src/auth/presentation/sign_up_flow.dart';
+import 'package:swf_app/src/catalog/presentation/catalog_page.dart';
 import 'package:swf_app/src/profile/data/profile_repository.dart';
 import 'package:swf_app/src/profile/data/quest_compendium.dart';
 import 'package:swf_app/src/profile/data/rune_compendium.dart';
@@ -261,7 +262,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _sessionStore?.clear();
         Navigator.pushAndRemoveUntil<void>(
           context,
-          MaterialPageRoute<void>(builder: (_) => const SignUpFlow()),
+          MaterialPageRoute<void>(builder: (_) => const CatalogPage()),
           (_) => false,
         );
       },
@@ -275,10 +276,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _goToSignUp() {
-    Navigator.pushAndRemoveUntil<void>(
+    Navigator.push<void>(
       context,
       MaterialPageRoute<void>(builder: (_) => const SignUpFlow()),
-      (_) => false,
     );
   }
 
