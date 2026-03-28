@@ -248,6 +248,19 @@ class AuthRepository {
     }
   }
 
+  Future<ApiResult<void>> deleteAccount() async {
+    final result = await _apiClient.delete<void>(
+      '/api/user/delete/account',
+      fromJson: (_) {},
+    );
+
+    if (result is Success<void>) {
+      _clearSession();
+    }
+
+    return result;
+  }
+
   Future<ApiResult<void>> signOut() async {
     final token = _sessionStore.token;
     if (token == null || token.isEmpty) {

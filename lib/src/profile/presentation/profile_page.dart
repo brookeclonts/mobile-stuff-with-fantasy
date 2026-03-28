@@ -43,6 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
   User? _user;
   bool _isLoading = true;
   bool _isSigningOut = false;
+  bool _isDeletingAccount = false;
   String? _errorMessage;
   int? _errorStatusCode;
   final Set<String> _completedObjectiveIds = <String>{};
@@ -209,6 +210,76 @@ class _ProfilePageState extends State<ProfilePage> {
       },
       failure: (message, _) {
         setState(() => _isSigningOut = false);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      },
+    );
+  }
+
+  Future<void> _deleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF2A2235),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.red.withAlpha(80)),
+        ),
+        title: Text(
+          'Delete Account',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: Colors.white,
+          ),
+        ),
+        content: Text(
+          'This will permanently delete your account and all associated data. This cannot be undone.',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Colors.white.withAlpha(180),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white.withAlpha(140)),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+    if (_isDeletingAccount) return;
+
+    setState(() => _isDeletingAccount = true);
+
+    final authRepository = _authRepository;
+    final result = authRepository != null
+        ? await authRepository.deleteAccount()
+        : const Success<void>(null);
+
+    if (!mounted) return;
+
+    result.when(
+      success: (_) {
+        _sessionStore?.clear();
+        Navigator.pushAndRemoveUntil<void>(
+          context,
+          MaterialPageRoute<void>(builder: (_) => const CatalogPage()),
+          (_) => false,
+        );
+      },
+      failure: (message, _) {
+        setState(() => _isDeletingAccount = false);
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(message)));
@@ -514,38 +585,68 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
 
-          // ── Exit the Realm ──
+          // ── Exit the Realm & Delete Account ──
           SliverToBoxAdapter(
             child: StaggeredFadeSlide(
               delay: const Duration(milliseconds: 1200),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 28, 16, 40),
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white.withAlpha(140),
-                    side: BorderSide(
-                      color: Colors.white.withAlpha(30),
+                child: Column(
+                  children: [
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white.withAlpha(140),
+                        side: BorderSide(
+                          color: Colors.white.withAlpha(30),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 14,
+                        ),
+                      ),
+                      onPressed: _isSigningOut ? null : _signOut,
+                      icon: _isSigningOut
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(Icons.logout_rounded),
+                      label: Text(
+                        _isSigningOut
+                            ? 'Leaving the realm...'
+                            : 'Exit the Realm',
+                      ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 14,
+                    const SizedBox(height: 12),
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red.withAlpha(140),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 14,
+                        ),
+                      ),
+                      onPressed: _isDeletingAccount ? null : _deleteAccount,
+                      icon: _isDeletingAccount
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.red,
+                              ),
+                            )
+                          : const Icon(Icons.delete_forever_rounded, size: 20),
+                      label: Text(
+                        _isDeletingAccount
+                            ? 'Deleting account...'
+                            : 'Delete Account',
+                      ),
                     ),
-                  ),
-                  onPressed: _isSigningOut ? null : _signOut,
-                  icon: _isSigningOut
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Icon(Icons.logout_rounded),
-                  label: Text(
-                    _isSigningOut
-                        ? 'Leaving the realm...'
-                        : 'Exit the Realm',
-                  ),
+                  ],
                 ),
               ),
             ),
