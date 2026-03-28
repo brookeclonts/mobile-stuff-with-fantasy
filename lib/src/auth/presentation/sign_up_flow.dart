@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/auth/models/user.dart';
-import 'package:swf_app/src/auth/presentation/widgets/interest_step.dart';
 import 'package:swf_app/src/auth/presentation/widgets/sign_up_form.dart';
 import 'package:swf_app/src/auth/presentation/widgets/welcome_step.dart';
 import 'package:swf_app/src/catalog/presentation/catalog_page.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
-/// Full-screen, 3-step sign-up flow.
+/// Full-screen, 2-step sign-up flow.
 ///
-///  1. Enter name, email, password (everyone signs up as a reader)
-///  2. Optional interest capture (author / influencer)
-///  3. Personalised welcome
+///  1. Enter name, email, password
+///  2. Personalised welcome
 ///
 /// Uses a [PageView] with programmatic navigation for smooth transitions.
 class SignUpFlow extends StatefulWidget {
@@ -22,17 +20,13 @@ class SignUpFlow extends StatefulWidget {
 }
 
 class _SignUpFlowState extends State<SignUpFlow> {
-  static const _totalSteps = 3;
+  static const _totalSteps = 2;
   final _pageController = PageController();
   int _currentStep = 0;
 
-  // Step 1 state
   bool _isLoading = false;
   String? _errorMessage;
   String _signedUpName = '';
-
-  // Step 2 state
-  final Set<String> _interests = <String>{};
 
   @override
   void dispose() {
@@ -74,7 +68,7 @@ class _SignUpFlowState extends State<SignUpFlow> {
           _isLoading = false;
           _signedUpName = name;
         });
-        _goToStep(1);
+        _goToStep(1); // → welcome
       },
       failure: (message, _) {
         setState(() {
@@ -83,21 +77,6 @@ class _SignUpFlowState extends State<SignUpFlow> {
         });
       },
     );
-  }
-
-  void _toggleInterest(String interest) {
-    setState(() {
-      if (_interests.contains(interest)) {
-        _interests.remove(interest);
-      } else {
-        _interests.add(interest);
-      }
-    });
-  }
-
-  void _onInterestContinue() {
-    // TODO: send _interests to backend when endpoint exists
-    _goToStep(2);
   }
 
   void _onGetStarted() {
@@ -125,8 +104,8 @@ class _SignUpFlowState extends State<SignUpFlow> {
             _TopBar(
               currentStep: _currentStep,
               totalSteps: _totalSteps,
-              onBack: _currentStep == 1 ? () => _goToStep(0) : null,
-              onSkip: _currentStep < 2 ? _skipToCatalog : null,
+              onBack: null,
+              onSkip: _currentStep == 0 ? _skipToCatalog : null,
             ),
             // ── Pages ──
             Expanded(
@@ -138,11 +117,6 @@ class _SignUpFlowState extends State<SignUpFlow> {
                     onSubmit: _onFormSubmit,
                     isLoading: _isLoading,
                     errorMessage: _errorMessage,
-                  ),
-                  InterestStep(
-                    selectedInterests: _interests,
-                    onToggle: _toggleInterest,
-                    onContinue: _onInterestContinue,
                   ),
                   WelcomeStep(
                     name: _signedUpName,

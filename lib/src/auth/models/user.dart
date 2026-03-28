@@ -1,30 +1,16 @@
 import 'package:flutter/material.dart';
 
-/// The three account types a user can choose during sign-up.
+/// Account type used during sign-up.
 enum UserRole {
-  reader,
-  influencer,
-  author;
+  reader;
 
-  String get label => switch (this) {
-        reader => 'Reader',
-        influencer => 'Influencer',
-        author => 'Author',
-      };
+  String get label => 'Reader';
 
-  String get description => switch (this) {
-        reader => 'Discover your next favorite fantasy book',
-        influencer => 'Share your love of fantasy with the world',
-        author => 'Get your books discovered by readers',
-      };
+  String get description => 'Discover your next favorite fantasy book';
 
   String get apiValue => name;
 
-  IconData get icon => switch (this) {
-        reader => Icons.auto_stories_rounded,
-        influencer => Icons.campaign_rounded,
-        author => Icons.edit_note_rounded,
-      };
+  IconData get icon => Icons.auto_stories_rounded;
 }
 
 /// Minimal user model returned by the sign-up / sign-in endpoints.

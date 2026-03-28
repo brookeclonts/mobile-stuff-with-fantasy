@@ -14,7 +14,6 @@ import 'package:swf_app/src/catalog/presentation/book_detail_page.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/book_tile.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/filter_bar.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/filter_sheet.dart';
-import 'package:swf_app/src/profile/data/profile_repository.dart';
 import 'package:swf_app/src/profile/presentation/profile_page.dart';
 import 'package:swf_app/src/reader/presentation/library_page.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
@@ -25,13 +24,11 @@ class CatalogPage extends StatefulWidget {
     this.repository,
     this.authRepository,
     this.sessionStore,
-    this.profileRepository,
   });
 
   final BookRepository? repository;
   final AuthRepository? authRepository;
   final SessionStore? sessionStore;
-  final ProfileRepository? profileRepository;
 
   @override
   State<CatalogPage> createState() => _CatalogPageState();
@@ -249,8 +246,6 @@ class _CatalogPageState extends State<CatalogPage> {
       MaterialPageRoute<void>(
         builder: (_) => ProfilePage(
           authRepository: _resolveAuthRepository(),
-          profileRepository:
-              widget.profileRepository ?? _resolveProfileRepository(),
           sessionStore: _resolveSessionStore(),
         ),
       ),
@@ -258,15 +253,6 @@ class _CatalogPageState extends State<CatalogPage> {
   }
 
   User? _currentUser() => _resolveSessionStore()?.user;
-
-  ProfileRepository? _resolveProfileRepository() {
-    if (widget.profileRepository != null) return widget.profileRepository;
-    try {
-      return ServiceLocator.profileRepository;
-    } catch (_) {
-      return null;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

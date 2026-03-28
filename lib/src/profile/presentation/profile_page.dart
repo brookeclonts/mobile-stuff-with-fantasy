@@ -7,7 +7,6 @@ import 'package:swf_app/src/auth/data/session_store.dart';
 import 'package:swf_app/src/auth/models/user.dart';
 import 'package:swf_app/src/auth/presentation/sign_up_flow.dart';
 import 'package:swf_app/src/catalog/presentation/catalog_page.dart';
-import 'package:swf_app/src/profile/data/profile_repository.dart';
 import 'package:swf_app/src/profile/data/quest_compendium.dart';
 import 'package:swf_app/src/profile/data/rune_compendium.dart';
 import 'package:swf_app/src/profile/models/quest_campaign.dart';
@@ -21,20 +20,16 @@ import 'package:swf_app/src/profile/presentation/widgets/rune_config_sheets.dart
 import 'package:swf_app/src/profile/presentation/widgets/rune_slots.dart';
 import 'package:swf_app/src/profile/presentation/widgets/section_divider.dart';
 import 'package:swf_app/src/profile/presentation/widgets/staggered_fade_slide.dart';
-import 'package:swf_app/src/profile/presentation/widgets/subscriber_ledger.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({
     super.key,
     this.authRepository,
-    this.profileRepository,
     this.sessionStore,
   });
 
   final AuthRepository? authRepository;
-  final ProfileRepository? profileRepository;
   final SessionStore? sessionStore;
 
   @override
@@ -42,10 +37,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  static const _subscriberFeatureUnlocked = false;
-
   late final AuthRepository? _authRepository;
-  late final ProfileRepository? _profileRepository;
   late final SessionStore? _sessionStore;
 
   User? _user;
@@ -53,9 +45,6 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isSigningOut = false;
   String? _errorMessage;
   int? _errorStatusCode;
-  SubscriberStats? _subscriberStats;
-  bool _isLoadingSubscriberStats = false;
-  String? _subscriberError;
   final Set<String> _completedObjectiveIds = <String>{};
   final Set<String> _revealedRewardIds = <String>{};
   final Set<String> _expandedScrollIds = <String>{};
@@ -155,8 +144,6 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _authRepository = widget.authRepository ?? ServiceLocator.authRepository;
-    _profileRepository =
-        widget.profileRepository ?? ServiceLocator.profileRepository;
     _sessionStore = widget.sessionStore ?? ServiceLocator.sessionStore;
 
     _loadProfile();
@@ -184,9 +171,6 @@ class _ProfilePageState extends State<ProfilePage> {
           _user = user;
           _isLoading = false;
         });
-        if (campaignForRole(user.role).role == 'author') {
-          _loadSubscriberStats();
-        }
       },
       failure: (message, statusCode) {
         setState(() {
@@ -198,52 +182,9 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> _loadSubscriberStats() async {
-    final repo = _profileRepository;
-    if (repo == null) return;
-
-    setState(() {
-      _isLoadingSubscriberStats = true;
-      _subscriberError = null;
-    });
-
-    final result = await repo.getSubscriberStats();
-    if (!mounted) return;
-
-    result.when(
-      success: (stats) {
-        setState(() {
-          _subscriberStats = stats;
-          _isLoadingSubscriberStats = false;
-        });
-      },
-      failure: (message, _) {
-        setState(() {
-          _subscriberError = message;
-          _isLoadingSubscriberStats = false;
-        });
-      },
-    );
-  }
-
   // ---------------------------------------------------------------------------
   // Actions
   // ---------------------------------------------------------------------------
-
-  Future<void> _openReference(String url) async {
-    final uri = Uri.tryParse(url);
-    if (uri == null) return;
-
-    final didLaunch = await launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication,
-    );
-    if (!didLaunch && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open that scroll.')),
-      );
-    }
-  }
 
   Future<void> _signOut() async {
     if (_isSigningOut) return;
@@ -354,7 +295,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ..addAll(notifs);
               }),
         );
-      // Author and Influencer runes — placeholder for future backend integration
       default:
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -404,7 +344,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (_isGuestState) {
       return GuestGuildState(
-        campaigns: guestCampaignPreview,
         onCreateAccount: _goToSignUp,
       );
     }
@@ -427,12 +366,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final runes = runesForRole(_user?.role);
 
     return RefreshIndicator(
-      onRefresh: () async {
-        await _loadProfile();
-        if (_campaign.role == 'author') {
-          await _loadSubscriberStats();
-        }
-      },
+      onRefresh: _loadProfile,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
@@ -485,32 +419,6 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
-
-          // ── Reference link (e.g. Author Help Scroll) ──
-          if (_campaign.referenceUrl != null)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: SwfColors.secondaryAccent,
-                    side: BorderSide(
-                      color: SwfColors.secondaryAccent.withAlpha(80),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 14,
-                    ),
-                  ),
-                  onPressed: () =>
-                      _openReference(_campaign.referenceUrl!),
-                  icon: const Icon(Icons.menu_book_rounded, size: 18),
-                  label: Text(
-                    _campaign.referenceLabel ?? 'Open reference',
-                  ),
-                ),
-              ),
-            ),
 
           // ── Quest Log ──
           SliverToBoxAdapter(
@@ -582,28 +490,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
 
-          // ── Author: Subscriber Ledger ──
-          if (_campaign.role == 'author') ...[
-            SliverToBoxAdapter(
-              child: StaggeredFadeSlide(
-                delay: const Duration(milliseconds: 950),
-                child: Column(
-                  children: [
-                    const SectionDivider(
-                      title: 'Subscriber Ledger',
-                    ),
-                    SubscriberLedger(
-                      isUnlocked: _subscriberFeatureUnlocked,
-                      stats: _subscriberStats,
-                      isLoading: _isLoadingSubscriberStats,
-                      errorMessage: _subscriberError,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-
           // ── Character Sheet ──
           SliverToBoxAdapter(
             child: StaggeredFadeSlide(
@@ -615,7 +501,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   CharacterSheet(
                     name: _displayName(user),
-                    guild: _roleLabel(user.role),
                     rank: _rankTitle,
                     questsCompleted: _completedScrollCount,
                     questsTotal: _campaign.scrolls.length,
@@ -676,14 +561,6 @@ class _ProfilePageState extends State<ProfilePage> {
     return user.email.split('@').first;
   }
 
-  String _roleLabel(String? role) {
-    return switch (role) {
-      'author' => 'Author',
-      'influencer' => 'Influencer',
-      'reader' => 'Reader',
-      _ => 'Member',
-    };
-  }
 }
 
 // ---------------------------------------------------------------------------

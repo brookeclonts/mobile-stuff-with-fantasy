@@ -49,14 +49,8 @@ class _WelcomeStepState extends State<WelcomeStep>
     super.dispose();
   }
 
-  String get _subtitle => switch (widget.role) {
-        UserRole.reader =>
-          'Your next great fantasy adventure is waiting for you.',
-        UserRole.influencer =>
-          'Start discovering and sharing amazing fantasy reads.',
-        UserRole.author =>
-          'Time to get your stories in front of fantasy readers.',
-      };
+  String get _subtitle =>
+      'Your next great fantasy adventure is waiting for you.';
 
   @override
   Widget build(BuildContext context) {

@@ -39,5 +39,15 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+
+    # Workaround: Xcode 26 beta ibtool can't compile storyboards from
+    # flutter_inappwebview_ios. Strip the resource so the archive succeeds.
+    if target.name == 'flutter_inappwebview_ios'
+      target.build_phases.each do |phase|
+        if phase.is_a?(Xcodeproj::Project::Object::PBXResourcesBuildPhase)
+          phase.files.reject! { |f| f.display_name == 'WebView.storyboard' }
+        end
+      end
+    end
   end
 end

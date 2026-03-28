@@ -212,7 +212,7 @@ void main() {
     },
   );
 
-  test('signUp succeeds when role persistence succeeds', () async {
+  test('signUp succeeds when role persistence succeeds (reader)', () async {
     final sessionStore = SessionStore();
     final repository = AuthRepository(
       baseUrl: 'http://localhost',
@@ -224,8 +224,8 @@ void main() {
             jsonEncode({
               'user': {
                 'id': 'user-1',
-                'email': 'author@example.com',
-                'name': 'Author',
+                'email': 'reader@example.com',
+                'name': 'Reader',
               },
               'session': {'token': 'token-123'},
             }),
@@ -242,7 +242,7 @@ void main() {
           return http.Response(
             jsonEncode({
               'success': true,
-              'data': {'role': 'author'},
+              'data': {'role': 'reader'},
             }),
             200,
             headers: {'content-type': 'application/json'},
@@ -254,15 +254,15 @@ void main() {
     );
 
     final result = await repository.signUp(
-      name: 'Author',
-      email: 'author@example.com',
+      name: 'Reader',
+      email: 'reader@example.com',
       password: 'password123',
-      role: UserRole.author,
+      role: UserRole.reader,
     );
 
     expect(result, isA<Success<User>>());
     expect(sessionStore.isAuthenticated, isTrue);
-    expect(sessionStore.user?.role, UserRole.author.apiValue);
+    expect(sessionStore.user?.role, UserRole.reader.apiValue);
   });
 
   test('signOut clears the local session on success', () async {

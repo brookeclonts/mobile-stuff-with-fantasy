@@ -8,7 +8,7 @@
 PRODUCT_NAME = swf_app
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.stuffwithfantasy.swfApp
+PRODUCT_BUNDLE_IDENTIFIER = com.secondstar.stuffwithfantasy
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.stuffwithfantasy. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 Second Star. All rights reserved.

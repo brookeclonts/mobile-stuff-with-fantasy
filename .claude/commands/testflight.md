@@ -38,11 +38,11 @@ Build the Flutter iOS app and upload to App Store Connect for TestFlight distrib
 
 ## Configuration
 
-- **Bundle ID:** `com.zora.stuffwithfantasy`
-- **Team ID:** `6T8CBMWW3D`
+- **Bundle ID:** `com.secondstar.stuffwithfantasy`
+- **Team ID:** `697ZACV5N9`
 - **App Name:** StuffWithFantasy
 - **ExportOptions.plist:** `ios/ExportOptions.plist`
-- **API Key ID:** `XLDQ97MTSN`
-- **API Issuer ID:** `43411856-265a-4af2-8a58-caaf3291c764`
-- **API Key Path:** `~/.private_keys/AuthKey_XLDQ97MTSN.p8`
+- **API Key ID:** `JJZ779Q67V`
+- **API Issuer ID:** `119abbe0-5bda-4086-aa55-fd7781f0b3b3`
+- **API Key Path:** `~/.private_keys/AuthKey_JJZ779Q67V.p8`
 - **pubspec.yaml:** `pubspec.yaml`

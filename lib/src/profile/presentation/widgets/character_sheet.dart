@@ -6,7 +6,6 @@ class CharacterSheet extends StatelessWidget {
   const CharacterSheet({
     super.key,
     required this.name,
-    required this.guild,
     required this.rank,
     required this.questsCompleted,
     required this.questsTotal,
@@ -17,7 +16,6 @@ class CharacterSheet extends StatelessWidget {
   });
 
   final String name;
-  final String guild;
   final String rank;
   final int questsCompleted;
   final int questsTotal;
@@ -89,8 +87,6 @@ class CharacterSheet extends StatelessWidget {
             child: Column(
               children: [
                 _StatRow(label: 'Name', value: name),
-                _StatDivider(),
-                _StatRow(label: 'Guild', value: guild),
                 _StatDivider(),
                 _StatRow(label: 'Rank', value: rank),
                 _StatDivider(),
