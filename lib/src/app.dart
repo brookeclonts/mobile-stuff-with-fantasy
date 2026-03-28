@@ -11,8 +11,7 @@ class SwfApp extends StatelessWidget {
       title: 'StuffWithFantasy',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       home: const CatalogPage(),
     );
   }
