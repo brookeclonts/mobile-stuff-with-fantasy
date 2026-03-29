@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swf_app/src/api/service_locator.dart';
+import 'package:swf_app/src/auth/data/auth_repository.dart';
+import 'package:swf_app/src/auth/data/session_store.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/catalog/presentation/book_detail_page.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/book_tile.dart';
+import 'package:swf_app/src/profile/presentation/profile_page.dart';
 import 'package:swf_app/src/reader/data/reader_access_repository.dart';
 import 'package:swf_app/src/reader/data/reading_list_repository.dart';
 import 'package:swf_app/src/reader/models/readable_book.dart';
@@ -169,6 +172,40 @@ class _LibraryPageState extends State<LibraryPage> {
     await _loadMyBooks(forceRefresh: true);
   }
 
+  AuthRepository? _resolveAuthRepository() {
+    try {
+      return ServiceLocator.authRepository;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  SessionStore? _resolveSessionStore() {
+    try {
+      return ServiceLocator.sessionStore;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _openSignIn() async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => ProfilePage(
+          authRepository: _resolveAuthRepository(),
+          sessionStore: _resolveSessionStore(),
+        ),
+      ),
+    );
+    if (!mounted) return;
+    await Future.wait([
+      _loadReadingList(forceRefresh: true),
+      _loadMyBooks(forceRefresh: true),
+    ]);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -209,11 +246,12 @@ class _LibraryPageState extends State<LibraryPage> {
       _myBooks.isEmpty,
     )) {
       (_, true, _, _) => const Center(child: CircularProgressIndicator()),
-      (false, _, _, _) => _EmptyState(
+      (false, _, _, _) => _SignInEmptyState(
         icon: Icons.auto_stories_outlined,
-        title: 'Sign in to unlock My Books',
+        title: 'Your bookshelf awaits',
         message:
-            'Books you buy, claim, or upload will appear here once they can be read in the app.',
+            'Sign in to access books you\'ve purchased, claimed, or uploaded — ready to read right here.',
+        onSignIn: _openSignIn,
       ),
       (_, _, final String error, _) => _ErrorState(
         message: error,
@@ -241,11 +279,12 @@ class _LibraryPageState extends State<LibraryPage> {
       _readingListBooks.isEmpty,
     )) {
       (_, true, _, _) => const Center(child: CircularProgressIndicator()),
-      (false, _, _, _) => _EmptyState(
+      (false, _, _, _) => _SignInEmptyState(
         icon: Icons.bookmarks_outlined,
-        title: 'Sign in to start a reading list',
+        title: 'Start your reading list',
         message:
-            'Open your profile to create an account, then save books from the catalog.',
+            'Sign in to save books from the catalog and build your personal reading list.',
+        onSignIn: _openSignIn,
       ),
       (_, _, final String error, _) => _ErrorState(
         message: error,
@@ -388,16 +427,24 @@ class _EmptyState extends StatelessWidget {
     final theme = Theme.of(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 72,
-              color: theme.colorScheme.onSurfaceVariant.withAlpha(100),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: SwfColors.color4.withAlpha(18),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 40,
+                color: SwfColors.color4.withAlpha(180),
+              ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 20),
             Text(
               title,
               style: theme.textTheme.titleMedium?.copyWith(
@@ -411,6 +458,94 @@ class _EmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SignInEmptyState extends StatelessWidget {
+  const _SignInEmptyState({
+    required this.icon,
+    required this.title,
+    required this.message,
+    required this.onSignIn,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+  final VoidCallback onSignIn;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 96,
+              height: 96,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    SwfColors.color3.withAlpha(40),
+                    SwfColors.color4.withAlpha(30),
+                  ],
+                ),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: SwfColors.color4.withAlpha(50),
+                ),
+              ),
+              child: Icon(
+                icon,
+                size: 44,
+                color: SwfColors.color4,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              title,
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 28),
+            FilledButton.icon(
+              onPressed: onSignIn,
+              icon: const Icon(Icons.person_outline, size: 20),
+              label: const Text('Sign In'),
+              style: FilledButton.styleFrom(
+                backgroundColor: SwfColors.color4,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
           ],

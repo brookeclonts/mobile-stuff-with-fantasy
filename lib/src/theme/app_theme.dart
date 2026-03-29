@@ -87,6 +87,12 @@ abstract final class AppTheme {
         color: SwfColors.color5,
         thickness: 1,
       ),
+      tabBarTheme: TabBarThemeData(
+        labelColor: Colors.white,
+        unselectedLabelColor: SwfColors.color5,
+        indicatorColor: SwfColors.color4,
+        indicatorSize: TabBarIndicatorSize.label,
+      ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: SwfColors.color2,
         selectedItemColor: SwfColors.color4,
@@ -190,6 +196,12 @@ abstract final class AppTheme {
       dividerTheme: const DividerThemeData(
         color: SwfColors.lightGray,
         thickness: 1,
+      ),
+      tabBarTheme: TabBarThemeData(
+        labelColor: Colors.white,
+        unselectedLabelColor: SwfColors.color5,
+        indicatorColor: SwfColors.color4,
+        indicatorSize: TabBarIndicatorSize.label,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: SwfColors.color2,
