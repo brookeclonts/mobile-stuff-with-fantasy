@@ -22,8 +22,6 @@ import 'package:swf_app/src/creators/presentation/widgets/featured_creators_row.
 import 'package:swf_app/src/events/models/event.dart';
 import 'package:swf_app/src/events/presentation/event_detail_page.dart';
 import 'package:swf_app/src/events/presentation/widgets/event_banner.dart';
-import 'package:swf_app/src/guild/presentation/guild_hub_page.dart';
-import 'package:swf_app/src/lore_board/presentation/lore_board_page.dart';
 import 'package:swf_app/src/profile/presentation/profile_page.dart';
 import 'package:swf_app/src/reader/presentation/library_page.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
@@ -394,25 +392,7 @@ class _CatalogPageState extends State<CatalogPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.campaign_outlined, size: 22),
-            tooltip: l10n.loreBoardTooltip,
-            color: SwfColors.color8,
-            onPressed: () => Navigator.push<void>(
-              context,
-              MaterialPageRoute<void>(builder: (_) => const LoreBoardPage()),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.shield_outlined, size: 22),
-            tooltip: l10n.guildHubTitle,
-            color: SwfColors.color8,
-            onPressed: () => Navigator.push<void>(
-              context,
-              MaterialPageRoute<void>(builder: (_) => const GuildHubPage()),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.local_library_outlined, size: 22),
+            icon: const Icon(Icons.menu_book_rounded, size: 22),
             tooltip: l10n.catalogTooltipLibrary,
             color: SwfColors.color8,
             onPressed: () => Navigator.push<void>(
