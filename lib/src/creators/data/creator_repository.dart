@@ -10,6 +10,9 @@ class CreatorRepository {
   /// Hardcoded featured creator IDs, in display order.
   /// Replace with a server-driven list when sponsorship/featuring is built.
   static const _featuredIds = <String>[
+    '684476864653ceacdf87bb38', // Jeremy Sparks
+    '6842ed2bb7f6ab6c06c847a3', // Andrea
+    '68018c1e7a31625ae2083631', // Madeline Burget
     '67fe0661f40e6ff07af89ce2', // Brooke Clonts
   ];
 
