@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 
 /// Step 2: Account details — name, email, password.
 class SignUpForm extends StatefulWidget {
@@ -56,6 +57,7 @@ class _SignUpFormState extends State<SignUpForm> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Form(
@@ -65,13 +67,13 @@ class _SignUpFormState extends State<SignUpForm> {
           children: [
             const SizedBox(height: 32),
             Text(
-              'Create your account',
+              l10n.signUpFormHeadline,
               style: theme.textTheme.headlineMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Just a few details and you\'re in',
+              l10n.signUpFormSubtitle,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -83,13 +85,13 @@ class _SignUpFormState extends State<SignUpForm> {
               focusNode: _nameFocus,
               textInputAction: TextInputAction.next,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'Display name',
-                hintText: 'How should we call you?',
-                prefixIcon: Icon(Icons.person_outline_rounded),
+              decoration: InputDecoration(
+                labelText: l10n.signUpFieldNameLabel,
+                hintText: l10n.signUpFieldNameHint,
+                prefixIcon: const Icon(Icons.person_outline_rounded),
               ),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Enter your name';
+                if (v == null || v.trim().isEmpty) return l10n.signUpValidatorEnterName;
                 return null;
               },
             ),
@@ -99,16 +101,16 @@ class _SignUpFormState extends State<SignUpForm> {
               textInputAction: TextInputAction.next,
               keyboardType: TextInputType.emailAddress,
               autocorrect: false,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                hintText: 'you@example.com',
-                prefixIcon: Icon(Icons.email_outlined),
+              decoration: InputDecoration(
+                labelText: l10n.signUpFieldEmailLabel,
+                hintText: l10n.signUpFieldEmailHint,
+                prefixIcon: const Icon(Icons.email_outlined),
               ),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Enter your email';
+                if (v == null || v.trim().isEmpty) return l10n.signUpValidatorEnterEmail;
                 final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
                 if (!emailRegex.hasMatch(v.trim())) {
-                  return 'Enter a valid email';
+                  return l10n.signUpValidatorInvalidEmail;
                 }
                 return null;
               },
@@ -120,8 +122,8 @@ class _SignUpFormState extends State<SignUpForm> {
               obscureText: _obscurePassword,
               onFieldSubmitted: (_) => _submit(),
               decoration: InputDecoration(
-                labelText: 'Password',
-                hintText: 'At least 8 characters',
+                labelText: l10n.signUpFieldPasswordLabel,
+                hintText: l10n.signUpFieldPasswordHint,
                 prefixIcon: const Icon(Icons.lock_outline_rounded),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -134,8 +136,8 @@ class _SignUpFormState extends State<SignUpForm> {
                 ),
               ),
               validator: (v) {
-                if (v == null || v.isEmpty) return 'Enter a password';
-                if (v.length < 8) return 'Must be at least 8 characters';
+                if (v == null || v.isEmpty) return l10n.signUpValidatorEnterPassword;
+                if (v.length < 8) return l10n.signUpValidatorPasswordTooShort;
                 return null;
               },
             ),
@@ -185,7 +187,7 @@ class _SignUpFormState extends State<SignUpForm> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Create Account'),
+                  : Text(l10n.signUpButtonCreateAccount),
             ),
             const SizedBox(height: 32),
           ],

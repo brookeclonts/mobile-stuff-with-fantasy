@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/profile/models/quest_campaign.dart';
 
 
@@ -9,10 +10,12 @@ Future<void> showRewardReveal(
   required Color accentColor,
   required bool isGrandReward,
 }) {
+  final l10n = AppLocalizations.of(context)!;
+
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
-    barrierLabel: 'Reward reveal',
+    barrierLabel: l10n.rewardRevealBarrierLabel,
     barrierColor: Colors.black87,
     transitionDuration: const Duration(milliseconds: 300),
     pageBuilder: (_, _, _) => _RewardRevealDialog(
@@ -48,6 +51,7 @@ class _RewardRevealDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Center(
       child: Padding(
@@ -112,8 +116,8 @@ class _RewardRevealDialog extends StatelessWidget {
 
                 Text(
                   isGrandReward
-                      ? 'LEGEND RELIC CLAIMED'
-                      : 'RELIC UNLOCKED',
+                      ? l10n.rewardRevealLegendRelicClaimed
+                      : l10n.rewardRevealRelicUnlocked,
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: accentColor,
                     letterSpacing: 2.0,
@@ -148,7 +152,7 @@ class _RewardRevealDialog extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Continue questing'),
+                    child: Text(l10n.rewardRevealContinue),
                   ),
                 ),
               ],

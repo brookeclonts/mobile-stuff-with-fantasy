@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_epub_viewer/flutter_epub_viewer.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/reader/models/reader_book.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
@@ -40,6 +41,11 @@ class _ReaderPageState extends State<ReaderPage> {
     _progress = _normalizeProgress(widget.book.progress);
     _scrubProgress = _progress;
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    ServiceLocator.readingStatsRepository.startSession(
+      widget.book.id,
+      widget.book.title,
+      _progress,
+    );
   }
 
   @override
@@ -55,6 +61,7 @@ class _ReaderPageState extends State<ReaderPage> {
 
   @override
   void dispose() {
+    ServiceLocator.readingStatsRepository.endSession();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(
@@ -206,6 +213,7 @@ class _ReaderPageState extends State<ReaderPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final currentProgress = _isScrubbing ? _scrubProgress : _progress;
     final progressLabel = '${(currentProgress * 100).round()}%';
 
@@ -249,6 +257,10 @@ class _ReaderPageState extends State<ReaderPage> {
                 widget.book.id,
                 cfi: location.startCfi,
                 progress: normalized,
+              );
+              ServiceLocator.readingStatsRepository.recordProgress(
+                widget.book.id,
+                normalized,
               );
             },
           ),
@@ -296,7 +308,7 @@ class _ReaderPageState extends State<ReaderPage> {
                           children: [
                             _ReaderControlButton(
                               appearance: _appearance,
-                              tooltip: 'Back',
+                              tooltip: l10n.readerTooltipBack,
                               icon: Icons.arrow_back_rounded,
                               onPressed: () => Navigator.of(context).pop(),
                             ),
@@ -333,7 +345,7 @@ class _ReaderPageState extends State<ReaderPage> {
                             const SizedBox(width: 10),
                             _ReaderControlButton(
                               appearance: _appearance,
-                              tooltip: 'Chapters',
+                              tooltip: l10n.readerTooltipChapters,
                               icon: Icons.list_rounded,
                               onPressed: _chapters.isEmpty
                                   ? null
@@ -342,7 +354,7 @@ class _ReaderPageState extends State<ReaderPage> {
                             const SizedBox(width: 8),
                             _ReaderControlButton(
                               appearance: _appearance,
-                              tooltip: 'Reading settings',
+                              tooltip: l10n.readerTooltipReadingSettings,
                               icon: Icons.tune_rounded,
                               onPressed: _showSettings,
                             ),
@@ -381,7 +393,7 @@ class _ReaderPageState extends State<ReaderPage> {
                             Row(
                               children: [
                                 Text(
-                                  '$progressLabel read',
+                                  l10n.readerProgressRead(progressLabel),
                                   style: Theme.of(context).textTheme.labelLarge
                                       ?.copyWith(
                                         color: _appearance.chromeTextColor,
@@ -391,8 +403,8 @@ class _ReaderPageState extends State<ReaderPage> {
                                 const Spacer(),
                                 Text(
                                   _isLoaded
-                                      ? 'Swipe to turn pages'
-                                      : 'Opening book…',
+                                      ? l10n.readerHintSwipeToTurn
+                                      : l10n.readerHintOpeningBook,
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
                                         color: _appearance.chromeMutedColor,
@@ -426,16 +438,16 @@ class _ReaderPageState extends State<ReaderPage> {
                               children: [
                                 _ReaderControlButton(
                                   appearance: _appearance,
-                                  tooltip: 'Previous page',
+                                  tooltip: l10n.readerTooltipPreviousPage,
                                   icon: Icons.chevron_left_rounded,
-                                  label: 'Prev',
+                                  label: l10n.readerButtonPrev,
                                   onPressed: _isLoaded
                                       ? () => _epubController.prev()
                                       : null,
                                 ),
                                 const Spacer(),
                                 Text(
-                                  'Tap the center to hide controls',
+                                  l10n.readerHintTapToHide,
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
                                         color: _appearance.chromeMutedColor,
@@ -444,9 +456,9 @@ class _ReaderPageState extends State<ReaderPage> {
                                 const Spacer(),
                                 _ReaderControlButton(
                                   appearance: _appearance,
-                                  tooltip: 'Next page',
+                                  tooltip: l10n.readerTooltipNextPage,
                                   icon: Icons.chevron_right_rounded,
-                                  label: 'Next',
+                                  label: l10n.readerButtonNext,
                                   onPressed: _isLoaded
                                       ? () => _epubController.next()
                                       : null,
@@ -525,7 +537,7 @@ class _ChapterSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             child: Text(
-              'Chapters',
+              AppLocalizations.of(context)!.readerChaptersTitle,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: appearance.chromeTextColor,
@@ -585,9 +597,21 @@ class _ReaderSettingsSheet extends StatelessWidget {
   final VoidCallback onIncreaseFont;
   final ValueChanged<_ReaderAppearance> onAppearanceSelected;
 
+  String _localizedAppearanceLabel(
+      AppLocalizations l10n, _ReaderAppearance appearance) {
+    if (identical(appearance, _ReaderAppearance.paper)) {
+      return l10n.readerAppearancePaper;
+    }
+    if (identical(appearance, _ReaderAppearance.sepia)) {
+      return l10n.readerAppearanceSepia;
+    }
+    return l10n.readerAppearanceNight;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       decoration: BoxDecoration(
@@ -614,7 +638,7 @@ class _ReaderSettingsSheet extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Text(
-                'Reading settings',
+                l10n.readerSettingsTitle,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: appearance.chromeTextColor,
                   fontWeight: FontWeight.w700,
@@ -622,7 +646,7 @@ class _ReaderSettingsSheet extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Text(
-                'Text size',
+                l10n.readerSettingsTextSize,
                 style: theme.textTheme.labelLarge?.copyWith(
                   color: appearance.chromeMutedColor,
                   fontWeight: FontWeight.w700,
@@ -635,13 +659,13 @@ class _ReaderSettingsSheet extends StatelessWidget {
                   children: [
                     _ReaderControlButton(
                       appearance: appearance,
-                      tooltip: 'Smaller text',
+                      tooltip: l10n.readerTooltipSmallerText,
                       icon: Icons.remove_rounded,
                       onPressed: canDecreaseFont ? onDecreaseFont : null,
                     ),
                     const Spacer(),
                     Text(
-                      '${fontSize.round()} pt',
+                      l10n.readerFontSizeLabel(fontSize.round()),
                       style: theme.textTheme.titleSmall?.copyWith(
                         color: appearance.chromeTextColor,
                         fontWeight: FontWeight.w700,
@@ -650,7 +674,7 @@ class _ReaderSettingsSheet extends StatelessWidget {
                     const Spacer(),
                     _ReaderControlButton(
                       appearance: appearance,
-                      tooltip: 'Larger text',
+                      tooltip: l10n.readerTooltipLargerText,
                       icon: Icons.add_rounded,
                       onPressed: canIncreaseFont ? onIncreaseFont : null,
                     ),
@@ -659,7 +683,7 @@ class _ReaderSettingsSheet extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Text(
-                'Page theme',
+                l10n.readerSettingsPageTheme,
                 style: theme.textTheme.labelLarge?.copyWith(
                   color: appearance.chromeMutedColor,
                   fontWeight: FontWeight.w700,
@@ -672,7 +696,7 @@ class _ReaderSettingsSheet extends StatelessWidget {
                 children: _ReaderAppearance.values.map((readerAppearance) {
                   final selected = readerAppearance == currentAppearance;
                   return ChoiceChip(
-                    label: Text(readerAppearance.label),
+                    label: Text(_localizedAppearanceLabel(l10n, readerAppearance)),
                     selected: selected,
                     labelStyle: theme.textTheme.bodyMedium?.copyWith(
                       color: selected

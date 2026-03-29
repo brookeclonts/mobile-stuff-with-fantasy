@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/profile/models/quest_campaign.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
@@ -89,6 +90,7 @@ class _SealedScroll extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 240),
@@ -180,7 +182,7 @@ class _SealedScroll extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Sealed',
+                            l10n.questScrollSealed,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: accentColor,
                               fontWeight: FontWeight.w600,
@@ -310,6 +312,7 @@ class _ActiveScroll extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final doneCount = scroll.objectives
         .where((obj) => completedObjectiveIds.contains(obj.id))
         .length;
@@ -370,7 +373,7 @@ class _ActiveScroll extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    'ACTIVE',
+                    l10n.questScrollActive,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: accentColor,
                       letterSpacing: 1,
@@ -443,7 +446,7 @@ class _ActiveScroll extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'REWARD',
+                              l10n.questScrollReward,
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: SwfColors.secondaryAccent,
                                 letterSpacing: 1.2,

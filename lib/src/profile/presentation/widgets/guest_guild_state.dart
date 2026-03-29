@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
 /// The unauthenticated guild hall — shows a reader-focused CTA
@@ -14,6 +15,7 @@ class GuestGuildState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Center(
       child: SingleChildScrollView(
@@ -44,7 +46,7 @@ class GuestGuildState extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    'GUILD HALL',
+                    l10n.guestGuildHallLabel,
                     style: theme.textTheme.labelLarge?.copyWith(
                       color: SwfColors.secondaryAccent,
                       letterSpacing: 2.0,
@@ -55,16 +57,14 @@ class GuestGuildState extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               Text(
-                'Begin your quest',
+                l10n.guestGuildHeadline,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Create an account to track your reading quests, '
-                'unlock ability runes, and collect relics as you '
-                'explore the realm.',
+                l10n.guestGuildBody,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: Colors.white.withAlpha(180),
                   height: 1.45,
@@ -75,7 +75,7 @@ class GuestGuildState extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: onCreateAccount,
-                  child: const Text('Create account to begin'),
+                  child: Text(l10n.guestGuildButtonCreateAccount),
                 ),
               ),
             ],

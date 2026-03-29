@@ -1,3 +1,4 @@
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 
 enum BookReadAccessType {
@@ -5,10 +6,10 @@ enum BookReadAccessType {
   purchased,
   owner;
 
-  String get label => switch (this) {
-    BookReadAccessType.owner => 'Your upload',
-    BookReadAccessType.purchased => 'Purchased',
-    BookReadAccessType.none => 'No access',
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+    BookReadAccessType.owner => l10n.readAccessOwner,
+    BookReadAccessType.purchased => l10n.readAccessPurchased,
+    BookReadAccessType.none => l10n.readAccessNone,
   };
 
   static BookReadAccessType fromApiValue(String? value) {
@@ -68,7 +69,8 @@ class ReadableBook {
   final DateTime? acquiredAt;
 
   bool get canReadInApp => book.distribution?.hasEpub ?? false;
-  String get accessLabel => accessType.label;
+  String localizedAccessLabel(AppLocalizations l10n) =>
+      accessType.localizedLabel(l10n);
 
   factory ReadableBook.fromJson(Object json) {
     final map = json as Map<String, Object?>;

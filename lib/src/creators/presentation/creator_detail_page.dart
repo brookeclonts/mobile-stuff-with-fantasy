@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/catalog/presentation/book_detail_page.dart';
@@ -61,6 +62,7 @@ class _CreatorDetailPageState extends State<CreatorDetailPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final ringColor =
         _creator.role.isAuthor ? SwfColors.color6 : SwfColors.blueBright;
 
@@ -144,7 +146,7 @@ class _CreatorDetailPageState extends State<CreatorDetailPage> {
                       border: Border.all(color: ringColor.withAlpha(80)),
                     ),
                     child: Text(
-                      _creator.role.label,
+                      _creator.role.localizedLabel(l10n),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: ringColor,
                         fontWeight: FontWeight.w600,
@@ -214,7 +216,7 @@ class _CreatorDetailPageState extends State<CreatorDetailPage> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
                 child: Text(
-                  _creator.booksLabel,
+                  _creator.localizedBooksLabel(l10n),
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -242,7 +244,7 @@ class _CreatorDetailPageState extends State<CreatorDetailPage> {
                 padding: const EdgeInsets.all(32),
                 child: Center(
                   child: Text(
-                    'No books to show yet.',
+                    l10n.creatorDetailNoBooksYet,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -270,31 +272,32 @@ class _SocialLinksRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final entries = <_SocialEntry>[
       if (socialLinks.tiktok.isNotEmpty)
-        _SocialEntry('TikTok', Icons.music_note_rounded, socialLinks.tiktok),
+        _SocialEntry(l10n.socialLinkTiktok, Icons.music_note_rounded, socialLinks.tiktok),
       if (socialLinks.instagram.isNotEmpty)
         _SocialEntry(
-            'Instagram', Icons.camera_alt_rounded, socialLinks.instagram),
+            l10n.socialLinkInstagram, Icons.camera_alt_rounded, socialLinks.instagram),
       if (socialLinks.youtube.isNotEmpty)
         _SocialEntry(
-            'YouTube', Icons.play_circle_outline_rounded, socialLinks.youtube),
+            l10n.socialLinkYoutube, Icons.play_circle_outline_rounded, socialLinks.youtube),
       if (socialLinks.threads.isNotEmpty)
-        _SocialEntry('Threads', Icons.alternate_email_rounded,
+        _SocialEntry(l10n.socialLinkThreads, Icons.alternate_email_rounded,
             socialLinks.threads),
       if (socialLinks.goodreads.isNotEmpty)
         _SocialEntry(
-            'Goodreads', Icons.menu_book_rounded, socialLinks.goodreads),
+            l10n.socialLinkGoodreads, Icons.menu_book_rounded, socialLinks.goodreads),
       if (socialLinks.storygraph.isNotEmpty)
         _SocialEntry(
-            'StoryGraph', Icons.auto_graph_rounded, socialLinks.storygraph),
+            l10n.socialLinkStorygraph, Icons.auto_graph_rounded, socialLinks.storygraph),
       if (socialLinks.bookbub.isNotEmpty)
         _SocialEntry(
-            'BookBub', Icons.notifications_rounded, socialLinks.bookbub),
+            l10n.socialLinkBookbub, Icons.notifications_rounded, socialLinks.bookbub),
       if (socialLinks.facebook.isNotEmpty)
-        _SocialEntry('Facebook', Icons.people_rounded, socialLinks.facebook),
+        _SocialEntry(l10n.socialLinkFacebook, Icons.people_rounded, socialLinks.facebook),
       if (socialLinks.website.isNotEmpty)
-        _SocialEntry('Website', Icons.language_rounded, socialLinks.website),
+        _SocialEntry(l10n.socialLinkWebsite, Icons.language_rounded, socialLinks.website),
     ];
 
     if (entries.isEmpty) return const SizedBox.shrink();
@@ -368,6 +371,7 @@ class _FavoritesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
@@ -385,7 +389,7 @@ class _FavoritesSection extends StatelessWidget {
                   child: Text.rich(
                     TextSpan(children: [
                       TextSpan(
-                        text: 'Favorite book: ',
+                        text: l10n.creatorDetailFavoriteBookLabel,
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -412,7 +416,7 @@ class _FavoritesSection extends StatelessWidget {
                   child: Text.rich(
                     TextSpan(children: [
                       TextSpan(
-                        text: 'Loves: ',
+                        text: l10n.creatorDetailLovesLabel,
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),

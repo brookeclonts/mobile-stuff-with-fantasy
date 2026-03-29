@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/auth/models/user.dart';
 import 'package:swf_app/src/auth/presentation/widgets/sign_up_form.dart';
@@ -153,6 +154,7 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Row(
@@ -198,7 +200,7 @@ class _TopBar extends StatelessWidget {
                     ),
                     onPressed: onSkip,
                     child: Text(
-                      'Skip',
+                      l10n.signUpSkip,
                       style: theme.textTheme.bodySmall,
                     ),
                   )

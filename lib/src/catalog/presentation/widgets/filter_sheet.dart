@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/catalog/models/taxonomy.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/filter_bar.dart';
@@ -33,6 +34,7 @@ class _FilterSheetState extends State<FilterSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
@@ -52,7 +54,7 @@ class _FilterSheetState extends State<FilterSheet> {
                 padding: const EdgeInsets.fromLTRB(20, 12, 12, 0),
                 child: Row(
                   children: [
-                    Text('Filters', style: theme.textTheme.titleLarge),
+                    Text(l10n.filterSheetTitle, style: theme.textTheme.titleLarge),
                     const Spacer(),
                     if (_draft.hasSheetFilters)
                       TextButton(
@@ -68,7 +70,7 @@ class _FilterSheetState extends State<FilterSheet> {
                             audiobookOnly: false,
                           ),
                         ),
-                        child: const Text('Reset'),
+                        child: Text(l10n.filterSheetReset),
                       ),
                     IconButton(
                       icon: const Icon(Icons.close),
@@ -86,7 +88,7 @@ class _FilterSheetState extends State<FilterSheet> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: [
                     _FilterSection(
-                      title: 'Subgenres',
+                      title: l10n.filterSheetSubgenres,
                       children: [
                         Wrap(
                           spacing: 8,
@@ -106,7 +108,7 @@ class _FilterSheetState extends State<FilterSheet> {
                       ],
                     ),
                     _FilterSection(
-                      title: 'Tropes',
+                      title: l10n.filterSheetTropes,
                       children: [
                         Wrap(
                           spacing: 8,
@@ -125,7 +127,7 @@ class _FilterSheetState extends State<FilterSheet> {
                       ],
                     ),
                     _FilterSection(
-                      title: 'Spice Level',
+                      title: l10n.filterSheetSpiceLevel,
                       children: [
                         Wrap(
                           spacing: 8,
@@ -145,7 +147,7 @@ class _FilterSheetState extends State<FilterSheet> {
                       ],
                     ),
                     _FilterSection(
-                      title: 'Age Category',
+                      title: l10n.filterSheetAgeCategory,
                       children: [
                         Wrap(
                           spacing: 8,
@@ -165,7 +167,7 @@ class _FilterSheetState extends State<FilterSheet> {
                       ],
                     ),
                     _FilterSection(
-                      title: 'Representation',
+                      title: l10n.filterSheetRepresentation,
                       children: [
                         Wrap(
                           spacing: 8,
@@ -186,7 +188,7 @@ class _FilterSheetState extends State<FilterSheet> {
                       ],
                     ),
                     _FilterSection(
-                      title: 'Language Level',
+                      title: l10n.filterSheetLanguageLevel,
                       children: [
                         Wrap(
                           spacing: 8,
@@ -195,7 +197,7 @@ class _FilterSheetState extends State<FilterSheet> {
                             final selected =
                                 _draft.languageLevels.contains(level);
                             return FilterChip(
-                              label: Text(level.label),
+                              label: Text(level.localizedLabel(l10n)),
                               selected: selected,
                               selectedColor: SwfColors.tropePill,
                               checkmarkColor: SwfColors.color3,
@@ -232,8 +234,8 @@ class _FilterSheetState extends State<FilterSheet> {
                     },
                     child: Text(
                       _draft.hasSheetFilters
-                          ? 'Apply Filters (${_draft.activeSheetFilterCount})'
-                          : 'Apply Filters',
+                          ? l10n.filterSheetApplyWithCount(_draft.activeSheetFilterCount)
+                          : l10n.filterSheetApply,
                     ),
                   ),
                 ),

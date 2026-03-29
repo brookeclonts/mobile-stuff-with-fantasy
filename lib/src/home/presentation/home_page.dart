@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -8,6 +9,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -37,34 +39,34 @@ class HomePage extends StatelessWidget {
                     Wrap(
                       spacing: 12,
                       runSpacing: 12,
-                      children: const <Widget>[
+                      children: <Widget>[
                         _FeatureChip(
                           icon: Icons.auto_awesome_rounded,
-                          label: 'Material 3',
+                          label: l10n.homeChipMaterial3,
                         ),
                         _FeatureChip(
                           icon: Icons.rule_folder_outlined,
-                          label: 'Structured starter',
+                          label: l10n.homeChipStructuredStarter,
                         ),
                         _FeatureChip(
                           icon: Icons.fact_check_outlined,
-                          label: 'Widget tests',
+                          label: l10n.homeChipWidgetTests,
                         ),
                       ],
                     ),
                     const SizedBox(height: 32),
                     Text(
-                      'Stuff With Fantasy',
+                      l10n.homeHeadline,
                       style: theme.textTheme.displaySmall,
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Your fantasy reading companion.',
+                      l10n.homeTagline,
                       style: theme.textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Discover, track, and share the fantasy books you love.',
+                      l10n.homeSubtitle,
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                         height: 1.5,
@@ -83,25 +85,25 @@ class HomePage extends StatelessWidget {
                           children: <Widget>[
                             SizedBox(
                               width: cardWidth,
-                              child: const _InfoCard(
+                              child: _InfoCard(
                                 icon: Icons.foundation_outlined,
-                                title: 'What is ready',
+                                title: l10n.homeCardWhatIsReadyTitle,
                                 items: <String>[
-                                  'A branded app shell with light and dark themes.',
-                                  'A stricter analyzer baseline using flutter_lints.',
-                                  'A widget test to protect the starter experience.',
+                                  l10n.homeCardWhatIsReadyItem1,
+                                  l10n.homeCardWhatIsReadyItem2,
+                                  l10n.homeCardWhatIsReadyItem3,
                                 ],
                               ),
                             ),
                             SizedBox(
                               width: cardWidth,
-                              child: const _InfoCard(
+                              child: _InfoCard(
                                 icon: Icons.explore_outlined,
-                                title: 'Where to go next',
+                                title: l10n.homeCardWhereToGoNextTitle,
                                 items: <String>[
-                                  'Add features under lib/src by domain instead of growing main.dart.',
-                                  'Replace placeholder assets, launcher icons, and product copy.',
-                                  'Run flutter analyze and flutter test as you add screens.',
+                                  l10n.homeCardWhereToGoNextItem1,
+                                  l10n.homeCardWhereToGoNextItem2,
+                                  l10n.homeCardWhereToGoNextItem3,
                                 ],
                               ),
                             ),
@@ -123,12 +125,12 @@ class HomePage extends StatelessWidget {
                             children: [
                               ElevatedButton(
                                 onPressed: () {},
-                                child: const Text('Get Started'),
+                                child: Text(l10n.homeGetStarted),
                               ),
                               const SizedBox(width: 16),
                               OutlinedButton(
                                 onPressed: () {},
-                                child: const Text('Browse Books'),
+                                child: Text(l10n.homeBrowseBooks),
                               ),
                             ],
                           ),

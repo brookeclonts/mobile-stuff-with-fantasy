@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/api/api_result.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/auth/data/auth_repository.dart';
@@ -9,10 +10,14 @@ import 'package:swf_app/src/auth/presentation/sign_up_flow.dart';
 import 'package:swf_app/src/catalog/presentation/catalog_page.dart';
 import 'package:swf_app/src/profile/data/quest_compendium.dart';
 import 'package:swf_app/src/profile/data/rune_compendium.dart';
+import 'package:swf_app/src/profile/models/daily_reading_entry.dart';
 import 'package:swf_app/src/profile/models/quest_campaign.dart';
+import 'package:swf_app/src/profile/models/reading_stats.dart';
+import 'package:swf_app/src/profile/presentation/widgets/achievement_sigils.dart';
 import 'package:swf_app/src/profile/presentation/widgets/character_sheet.dart';
 import 'package:swf_app/src/profile/presentation/widgets/guest_guild_state.dart';
 import 'package:swf_app/src/profile/presentation/widgets/quest_scroll_card.dart';
+import 'package:swf_app/src/profile/presentation/widgets/reading_chronicle.dart';
 import 'package:swf_app/src/profile/presentation/widgets/realm_map.dart';
 import 'package:swf_app/src/profile/presentation/widgets/relic_vault.dart';
 import 'package:swf_app/src/profile/presentation/widgets/reward_reveal_dialog.dart';
@@ -20,6 +25,7 @@ import 'package:swf_app/src/profile/presentation/widgets/rune_config_sheets.dart
 import 'package:swf_app/src/profile/presentation/widgets/rune_slots.dart';
 import 'package:swf_app/src/profile/presentation/widgets/section_divider.dart';
 import 'package:swf_app/src/profile/presentation/widgets/staggered_fade_slide.dart';
+import 'package:swf_app/src/profile/presentation/widgets/tome_counter.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -49,6 +55,10 @@ class _ProfilePageState extends State<ProfilePage> {
   final Set<String> _completedObjectiveIds = <String>{};
   final Set<String> _revealedRewardIds = <String>{};
   final Set<String> _expandedScrollIds = <String>{};
+
+  // Reading stats
+  ReadingStats _readingStats = const ReadingStats();
+  List<DailyReadingEntry> _dailyEntries = const [];
 
   // Rune configuration state
   bool _arcEnabled = false;
@@ -82,7 +92,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String get _rankTitle {
     final titles = _campaign.rankTitles;
-    if (titles.isEmpty) return 'Unknown Rank';
+    if (titles.isEmpty) return AppLocalizations.of(context)!.profileUnknownRank;
     return titles[_rankIndex];
   }
 
@@ -148,6 +158,18 @@ class _ProfilePageState extends State<ProfilePage> {
     _sessionStore = widget.sessionStore ?? ServiceLocator.sessionStore;
 
     _loadProfile();
+    _loadReadingStats();
+  }
+
+  Future<void> _loadReadingStats() async {
+    final repo = ServiceLocator.readingStatsRepository;
+    final stats = await repo.getStats();
+    final entries = await repo.getDailyEntries();
+    if (!mounted) return;
+    setState(() {
+      _readingStats = stats;
+      _dailyEntries = entries;
+    });
   }
 
   Future<void> _loadProfile() async {
@@ -218,6 +240,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _deleteAccount() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -227,13 +250,13 @@ class _ProfilePageState extends State<ProfilePage> {
           side: BorderSide(color: Colors.red.withAlpha(80)),
         ),
         title: Text(
-          'Delete Account',
+          l10n.profileDeleteAccountTitle,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
             color: Colors.white,
           ),
         ),
         content: Text(
-          'This will permanently delete your account and all associated data. This cannot be undone.',
+          l10n.profileDeleteAccountBody,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Colors.white.withAlpha(180),
           ),
@@ -242,15 +265,15 @@ class _ProfilePageState extends State<ProfilePage> {
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
-              'Cancel',
+              l10n.profileDeleteCancel,
               style: TextStyle(color: Colors.white.withAlpha(140)),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
+            child: Text(
+              l10n.profileDeleteConfirm,
+              style: const TextStyle(color: Colors.red),
             ),
           ),
         ],
@@ -368,8 +391,8 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       default:
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('This rune will be configurable soon.'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.profileSnackbarRuneComingSoon),
           ),
         );
     }
@@ -391,11 +414,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: SwfColors.primaryBackground,
       appBar: AppBar(
         title: Text(
-          'Guild Hall',
+          l10n.profileAppBarTitle,
           style: GoogleFonts.playfairDisplay(
             fontSize: 19,
             fontWeight: FontWeight.w600,
@@ -409,6 +433,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildBody(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_isLoading && _user == null) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -476,9 +502,9 @@ class _ProfilePageState extends State<ProfilePage> {
               delay: const Duration(milliseconds: 250),
               child: Column(
                 children: [
-                  const SectionDivider(
-                    title: 'Runes',
-                    subtitle: 'Seal quests to engrave ability runes.',
+                  SectionDivider(
+                    title: l10n.profileSectionRunes,
+                    subtitle: l10n.profileSectionRunesSubtitle,
                   ),
                   RuneSlots(
                     runes: runes,
@@ -495,9 +521,9 @@ class _ProfilePageState extends State<ProfilePage> {
           SliverToBoxAdapter(
             child: StaggeredFadeSlide(
               delay: const Duration(milliseconds: 400),
-              child: const SectionDivider(
-                title: 'Quest Log',
-                subtitle: 'Unfurl scrolls to track and seal objectives.',
+              child: SectionDivider(
+                title: l10n.profileSectionQuestLog,
+                subtitle: l10n.profileSectionQuestLogSubtitle,
               ),
             ),
           ),
@@ -547,10 +573,9 @@ class _ProfilePageState extends State<ProfilePage> {
               delay: const Duration(milliseconds: 800),
               child: Column(
                 children: [
-                  const SectionDivider(
-                    title: 'Relic Vault',
-                    subtitle:
-                        'Seal scrolls to claim relics for your vault.',
+                  SectionDivider(
+                    title: l10n.profileSectionRelicVault,
+                    subtitle: l10n.profileSectionRelicVaultSubtitle,
                   ),
                   RelicVault(
                     campaign: _campaign,
@@ -561,14 +586,72 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
 
-          // ── Character Sheet ──
+          // ── Reading Chronicle ──
           SliverToBoxAdapter(
             child: StaggeredFadeSlide(
               delay: const Duration(milliseconds: 1050),
               child: Column(
                 children: [
-                  const SectionDivider(
-                    title: 'Character Sheet',
+                  SectionDivider(
+                    title: l10n.profileSectionReadingChronicle,
+                    subtitle: l10n.profileSectionReadingChronicleSubtitle,
+                  ),
+                  ReadingChronicle(
+                    entries: _dailyEntries,
+                    stats: _readingStats,
+                    accentColor: _campaign.accentColor,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // ── Tome Counter ──
+          SliverToBoxAdapter(
+            child: StaggeredFadeSlide(
+              delay: const Duration(milliseconds: 1200),
+              child: Column(
+                children: [
+                  SectionDivider(
+                    title: l10n.profileSectionTomeCounter,
+                    subtitle: l10n.profileSectionTomeCounterSubtitle,
+                  ),
+                  TomeCounter(
+                    stats: _readingStats,
+                    accentColor: _campaign.accentColor,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // ── Achievement Sigils ──
+          SliverToBoxAdapter(
+            child: StaggeredFadeSlide(
+              delay: const Duration(milliseconds: 1350),
+              child: Column(
+                children: [
+                  SectionDivider(
+                    title: l10n.profileSectionAchievementSigils,
+                    subtitle: l10n.profileSectionAchievementSigilsSubtitle,
+                  ),
+                  AchievementSigils(
+                    stats: _readingStats,
+                    accentColor: _campaign.accentColor,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // ── Character Sheet ──
+          SliverToBoxAdapter(
+            child: StaggeredFadeSlide(
+              delay: const Duration(milliseconds: 1500),
+              child: Column(
+                children: [
+                  SectionDivider(
+                    title: l10n.profileSectionCharacterSheet,
                   ),
                   CharacterSheet(
                     name: _displayName(user),
@@ -585,10 +668,20 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
 
+          // ── Language ──
+          SliverToBoxAdapter(
+            child: StaggeredFadeSlide(
+              delay: const Duration(milliseconds: 1650),
+              child: _LanguagePicker(
+                accentColor: _campaign.accentColor,
+              ),
+            ),
+          ),
+
           // ── Exit the Realm & Delete Account ──
           SliverToBoxAdapter(
             child: StaggeredFadeSlide(
-              delay: const Duration(milliseconds: 1200),
+              delay: const Duration(milliseconds: 1800),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 28, 16, 40),
                 child: Column(
@@ -616,8 +709,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           : const Icon(Icons.logout_rounded),
                       label: Text(
                         _isSigningOut
-                            ? 'Leaving the realm...'
-                            : 'Exit the Realm',
+                            ? l10n.profileSigningOut
+                            : l10n.profileSignOut,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -642,8 +735,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           : const Icon(Icons.delete_forever_rounded, size: 20),
                       label: Text(
                         _isDeletingAccount
-                            ? 'Deleting account...'
-                            : 'Delete Account',
+                            ? l10n.profileDeletingAccount
+                            : l10n.profileDeleteAccount,
                       ),
                     ),
                   ],
@@ -681,6 +774,7 @@ class _InlineNotice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Container(
@@ -705,7 +799,7 @@ class _InlineNotice extends StatelessWidget {
             TextButton(
               onPressed: onRetry,
               child: Text(
-                'Retry',
+                l10n.profileRetry,
                 style: TextStyle(color: accentColor),
               ),
             ),
@@ -725,6 +819,7 @@ class _ProfileErrorState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Center(
       child: Padding(
@@ -748,7 +843,7 @@ class _ProfileErrorState extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'The quest board failed to load',
+                l10n.profileErrorHeadline,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   color: Colors.white,
                 ),
@@ -765,10 +860,115 @@ class _ProfileErrorState extends StatelessWidget {
               const SizedBox(height: 22),
               ElevatedButton(
                 onPressed: onRetry,
-                child: const Text('Try again'),
+                child: Text(l10n.profileTryAgain),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Language picker
+// ---------------------------------------------------------------------------
+
+class _LanguagePicker extends StatelessWidget {
+  const _LanguagePicker({required this.accentColor});
+
+  final Color accentColor;
+
+  static const _locales = <(String, Locale?)>[
+    ('languageSystemDefault', null),
+    ('languageEnglish', Locale('en')),
+    ('languageSpanish', Locale('es')),
+    ('languagePortuguese', Locale('pt')),
+    ('languageGerman', Locale('de')),
+    ('languageRussian', Locale('ru')),
+    ('languageBulgarian', Locale('bg')),
+    ('languageJapanese', Locale('ja')),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final provider = ServiceLocator.localeProvider;
+    final current = provider.locale;
+
+    String label(String key) => switch (key) {
+          'languageSystemDefault' => l10n.languageSystemDefault,
+          'languageEnglish' => l10n.languageEnglish,
+          'languageSpanish' => l10n.languageSpanish,
+          'languagePortuguese' => l10n.languagePortuguese,
+          'languageGerman' => l10n.languageGerman,
+          'languageRussian' => l10n.languageRussian,
+          'languageBulgarian' => l10n.languageBulgarian,
+          'languageJapanese' => l10n.languageJapanese,
+          _ => key,
+        };
+
+    return Column(
+      children: [
+        SectionDivider(title: l10n.profileSectionLanguage),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Column(
+            children: [
+              for (final (key, locale) in _locales)
+                _LanguageOption(
+                  label: label(key),
+                  selected: current?.languageCode == locale?.languageCode,
+                  accentColor: accentColor,
+                  onTap: () => provider.setLocale(locale),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _LanguageOption extends StatelessWidget {
+  const _LanguageOption({
+    required this.label,
+    required this.selected,
+    required this.accentColor,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final Color accentColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        child: Row(
+          children: [
+            Icon(
+              selected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_unchecked_rounded,
+              size: 20,
+              color: selected ? accentColor : Colors.white.withAlpha(80),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: selected ? Colors.white : Colors.white.withAlpha(180),
+                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
         ),
       ),
     );

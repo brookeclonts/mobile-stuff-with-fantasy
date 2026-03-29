@@ -1,3 +1,4 @@
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/creators/models/social_links.dart';
 
@@ -14,9 +15,9 @@ enum CreatorRole {
     };
   }
 
-  String get label => switch (this) {
-        CreatorRole.author || CreatorRole.admin => 'Author',
-        CreatorRole.influencer => 'Influencer',
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+        CreatorRole.author || CreatorRole.admin => l10n.creatorRoleAuthor,
+        CreatorRole.influencer => l10n.creatorRoleInfluencer,
       };
 
   bool get isAuthor => this == CreatorRole.author || this == CreatorRole.admin;
@@ -81,8 +82,8 @@ class Creator {
   /// Books to display — authors show their own books, influencers show favorites.
   List<Book> get displayBooks => role.isAuthor ? books : favoriteBooks;
 
-  String get booksLabel =>
-      role.isAuthor ? 'Books by $name' : 'Recommended by $name';
+  String localizedBooksLabel(AppLocalizations l10n) =>
+      role.isAuthor ? l10n.creatorDetailBooksBy(name) : l10n.creatorDetailRecommendedBy(name);
 
   static SocialLinks _parseSocialLinks(Object? raw) {
     if (raw is Map<String, Object?>) return SocialLinks.fromJson(raw);

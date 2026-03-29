@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/api/api_result.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/auth/data/auth_repository.dart';
@@ -276,12 +277,14 @@ class _CatalogPageState extends State<CatalogPage> {
   }
 
   void _showSignUpPrompt() {
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text(
-          'Create an account to save books to your reading list.',
+        content: Text(l10n.catalogSignUpPrompt),
+        action: SnackBarAction(
+          label: l10n.catalogSnackbarActionProfile,
+          onPressed: _openProfile,
         ),
-        action: SnackBarAction(label: 'Profile', onPressed: _openProfile),
       ),
     );
   }
@@ -372,6 +375,7 @@ class _CatalogPageState extends State<CatalogPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final user = _currentUser();
 
     return Scaffold(
@@ -389,7 +393,7 @@ class _CatalogPageState extends State<CatalogPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.local_library_outlined, size: 22),
-            tooltip: 'Library',
+            tooltip: l10n.catalogTooltipLibrary,
             color: SwfColors.color8,
             onPressed: () => Navigator.push<void>(
               context,
@@ -399,7 +403,7 @@ class _CatalogPageState extends State<CatalogPage> {
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: Tooltip(
-              message: 'Profile',
+              message: l10n.catalogTooltipProfile,
               child: InkWell(
                 borderRadius: BorderRadius.circular(999),
                 onTap: _openProfile,
@@ -453,6 +457,7 @@ class _CatalogPageState extends State<CatalogPage> {
   }
 
   Widget _buildBody() {
+    final l10n = AppLocalizations.of(context)!;
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -504,7 +509,7 @@ class _CatalogPageState extends State<CatalogPage> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
                   child: Text(
-                    '$_totalBooks ${_totalBooks == 1 ? 'book' : 'books'}',
+                    l10n.booksCount(_totalBooks),
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -554,9 +559,8 @@ class _CatalogPageState extends State<CatalogPage> {
 
   void _showFilterSheet() {
     if (_repo.taxonomy.isEmpty) {
-      _showMessage(
-        'Filters are unavailable until taxonomy loads successfully.',
-      );
+      final l10n = AppLocalizations.of(context)!;
+      _showMessage(l10n.catalogFiltersUnavailable);
       return;
     }
 
@@ -595,6 +599,7 @@ class _ErrorState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Center(
       child: Padding(
@@ -613,7 +618,7 @@ class _ErrorState extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Retry'),
+              label: Text(l10n.catalogRetry),
             ),
           ],
         ),
@@ -631,6 +636,7 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Center(
       child: Padding(
@@ -647,14 +653,14 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              hasFilters ? 'No books match your filters' : 'No books yet',
+              hasFilters ? l10n.catalogEmptyFiltered : l10n.catalogEmptyNoBooks,
               style: theme.textTheme.titleMedium,
             ),
             if (hasFilters) ...[
               const SizedBox(height: 12),
               OutlinedButton(
                 onPressed: onClear,
-                child: const Text('Clear Filters'),
+                child: Text(l10n.catalogClearFilters),
               ),
             ],
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
 // ---------------------------------------------------------------------------
@@ -102,6 +103,7 @@ class _ArcShieldSheetState extends State<_ArcShieldSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final accent = widget.accentColor;
 
     return Container(
@@ -119,14 +121,14 @@ class _ArcShieldSheetState extends State<_ArcShieldSheet> {
           Icon(Icons.shield_rounded, size: 32, color: accent),
           const SizedBox(height: 12),
           Text(
-            'ARC Shield',
+            l10n.arcShieldTitle,
             style: theme.textTheme.headlineSmall?.copyWith(
               color: Colors.white,
             ),
           ),
           const SizedBox(height: 6),
           Text(
-            'When active, authors and publishers can find you as an ARC reader.',
+            l10n.arcShieldDescription,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: Colors.white.withAlpha(170),
@@ -135,7 +137,7 @@ class _ArcShieldSheetState extends State<_ArcShieldSheet> {
           ),
 
           const SizedBox(height: 24),
-          const _ConfigSectionLabel('Availability'),
+          _ConfigSectionLabel(l10n.arcShieldSectionAvailability),
 
           // Toggle
           Container(
@@ -165,7 +167,7 @@ class _ArcShieldSheetState extends State<_ArcShieldSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _enabled ? 'Open to ARCs' : 'Not accepting ARCs',
+                        _enabled ? l10n.arcShieldToggleOpenLabel : l10n.arcShieldToggleClosedLabel,
                         style: theme.textTheme.titleSmall?.copyWith(
                           color: Colors.white.withAlpha(220),
                         ),
@@ -173,8 +175,8 @@ class _ArcShieldSheetState extends State<_ArcShieldSheet> {
                       const SizedBox(height: 2),
                       Text(
                         _enabled
-                            ? 'Authors can reach out to you'
-                            : 'Your profile is hidden from ARC searches',
+                            ? l10n.arcShieldToggleOpenSubtitle
+                            : l10n.arcShieldToggleClosedSubtitle,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: Colors.white.withAlpha(130),
                         ),
@@ -241,30 +243,30 @@ class _GenreAttunementSheet extends StatefulWidget {
 class _GenreAttunementSheetState extends State<_GenreAttunementSheet> {
   late Set<String> _selected;
 
-  static const _genres = [
-    'Epic Fantasy',
-    'Dark Fantasy',
-    'Urban Fantasy',
-    'Romantasy',
-    'Cozy Fantasy',
-    'Grimdark',
-    'LitRPG',
-    'Sword & Sorcery',
-    'Mythic Fantasy',
-    'Portal Fantasy',
+  static List<String> _genres(AppLocalizations l10n) => [
+    l10n.genreEpicFantasy,
+    l10n.genreDarkFantasy,
+    l10n.genreUrbanFantasy,
+    l10n.genreRomantasy,
+    l10n.genreCozyFantasy,
+    l10n.genreGrimdark,
+    l10n.genreLitRpg,
+    l10n.genreSwordAndSorcery,
+    l10n.genreMythicFantasy,
+    l10n.genrePortalFantasy,
   ];
 
-  static const _tropes = [
-    'Found Family',
-    'Enemies to Lovers',
-    'Chosen One',
-    'Magic Schools',
-    'Morally Grey',
-    'Slow Burn',
-    'Political Intrigue',
-    'Quest Journey',
-    'Hidden Royalty',
-    'Revenge Arc',
+  static List<String> _tropes(AppLocalizations l10n) => [
+    l10n.tropeFoundFamily,
+    l10n.tropeEnemiesToLovers,
+    l10n.tropeChosenOne,
+    l10n.tropeMagicSchools,
+    l10n.tropeMorallyGrey,
+    l10n.tropeSlowBurn,
+    l10n.tropePoliticalIntrigue,
+    l10n.tropeQuestJourney,
+    l10n.tropeHiddenRoyalty,
+    l10n.tropeRevengeArc,
   ];
 
   @override
@@ -287,7 +289,10 @@ class _GenreAttunementSheetState extends State<_GenreAttunementSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final accent = widget.accentColor;
+    final genres = _genres(l10n);
+    final tropes = _tropes(l10n);
 
     return Container(
       constraints: BoxConstraints(
@@ -307,15 +312,14 @@ class _GenreAttunementSheetState extends State<_GenreAttunementSheet> {
             Icon(Icons.auto_awesome_rounded, size: 32, color: accent),
             const SizedBox(height: 12),
             Text(
-              'Genre Attunement',
+              l10n.genreAttunementTitle,
               style: theme.textTheme.headlineSmall?.copyWith(
                 color: Colors.white,
               ),
             ),
             const SizedBox(height: 6),
             Text(
-              'Select the genres and tropes that call to you. '
-              'The realm will learn what to surface.',
+              l10n.genreAttunementDescription,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.white.withAlpha(170),
@@ -324,12 +328,12 @@ class _GenreAttunementSheetState extends State<_GenreAttunementSheet> {
             ),
 
             const SizedBox(height: 24),
-            const _ConfigSectionLabel('Genres'),
+            _ConfigSectionLabel(l10n.genreAttunementSectionGenres),
 
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: _genres
+              children: genres
                   .map((g) => _SelectableChip(
                         label: g,
                         isSelected: _selected.contains(g),
@@ -340,12 +344,12 @@ class _GenreAttunementSheetState extends State<_GenreAttunementSheet> {
             ),
 
             const SizedBox(height: 20),
-            const _ConfigSectionLabel('Tropes'),
+            _ConfigSectionLabel(l10n.genreAttunementSectionTropes),
 
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: _tropes
+              children: tropes
                   .map((t) => _SelectableChip(
                         label: t,
                         isSelected: _selected.contains(t),
@@ -359,7 +363,7 @@ class _GenreAttunementSheetState extends State<_GenreAttunementSheet> {
 
             if (_selected.isNotEmpty)
               Text(
-                '${_selected.length} attuned',
+                l10n.genreAttunementCountAttuned(_selected.length),
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: accent,
                   fontWeight: FontWeight.w600,
@@ -459,23 +463,23 @@ class _EventWatchtowerSheet extends StatefulWidget {
 class _EventWatchtowerSheetState extends State<_EventWatchtowerSheet> {
   late Set<String> _enabled;
 
-  static const _notificationTypes = <({String id, String title, String description, IconData icon})>[
+  static List<({String id, String title, String description, IconData icon})> _notificationTypes(AppLocalizations l10n) => [
     (
       id: 'events',
-      title: 'New Events',
-      description: 'When a Stuff Your Kindle event launches',
+      title: l10n.notifNewEventsTitle,
+      description: l10n.notifNewEventsDescription,
       icon: Icons.celebration_rounded,
     ),
     (
       id: 'drops',
-      title: 'Book Drops',
-      description: 'When new books are added to the catalog',
+      title: l10n.notifBookDropsTitle,
+      description: l10n.notifBookDropsDescription,
       icon: Icons.library_add_rounded,
     ),
     (
       id: 'recommendations',
-      title: 'Recommendations',
-      description: 'Personalized picks based on your attunement',
+      title: l10n.notifRecommendationsTitle,
+      description: l10n.notifRecommendationsDescription,
       icon: Icons.recommend_rounded,
     ),
   ];
@@ -500,7 +504,9 @@ class _EventWatchtowerSheetState extends State<_EventWatchtowerSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final accent = widget.accentColor;
+    final notifTypes = _notificationTypes(l10n);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
@@ -520,14 +526,14 @@ class _EventWatchtowerSheetState extends State<_EventWatchtowerSheet> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Event Watchtower',
+            l10n.eventWatchtowerTitle,
             style: theme.textTheme.headlineSmall?.copyWith(
               color: Colors.white,
             ),
           ),
           const SizedBox(height: 6),
           Text(
-            'Choose which signals reach you from the realm.',
+            l10n.eventWatchtowerDescription,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: Colors.white.withAlpha(170),
@@ -536,9 +542,9 @@ class _EventWatchtowerSheetState extends State<_EventWatchtowerSheet> {
           ),
 
           const SizedBox(height: 24),
-          const _ConfigSectionLabel('Signals'),
+          _ConfigSectionLabel(l10n.eventWatchtowerSectionSignals),
 
-          ..._notificationTypes.map(
+          ...notifTypes.map(
             (type) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: _NotificationToggle(

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 
 /// Account type used during sign-up.
 enum UserRole {
   reader;
 
-  String get label => 'Reader';
+  String localizedLabel(AppLocalizations l10n) => l10n.userRoleReader;
 
-  String get description => 'Discover your next favorite fantasy book';
+  String localizedDescription(AppLocalizations l10n) =>
+      l10n.userRoleReaderDescription;
 
   String get apiValue => name;
 

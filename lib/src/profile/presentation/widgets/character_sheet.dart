@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
 /// Parchment-styled RPG character sheet with stat rows and ornamental dividers.
@@ -31,6 +32,7 @@ class CharacterSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final accent = accentColor ?? SwfColors.secondaryAccent;
 
     return Container(
@@ -68,7 +70,7 @@ class CharacterSheet extends StatelessWidget {
                 _OrnamentDot(color: accent),
                 const SizedBox(width: 12),
                 Text(
-                  'CHARACTER SHEET',
+                  l10n.characterSheetHeaderLabel,
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: SwfColors.secondaryAccent,
                     letterSpacing: 2.5,
@@ -86,21 +88,21 @@ class CharacterSheet extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
             child: Column(
               children: [
-                _StatRow(label: 'Name', value: name),
+                _StatRow(label: l10n.characterSheetStatName, value: name),
                 _StatDivider(),
-                _StatRow(label: 'Rank', value: rank),
+                _StatRow(label: l10n.characterSheetStatRank, value: rank),
                 _StatDivider(),
                 _StatRow(
-                  label: 'Quests',
+                  label: l10n.characterSheetStatQuests,
                   value: '$questsCompleted / $questsTotal',
                 ),
                 _StatDivider(),
                 _StatRow(
-                  label: 'Relics',
+                  label: l10n.characterSheetStatRelics,
                   value: '$relicsCollected / $relicsTotal',
                 ),
                 _StatDivider(),
-                _StatRow(label: 'Signal', value: signal),
+                _StatRow(label: l10n.characterSheetStatSignal, value: signal),
               ],
             ),
           ),

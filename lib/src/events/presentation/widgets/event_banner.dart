@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/events/models/event.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
@@ -59,7 +60,7 @@ class EventBanner extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      _StatusPill(label: event.statusLabel),
+                      _StatusPill(label: event.localizedStatusLabel(AppLocalizations.of(context)!)),
                     ],
                   ),
                 ),

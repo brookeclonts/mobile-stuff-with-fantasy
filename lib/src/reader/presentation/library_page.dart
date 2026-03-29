@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/auth/data/auth_repository.dart';
 import 'package:swf_app/src/auth/data/session_store.dart';
@@ -209,6 +210,7 @@ class _LibraryPageState extends State<LibraryPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return DefaultTabController(
       initialIndex: widget.initialTab.index,
@@ -216,7 +218,7 @@ class _LibraryPageState extends State<LibraryPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            'Library',
+            l10n.libraryAppBarTitle,
             style: GoogleFonts.playfairDisplay(
               fontSize: 19,
               fontWeight: FontWeight.w600,
@@ -224,10 +226,10 @@ class _LibraryPageState extends State<LibraryPage> {
               letterSpacing: 0.5,
             ),
           ),
-          bottom: const TabBar(
+          bottom: TabBar(
             tabs: [
-              Tab(text: 'My Books'),
-              Tab(text: 'Reading List'),
+              Tab(text: l10n.libraryTabMyBooks),
+              Tab(text: l10n.libraryTabReadingList),
             ],
           ),
         ),
@@ -239,6 +241,7 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   Widget _buildMyBooksTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return switch ((
       _isAuthenticated,
       _myBooksLoading,
@@ -248,9 +251,8 @@ class _LibraryPageState extends State<LibraryPage> {
       (_, true, _, _) => const Center(child: CircularProgressIndicator()),
       (false, _, _, _) => _SignInEmptyState(
         icon: Icons.auto_stories_outlined,
-        title: 'Your bookshelf awaits',
-        message:
-            'Sign in to access books you\'ve purchased, claimed, or uploaded — ready to read right here.',
+        title: l10n.libraryMyBooksSignInTitle,
+        message: l10n.libraryMyBooksSignInMessage,
         onSignIn: _openSignIn,
       ),
       (_, _, final String error, _) => _ErrorState(
@@ -259,9 +261,8 @@ class _LibraryPageState extends State<LibraryPage> {
       ),
       (_, _, _, true) => _EmptyState(
         icon: Icons.library_books_outlined,
-        title: 'No readable books yet',
-        message:
-            'Books you buy, claim, or upload will show up here when they are ready to read.',
+        title: l10n.libraryMyBooksEmptyTitle,
+        message: l10n.libraryMyBooksEmptyMessage,
       ),
       _ => RefreshIndicator(
         onRefresh: () => _loadMyBooks(forceRefresh: true),
@@ -272,6 +273,7 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   Widget _buildReadingListTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return switch ((
       _isAuthenticated,
       _readingListLoading,
@@ -281,9 +283,8 @@ class _LibraryPageState extends State<LibraryPage> {
       (_, true, _, _) => const Center(child: CircularProgressIndicator()),
       (false, _, _, _) => _SignInEmptyState(
         icon: Icons.bookmarks_outlined,
-        title: 'Start your reading list',
-        message:
-            'Sign in to save books from the catalog and build your personal reading list.',
+        title: l10n.libraryReadingListSignInTitle,
+        message: l10n.libraryReadingListSignInMessage,
         onSignIn: _openSignIn,
       ),
       (_, _, final String error, _) => _ErrorState(
@@ -292,8 +293,8 @@ class _LibraryPageState extends State<LibraryPage> {
       ),
       (_, _, _, true) => _EmptyState(
         icon: Icons.menu_book_outlined,
-        title: 'Nothing saved yet',
-        message: 'Save books from the catalog to build your reading list.',
+        title: l10n.libraryReadingListEmptyTitle,
+        message: l10n.libraryReadingListEmptyMessage,
       ),
       _ => RefreshIndicator(
         onRefresh: () => _loadReadingList(forceRefresh: true),
@@ -396,7 +397,7 @@ class _ReadableBookTile extends StatelessWidget {
                   vertical: 6,
                 ),
                 child: Text(
-                  readableBook.accessLabel,
+                  readableBook.localizedAccessLabel(AppLocalizations.of(context)!),
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -483,6 +484,7 @@ class _SignInEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
@@ -535,7 +537,7 @@ class _SignInEmptyState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onSignIn,
               icon: const Icon(Icons.person_outline, size: 20),
-              label: const Text('Sign In'),
+              label: Text(l10n.libraryButtonSignIn),
               style: FilledButton.styleFrom(
                 backgroundColor: SwfColors.color4,
                 foregroundColor: Colors.white,
@@ -564,6 +566,7 @@ class _ErrorState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -584,7 +587,7 @@ class _ErrorState extends StatelessWidget {
             const SizedBox(height: 16),
             FilledButton(
               onPressed: () => onRetry(),
-              child: const Text('Retry'),
+              child: Text(l10n.libraryRetry),
             ),
           ],
         ),

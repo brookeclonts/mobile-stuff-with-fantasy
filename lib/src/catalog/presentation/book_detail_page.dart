@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/reader/models/readable_book.dart';
@@ -59,8 +60,15 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   Future<void> _openLink(String url) async {
-    final uri = Uri.tryParse(url);
-    if (uri != null && await canLaunchUrl(uri)) {
+    var uri = Uri.tryParse(url);
+    if (uri == null) return;
+    // Append Amazon affiliate tag to Amazon links.
+    if (uri.host.contains('amazon.')) {
+      uri = uri.replace(
+        queryParameters: {...uri.queryParameters, 'tag': 'stuffwithfant-20'},
+      );
+    }
+    if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
@@ -140,11 +148,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   void _showSignUpPrompt() {
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Create an account from your profile to save books to your reading list.',
-        ),
+      SnackBar(
+        content: Text(l10n.bookDetailSignUpPrompt),
       ),
     );
   }
@@ -152,6 +159,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.sizeOf(context).width;
 
     return Scaffold(
@@ -207,7 +215,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   Text(_book.title, style: theme.textTheme.headlineMedium),
                   const SizedBox(height: 4),
                   Text(
-                    'by ${_book.authorName}',
+                    l10n.bookDetailByAuthor(_book.authorName),
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -239,7 +247,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
 
                   // Subgenres
                   if (_book.subgenres.isNotEmpty) ...[
-                    _SectionLabel(label: 'Subgenres'),
+                    _SectionLabel(label: l10n.bookDetailSectionSubgenres),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -259,7 +267,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
 
                   // Tropes
                   if (_book.tropes.isNotEmpty) ...[
-                    _SectionLabel(label: 'Tropes'),
+                    _SectionLabel(label: l10n.bookDetailSectionTropes),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -279,7 +287,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
 
                   // Representations
                   if (_book.representations.isNotEmpty) ...[
-                    _SectionLabel(label: 'Representation'),
+                    _SectionLabel(label: l10n.bookDetailSectionRepresentation),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -299,7 +307,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
 
                   // Description
                   if (_book.description.isNotEmpty) ...[
-                    _SectionLabel(label: 'About this book'),
+                    _SectionLabel(label: l10n.bookDetailSectionAbout),
                     const SizedBox(height: 8),
                     GestureDetector(
                       onTap: () => setState(
@@ -324,7 +332,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Read more',
+                              l10n.bookDetailReadMore,
                               style: theme.textTheme.labelMedium?.copyWith(
                                 color: theme.colorScheme.primary,
                               ),
@@ -352,7 +360,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                child: _SectionLabel(label: 'You might also like'),
+                child: _SectionLabel(label: l10n.bookDetailSectionSimilar),
               ),
             ),
             SliverToBoxAdapter(
@@ -428,6 +436,7 @@ class _StatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isDark = theme.brightness == Brightness.dark;
     final dividerColor = isDark ? SwfColors.color3 : SwfColors.color5;
 
@@ -439,7 +448,7 @@ class _StatsRow extends StatelessWidget {
           iconColor: book.spiceLevel == SpiceLevel.none
               ? theme.colorScheme.outline
               : SwfColors.color4,
-          label: book.spiceLevel.label,
+          label: book.spiceLevel.localizedLabel(l10n),
         ),
         _VerticalDivider(color: dividerColor),
         // Age category
@@ -455,7 +464,7 @@ class _StatsRow extends StatelessWidget {
         _StatItem(
           icon: Icons.chat_bubble_outline_rounded,
           iconColor: SwfColors.color6,
-          label: book.languageLevel.label,
+          label: book.languageLevel.localizedLabel(l10n),
         ),
         // KU / Audiobook badges
         const Spacer(),
@@ -469,7 +478,7 @@ class _StatsRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
-                'KU',
+                l10n.bookDetailBadgeKu,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
@@ -561,6 +570,7 @@ class _ReadingListButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: isSaved
@@ -574,7 +584,7 @@ class _ReadingListButton extends StatelessWidget {
                     )
                   : const Icon(Icons.bookmark_remove_outlined, size: 18),
               label: Text(
-                isLoading ? 'Updating...' : 'Remove from Reading List',
+                isLoading ? l10n.bookDetailUpdating : l10n.bookDetailRemoveFromList,
               ),
             )
           : FilledButton.icon(
@@ -589,7 +599,7 @@ class _ReadingListButton extends StatelessWidget {
                       ),
                     )
                   : const Icon(Icons.bookmark_add_outlined, size: 18),
-              label: Text(isLoading ? 'Saving...' : 'Save to Reading List'),
+              label: Text(isLoading ? l10n.bookDetailSaving : l10n.bookDetailSaveToList),
             ),
     );
   }
@@ -603,6 +613,7 @@ class _ReadInAppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(
@@ -617,7 +628,7 @@ class _ReadInAppButton extends StatelessWidget {
                 ),
               )
             : const Icon(Icons.auto_stories_rounded, size: 18),
-        label: Text(isLoading ? 'Opening...' : 'Read in App'),
+        label: Text(isLoading ? l10n.bookDetailOpening : l10n.bookDetailReadInApp),
       ),
     );
   }
@@ -635,6 +646,7 @@ class _ActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final hasPrimary = book.purchaseLink.isNotEmpty;
     final hasAlt = book.alternatePurchaseLink.isNotEmpty;
     final hasAudio = book.audiobookLink.isNotEmpty;
@@ -648,7 +660,7 @@ class _ActionButtons extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: () => onOpenLink(book.purchaseLink),
               icon: const Icon(Icons.shopping_bag_outlined, size: 18),
-              label: const Text('Get this Book'),
+              label: Text(l10n.bookDetailGetBook),
             ),
           ),
         if (hasPrimary && hasAudio) const SizedBox(width: 12),
@@ -657,7 +669,7 @@ class _ActionButtons extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: () => onOpenLink(book.audiobookLink),
               icon: const Icon(Icons.headphones_rounded, size: 18),
-              label: const Text('Audiobook'),
+              label: Text(l10n.bookDetailAudiobook),
             ),
           ),
       ],

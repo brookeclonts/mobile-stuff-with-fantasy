@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/profile/models/quest_campaign.dart';
 
 
@@ -68,6 +69,7 @@ class _VaultAlcove extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       decoration: BoxDecoration(
@@ -154,7 +156,7 @@ class _VaultAlcove extends StatelessWidget {
 
                 // Title
                 Text(
-                  isUnlocked ? reward.title : '???',
+                  isUnlocked ? reward.title : l10n.relicVaultLockedTitle,
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -171,8 +173,8 @@ class _VaultAlcove extends StatelessWidget {
                 // Status
                 Text(
                   isUnlocked
-                      ? (isFinalReward ? 'Legend relic' : 'Claimed')
-                      : 'Sealed',
+                      ? (isFinalReward ? l10n.relicVaultLegendRelic : l10n.relicVaultClaimed)
+                      : l10n.relicVaultSealed,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: isUnlocked
                         ? accentColor.withAlpha(180)

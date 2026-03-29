@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
 /// Step 2: Ask what else brings them here (author / influencer).
@@ -20,6 +21,7 @@ class InterestStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -27,13 +29,13 @@ class InterestStep extends StatelessWidget {
         children: [
           const SizedBox(height: 32),
           Text(
-            'What else brings you here?',
+            l10n.interestStepHeadline,
             style: theme.textTheme.headlineMedium,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
-            'Select any that apply — or skip ahead.',
+            l10n.interestStepSubtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -41,17 +43,16 @@ class InterestStep extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           _InterestCard(
-            title: 'I\'m an Author',
-            description: 'I want to get my books discovered by fantasy readers.',
+            title: l10n.interestCardAuthorTitle,
+            description: l10n.interestCardAuthorDescription,
             icon: Icons.edit_note_rounded,
             isSelected: selectedInterests.contains('author'),
             onTap: () => onToggle('author'),
           ),
           const SizedBox(height: 14),
           _InterestCard(
-            title: 'I\'m an Influencer',
-            description:
-                'I create content and want to share fantasy books with my audience.',
+            title: l10n.interestCardInfluencerTitle,
+            description: l10n.interestCardInfluencerDescription,
             icon: Icons.campaign_rounded,
             isSelected: selectedInterests.contains('influencer'),
             onTap: () => onToggle('influencer'),
@@ -61,7 +62,7 @@ class InterestStep extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: onContinue,
-              child: const Text('Continue'),
+              child: Text(l10n.interestStepContinue),
             ),
           ),
           const SizedBox(height: 32),

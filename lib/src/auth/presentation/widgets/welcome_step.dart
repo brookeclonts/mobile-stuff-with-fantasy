@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/auth/models/user.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
@@ -49,12 +50,10 @@ class _WelcomeStepState extends State<WelcomeStep>
     super.dispose();
   }
 
-  String get _subtitle =>
-      'Your next great fantasy adventure is waiting for you.';
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -83,13 +82,13 @@ class _WelcomeStepState extends State<WelcomeStep>
             child: Column(
               children: [
                 Text(
-                  'Welcome, ${widget.name}!',
+                  l10n.welcomeStepHeadline(widget.name),
                   style: theme.textTheme.headlineMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  _subtitle,
+                  l10n.welcomeStepSubtitle,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -105,7 +104,7 @@ class _WelcomeStepState extends State<WelcomeStep>
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: widget.onGetStarted,
-                child: const Text('Get Started'),
+                child: Text(l10n.welcomeStepGetStarted),
               ),
             ),
           ),

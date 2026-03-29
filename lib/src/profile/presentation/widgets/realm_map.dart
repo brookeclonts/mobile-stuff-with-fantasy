@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/profile/models/quest_campaign.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
@@ -526,6 +527,7 @@ class _QuestCallout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
@@ -557,7 +559,7 @@ class _QuestCallout extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'CURRENT QUEST',
+                  l10n.realmMapCurrentQuest,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: accentColor,
                     letterSpacing: 1.2,

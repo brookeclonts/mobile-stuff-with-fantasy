@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/profile/models/ability_rune.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
@@ -155,6 +156,7 @@ class _RuneNode extends StatelessWidget {
 
   void _showRuneDetail(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     showModalBottomSheet<void>(
       context: context,
@@ -234,7 +236,7 @@ class _RuneNode extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  isUnlocked ? 'ENGRAVED' : 'LOCKED',
+                  isUnlocked ? l10n.runeStatusEngraved : l10n.runeStatusLocked,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: isUnlocked
                         ? accentColor
@@ -280,7 +282,7 @@ class _RuneNode extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      'Complete the linked quest to engrave this rune',
+                      l10n.runeDetailLockedHint,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: SwfColors.secondaryAccent.withAlpha(120),
                       ),
@@ -298,7 +300,7 @@ class _RuneNode extends StatelessWidget {
                       Navigator.of(context).pop();
                       onRuneTapped?.call(rune.id);
                     },
-                    child: const Text('Configure'),
+                    child: Text(l10n.runeDetailConfigure),
                   ),
                 ),
               ],

@@ -5,7 +5,9 @@ import 'package:swf_app/src/auth/data/session_store.dart';
 import 'package:swf_app/src/catalog/data/book_repository.dart';
 import 'package:swf_app/src/creators/data/creator_repository.dart';
 import 'package:swf_app/src/events/data/event_repository.dart';
+import 'package:swf_app/src/locale_provider.dart';
 import 'package:swf_app/src/profile/data/profile_repository.dart';
+import 'package:swf_app/src/profile/data/reading_stats_repository.dart';
 import 'package:swf_app/src/reader/data/reader_access_repository.dart';
 import 'package:swf_app/src/reader/data/reader_repository.dart';
 import 'package:swf_app/src/reader/data/reading_list_repository.dart';
@@ -28,6 +30,8 @@ abstract final class ServiceLocator {
   static late final ReaderAccessRepository _readerAccessRepository;
   static late final ReaderRepository _readerRepository;
   static late final ReadingListRepository _readingListRepository;
+  static late final LocaleProvider _localeProvider;
+  static late final ReadingStatsRepository _readingStatsRepository;
 
   static ApiClient get apiClient => _apiClient;
   static BookRepository get bookRepository => _bookRepository;
@@ -41,6 +45,9 @@ abstract final class ServiceLocator {
   static ReaderRepository get readerRepository => _readerRepository;
   static ReadingListRepository get readingListRepository =>
       _readingListRepository;
+  static LocaleProvider get localeProvider => _localeProvider;
+  static ReadingStatsRepository get readingStatsRepository =>
+      _readingStatsRepository;
 
   /// Initialize all shared services. Call from `main()` before `runApp`.
   static void init({String? baseUrl}) {
@@ -59,6 +66,8 @@ abstract final class ServiceLocator {
     _readerAccessRepository = ReaderAccessRepository(apiClient: _apiClient);
     _readerRepository = ReaderRepository();
     _readingListRepository = ReadingListRepository(apiClient: _apiClient);
+    _localeProvider = LocaleProvider();
+    _readingStatsRepository = ReadingStatsRepository();
   }
 
   /// Tear down. Useful in tests.

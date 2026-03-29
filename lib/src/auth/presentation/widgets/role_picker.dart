@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/auth/models/user.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
@@ -20,6 +21,7 @@ class RolePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -27,13 +29,13 @@ class RolePicker extends StatelessWidget {
         children: [
           const SizedBox(height: 32),
           Text(
-            'I am a...',
+            l10n.rolePickerHeadline,
             style: theme.textTheme.headlineMedium,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
-            'Choose how you want to use StuffWithFantasy',
+            l10n.rolePickerSubtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -59,7 +61,7 @@ class RolePicker extends StatelessWidget {
               curve: Curves.easeOut,
               child: ElevatedButton(
                 onPressed: selected != null ? onContinue : null,
-                child: const Text('Continue'),
+                child: Text(l10n.rolePickerContinue),
               ),
             ),
           ),
@@ -141,7 +143,7 @@ class _RoleCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    role.label,
+                    role.localizedLabel(AppLocalizations.of(context)!),
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: isSelected
                           ? SwfColors.color4
@@ -150,7 +152,7 @@ class _RoleCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    role.description,
+                    role.localizedDescription(AppLocalizations.of(context)!),
                     style: theme.textTheme.bodySmall,
                   ),
                 ],

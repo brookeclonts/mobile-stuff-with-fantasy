@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/catalog/presentation/book_detail_page.dart';
@@ -46,6 +47,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final event = widget.event;
     final hasImage = event.bannerImage.isNotEmpty;
 
@@ -104,10 +106,10 @@ class _EventDetailPageState extends State<EventDetailPage> {
                         const SizedBox(height: 6),
                         Row(
                           children: [
-                            _Pill(label: event.statusLabel),
+                            _Pill(label: event.localizedStatusLabel(AppLocalizations.of(context)!)),
                             const SizedBox(width: 8),
                             Text(
-                              event.dateRangeLabel,
+                              event.localizedDateRangeLabel(AppLocalizations.of(context)!),
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: Colors.white70,
                               ),
@@ -143,8 +145,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
               child: Text(
                 _isLoading
-                    ? 'Loading books...'
-                    : '${_books.length} ${_books.length == 1 ? 'book' : 'books'} in this event',
+                    ? l10n.eventDetailLoadingBooks
+                    : l10n.eventDetailBookCount(_books.length),
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -211,7 +213,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 padding: const EdgeInsets.all(32),
                 child: Center(
                   child: Text(
-                    'No books in this event yet.',
+                    l10n.eventDetailNoBooksYet,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),

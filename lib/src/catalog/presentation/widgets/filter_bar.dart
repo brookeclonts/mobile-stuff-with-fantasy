@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/catalog/models/taxonomy.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
@@ -105,6 +106,7 @@ class FilterBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -119,7 +121,7 @@ class FilterBar extends StatelessWidget {
                   controller: searchController,
                   onChanged: onSearchChanged,
                   decoration: InputDecoration(
-                    hintText: 'Search by title or author...',
+                    hintText: l10n.filterSearchHint,
                     prefixIcon: const Icon(Icons.search, size: 20),
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(
@@ -167,7 +169,7 @@ class FilterBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
               _QuickChip(
-                label: 'KU',
+                label: l10n.filterChipKu,
                 icon: Icons.auto_stories_outlined,
                 selected: filters.kindleUnlimitedOnly,
                 onSelected: (v) =>
@@ -175,7 +177,7 @@ class FilterBar extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               _QuickChip(
-                label: 'Audiobook',
+                label: l10n.filterChipAudiobook,
                 icon: Icons.headphones_rounded,
                 selected: filters.audiobookOnly,
                 onSelected: (v) =>
@@ -211,7 +213,7 @@ class FilterBar extends StatelessWidget {
               child: TextButton.icon(
                 onPressed: onClearAll,
                 icon: const Icon(Icons.clear_all, size: 16),
-                label: const Text('Clear all'),
+                label: Text(l10n.filterClearAll),
               ),
             ),
           ),

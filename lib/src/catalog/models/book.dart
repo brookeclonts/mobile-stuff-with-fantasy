@@ -1,3 +1,5 @@
+import 'package:swf_app/l10n/app_localizations.dart';
+
 class Book {
   const Book({
     required this.id,
@@ -189,22 +191,31 @@ class BookDistributionInfo {
 }
 
 enum SpiceLevel {
-  none('No Spice'),
-  mild('Mild Spice'),
-  medium('Medium Spice'),
-  hot('Hot'),
-  scorching('Scorching');
+  none,
+  mild,
+  medium,
+  hot,
+  scorching;
 
-  const SpiceLevel(this.label);
-  final String label;
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+        SpiceLevel.none => l10n.spiceLevelNone,
+        SpiceLevel.mild => l10n.spiceLevelMild,
+        SpiceLevel.medium => l10n.spiceLevelMedium,
+        SpiceLevel.hot => l10n.spiceLevelHot,
+        SpiceLevel.scorching => l10n.spiceLevelScorching,
+      };
 }
 
 enum LanguageLevel {
-  clean('Clean'),
-  mild('Mild Language'),
-  moderate('Moderate Language'),
-  strong('Strong Language');
+  clean,
+  mild,
+  moderate,
+  strong;
 
-  const LanguageLevel(this.label);
-  final String label;
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+        LanguageLevel.clean => l10n.languageLevelClean,
+        LanguageLevel.mild => l10n.languageLevelMild,
+        LanguageLevel.moderate => l10n.languageLevelModerate,
+        LanguageLevel.strong => l10n.languageLevelStrong,
+      };
 }
