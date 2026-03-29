@@ -304,9 +304,15 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadProfile() async {
     final authRepository = _authRepository;
     if (authRepository == null) {
+      print('[PROFILE] authRepository is null — showing guest state');
       setState(() => _isLoading = false);
       return;
     }
+
+    final token = _sessionStore?.token;
+    print('[PROFILE] _loadProfile called. '
+        'hasToken: ${token != null}, '
+        'tokenLength: ${token?.length ?? 0}');
 
     setState(() {
       _isLoading = true;
@@ -319,6 +325,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     result.when(
       success: (user) {
+        print('[PROFILE] getCurrentUser SUCCESS: ${user.email}');
         setState(() {
           _user = user;
           _isLoading = false;
@@ -327,6 +334,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _loadPreferences();
       },
       failure: (message, statusCode) {
+        print('[PROFILE] getCurrentUser FAILED: $statusCode — $message');
         setState(() {
           _errorMessage = message;
           _errorStatusCode = statusCode;
@@ -644,11 +652,19 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _goToSignUp() {
-    Navigator.push<void>(
+  Future<void> _goToSignUp() async {
+    await Navigator.push<void>(
       context,
       MaterialPageRoute<void>(builder: (_) => const SignUpFlow()),
     );
+    if (!mounted) return;
+    // Reload all data so the Guild Hall reflects the new session.
+    _loadProfile();
+    _loadReadingStats();
+    _loadReviews();
+    _loadPairings();
+    _loadOath();
+    _loadSeasonalCampaigns();
   }
 
   void _toggleObjective(QuestScroll scroll, QuestObjective objective) {

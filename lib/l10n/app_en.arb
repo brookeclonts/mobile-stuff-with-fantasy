@@ -35,6 +35,8 @@
   "bookDetailOpening": "Opening...",
   "bookDetailReadInApp": "Read in App",
   "bookDetailGetBook": "Get this Book",
+  "bookDetailAmazon": "Amazon US",
+  "bookDetailAllRetailers": "View all retailers",
   "bookDetailAudiobook": "Audiobook",
 
   "filterSearchHint": "Search by title or author...",

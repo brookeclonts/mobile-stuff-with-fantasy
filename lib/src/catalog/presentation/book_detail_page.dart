@@ -702,34 +702,64 @@ class _ActionButtons extends StatelessWidget {
   final Book book;
   final ValueChanged<String> onOpenLink;
 
+  String? get _amazonUrl {
+    if (book.amazonAsin.isEmpty) return null;
+    return 'https://www.amazon.com/dp/${book.amazonAsin}?tag=stuffwithfant-20';
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final amazonUrl = _amazonUrl;
     final hasPrimary = book.purchaseLink.isNotEmpty;
-    final hasAlt = book.alternatePurchaseLink.isNotEmpty;
     final hasAudio = book.audiobookLink.isNotEmpty;
+    final hasAny = amazonUrl != null || hasPrimary || hasAudio;
 
-    if (!hasPrimary && !hasAlt && !hasAudio) return const SizedBox.shrink();
+    if (!hasAny) return const SizedBox.shrink();
 
-    return Row(
+    // When we have an ASIN: Amazon is the big button, books2read is a text link.
+    // When no ASIN: books2read gets the big button instead.
+    final primaryUrl = amazonUrl ?? (hasPrimary ? book.purchaseLink : null);
+    final primaryLabel = amazonUrl != null
+        ? l10n.bookDetailAmazon
+        : l10n.bookDetailGetBook;
+
+    return Column(
       children: [
-        if (hasPrimary)
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () => onOpenLink(book.purchaseLink),
-              icon: const Icon(Icons.shopping_bag_outlined, size: 18),
-              label: Text(l10n.bookDetailGetBook),
+        Row(
+          children: [
+            if (primaryUrl != null)
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => onOpenLink(primaryUrl),
+                  icon: const Icon(Icons.shopping_bag_outlined, size: 18),
+                  label: Text(primaryLabel),
+                ),
+              ),
+            if (primaryUrl != null && hasAudio) const SizedBox(width: 12),
+            if (hasAudio)
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => onOpenLink(book.audiobookLink),
+                  icon: const Icon(Icons.headphones_rounded, size: 18),
+                  label: Text(l10n.bookDetailAudiobook),
+                ),
+              ),
+          ],
+        ),
+        // Show "View all retailers" link when Amazon is the primary button
+        if (amazonUrl != null && hasPrimary) ...[
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () => onOpenLink(book.purchaseLink),
+            child: Text(
+              l10n.bookDetailAllRetailers,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
           ),
-        if (hasPrimary && hasAudio) const SizedBox(width: 12),
-        if (hasAudio)
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () => onOpenLink(book.audiobookLink),
-              icon: const Icon(Icons.headphones_rounded, size: 18),
-              label: Text(l10n.bookDetailAudiobook),
-            ),
-          ),
+        ],
       ],
     );
   }

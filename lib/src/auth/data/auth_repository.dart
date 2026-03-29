@@ -45,38 +45,60 @@ class AuthRepository {
   SessionStore get sessionStore => _sessionStore;
 
   Future<ApiResult<User>> getCurrentUser() async {
+    final token = _sessionStore.token;
+    print('[AUTH] getCurrentUser: hasToken=${token != null}, '
+        'tokenLength=${token?.length ?? 0}');
+
+    // Use better-auth's native get-session endpoint which supports Bearer
+    // auth via the bearer plugin. The custom /api/auth/me route doesn't go
+    // through better-auth's middleware so Bearer tokens don't work there.
+    // Note: better-auth returns `null` (not an error) when unauthenticated,
+    // which causes a FormatException in ApiClient. We treat that as 401.
     final result = await _apiClient.get<User>(
-      '/api/auth/me',
+      '/api/auth/get-session',
       fromJson: (json) {
         final data = json as Map<String, Object?>;
-        return User.fromJson(data['user'] ?? json);
+        final userData = data['user'] as Map<String, Object?>?;
+        if (userData == null) throw const FormatException('No user in session');
+        return User.fromJson(userData);
       },
     );
 
+    // `null` body from better-auth → FormatException → "Invalid response"
+    if (result is Failure<User> &&
+        result.message == 'Invalid response from server') {
+      print('[AUTH] getCurrentUser: no session (null response)');
+      _clearSession();
+      return const Failure('Not authenticated', statusCode: 401);
+    }
+
     if (result is Success<User>) {
-      final token = _sessionStore.token;
+      print('[AUTH] getCurrentUser: SUCCESS ${result.value.email}');
       if (token != null && token.isNotEmpty) {
         _sessionStore.save(token: token, user: result.value);
       }
       return result;
     }
 
-    if (result is Failure<User> && result.statusCode == 401) {
-      _clearSession();
+    if (result is Failure<User>) {
+      print('[AUTH] getCurrentUser: FAILED ${result.statusCode} — '
+          '${result.message}');
+      if (result.statusCode == 401) {
+        _clearSession();
+      }
     }
 
     return result;
   }
 
-  /// Create a new account via better-auth and set the chosen role.
+  /// Create a new account via better-auth.
   ///
-  /// 1. POST /api/auth/sign-up/email  → creates auth user + session
-  /// 2. POST /api/user/role            → sets the user's role
+  /// POST /api/auth/sign-up/email → creates auth user + session.
+  /// The backend defaults new users to the "reader" role.
   Future<ApiResult<User>> signUp({
     required String name,
     required String email,
     required String password,
-    required UserRole role,
   }) async {
     try {
       // ── Step 1: better-auth sign-up ──
@@ -133,24 +155,23 @@ class AuthRepository {
         return Failure(error, statusCode: response.statusCode);
       }
 
-      // Extract the session token from the response body.
-      // We use Bearer auth (not cookies), so the body token is what we need.
+      // The bearer plugin adds a `set-auth-token` response header with the
+      // full signed token (token.hmac). This is what we need for Bearer auth.
+      // Fall back to the body token if the header isn't present.
+      final setAuthToken = response.headers['set-auth-token'];
       final sessionData = body['session'] as Map<String, Object?>?;
-      String? token = sessionData?['token'] as String?;
+      String? token = setAuthToken;
+      token ??= sessionData?['token'] as String?;
       token ??= body['token'] as String?;
 
-      debugPrint(
-        'AuthRepository.signUp response keys: ${body.keys.toList()}, '
-        'token found: ${token != null && token.isNotEmpty}, '
-        'token length: ${token?.length ?? 0}',
-      );
+      print('[AUTH] signUp: set-auth-token header present: ${setAuthToken != null}, '
+          'token length: ${token?.length ?? 0}');
 
       final userData = body['user'] as Map<String, Object?>?;
       final user = User(
         id: (userData?['id'] ?? '').toString(),
         email: userData?['email'] as String? ?? email,
         name: userData?['name'] as String? ?? name,
-        role: role.apiValue,
       );
 
       if (token == null || token.isEmpty) {
@@ -164,16 +185,6 @@ class AuthRepository {
       _sessionStore.save(token: token, user: user);
       _apiClient.setSessionToken(token);
 
-      // ── Step 2: set chosen role (best-effort — don't fail sign-up) ──
-      final roleResult = await _setRole(role, token);
-      if (roleResult is Failure<void>) {
-        debugPrint(
-          'AuthRepository.signUp: role-setting failed '
-          '(${roleResult.statusCode}): ${roleResult.message} — '
-          'proceeding with sign-up anyway',
-        );
-      }
-
       return Success(user);
     } on SocketException {
       return const Failure('No internet connection');
@@ -184,52 +195,6 @@ class AuthRepository {
     } catch (e) {
       debugPrint('AuthRepository.signUp error: $e');
       return Failure('Unexpected error: $e');
-    }
-  }
-
-  /// Call POST /api/user/role to persist the selected role.
-  Future<ApiResult<void>> _setRole(UserRole role, String token) async {
-    try {
-      final url = '$_baseUrl/api/user/role';
-      debugPrint('AuthRepository._setRole: POST $url');
-
-      final response = await _http.post(
-        Uri.parse(url),
-        headers: {
-          ..._jsonHeaders,
-          HttpHeaders.authorizationHeader: 'Bearer $token',
-        },
-        body: jsonEncode({'role': role.apiValue}),
-      );
-
-      debugPrint(
-        'AuthRepository._setRole: ${response.statusCode} '
-        '(${response.body.length} bytes)',
-      );
-
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return const Success<void>(null);
-      }
-
-      // Try to parse JSON error, but don't crash on non-JSON (e.g. HTML 404)
-      String errorMessage = 'Failed to set account role (${response.statusCode})';
-      try {
-        final body = jsonDecode(response.body) as Map<String, Object?>;
-        errorMessage = _parseError(body) ?? errorMessage;
-      } on FormatException {
-        // Response wasn't JSON — use the default error message
-      }
-
-      return Failure(errorMessage, statusCode: response.statusCode);
-    } catch (e) {
-      debugPrint('AuthRepository._setRole error: $e');
-      if (e is SocketException) {
-        return const Failure('No internet connection');
-      }
-      if (e is HttpException) {
-        return const Failure('Server unreachable');
-      }
-      return Failure('Failed to set role: $e');
     }
   }
 

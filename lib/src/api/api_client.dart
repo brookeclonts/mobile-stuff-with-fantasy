@@ -146,7 +146,18 @@ class ApiClient {
   }) async {
     try {
       final response = await send();
-      final body = jsonDecode(response.body) as Map<String, Object?>;
+      final decoded = jsonDecode(response.body);
+
+      if (decoded is! Map<String, Object?>) {
+        // Some endpoints (e.g. better-auth get-session) return `null` when
+        // unauthenticated. Treat non-map responses as 401.
+        return Failure(
+          'Not authenticated',
+          statusCode: response.statusCode == 200 ? 401 : response.statusCode,
+        );
+      }
+
+      final body = decoded;
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         // Standard envelope: { success: true, data: T }

@@ -109,6 +109,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get bookDetailGetBook => 'Get this Book';
 
   @override
+  String get bookDetailAmazon => 'Amazon US';
+
+  @override
+  String get bookDetailAllRetailers => 'View all retailers';
+
+  @override
   String get bookDetailAudiobook => 'Audiobook';
 
   @override

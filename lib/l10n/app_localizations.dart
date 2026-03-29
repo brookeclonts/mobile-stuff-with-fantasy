@@ -282,6 +282,18 @@ abstract class AppLocalizations {
   /// **'Get this Book'**
   String get bookDetailGetBook;
 
+  /// No description provided for @bookDetailAmazon.
+  ///
+  /// In en, this message translates to:
+  /// **'Amazon US'**
+  String get bookDetailAmazon;
+
+  /// No description provided for @bookDetailAllRetailers.
+  ///
+  /// In en, this message translates to:
+  /// **'View all retailers'**
+  String get bookDetailAllRetailers;
+
   /// No description provided for @bookDetailAudiobook.
   ///
   /// In en, this message translates to:

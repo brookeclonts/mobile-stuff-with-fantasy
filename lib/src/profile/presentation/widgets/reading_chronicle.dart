@@ -246,33 +246,41 @@ class _HeatmapGrid extends StatelessWidget {
         final startIndex =
             (totalDays - visibleDays).clamp(0, totalDays);
 
-        return Wrap(
-          direction: Axis.vertical,
-          spacing: ReadingChronicle._cellGap,
-          runSpacing: ReadingChronicle._cellGap,
-          children: [
-            for (var week = 0; week < weeks; week++)
-              for (var day = 0; day < 7; day++)
-                () {
-                  final idx = startIndex + week * 7 + day;
-                  final entry =
-                      idx < totalDays ? entries[idx] : null;
-                  final intensity = (entry != null && maxSeconds > 0)
-                      ? (entry.totalSeconds / maxSeconds).clamp(0.0, 1.0)
-                      : 0.0;
-                  return Container(
-                    width: ReadingChronicle._cellSize,
-                    height: ReadingChronicle._cellSize,
-                    decoration: BoxDecoration(
-                      color: ReadingChronicle._cellColor(
-                        intensity,
-                        accentColor,
+        // Constrain height to exactly 7 rows so the vertical Wrap
+        // wraps into columns instead of stacking everything vertically.
+        final gridHeight = 7 * ReadingChronicle._cellSize +
+            6 * ReadingChronicle._cellGap;
+
+        return SizedBox(
+          height: gridHeight,
+          child: Wrap(
+            direction: Axis.vertical,
+            spacing: ReadingChronicle._cellGap,
+            runSpacing: ReadingChronicle._cellGap,
+            children: [
+              for (var week = 0; week < weeks; week++)
+                for (var day = 0; day < 7; day++)
+                  () {
+                    final idx = startIndex + week * 7 + day;
+                    final entry =
+                        idx < totalDays ? entries[idx] : null;
+                    final intensity = (entry != null && maxSeconds > 0)
+                        ? (entry.totalSeconds / maxSeconds).clamp(0.0, 1.0)
+                        : 0.0;
+                    return Container(
+                      width: ReadingChronicle._cellSize,
+                      height: ReadingChronicle._cellSize,
+                      decoration: BoxDecoration(
+                        color: ReadingChronicle._cellColor(
+                          intensity,
+                          accentColor,
+                        ),
+                        borderRadius: BorderRadius.circular(2.5),
                       ),
-                      borderRadius: BorderRadius.circular(2.5),
-                    ),
-                  );
-                }(),
-          ],
+                    );
+                  }(),
+            ],
+          ),
         );
       },
     );

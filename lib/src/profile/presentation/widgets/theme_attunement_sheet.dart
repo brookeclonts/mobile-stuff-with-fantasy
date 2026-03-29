@@ -65,6 +65,7 @@ Future<String?> showThemeAttunementSheet(
 }) {
   return showModalBottomSheet<String?>(
     context: context,
+    isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (context) => _ThemeAttunementSheet(
       currentKey: currentKey,

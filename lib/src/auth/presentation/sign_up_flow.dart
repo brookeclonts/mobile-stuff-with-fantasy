@@ -58,7 +58,6 @@ class _SignUpFlowState extends State<SignUpFlow> {
       name: name,
       email: email,
       password: password,
-      role: UserRole.reader,
     );
 
     if (!mounted) return;
@@ -81,11 +80,9 @@ class _SignUpFlowState extends State<SignUpFlow> {
   }
 
   void _onGetStarted() {
-    Navigator.pushAndRemoveUntil<void>(
-      context,
-      MaterialPageRoute<void>(builder: (_) => const CatalogPage()),
-      (_) => false,
-    );
+    // Pop back to the profile page (Guild Hall) so the user stays there
+    // after creating an account, rather than being sent to the catalog.
+    Navigator.pop(context);
   }
 
   void _skipToCatalog() {
@@ -105,8 +102,10 @@ class _SignUpFlowState extends State<SignUpFlow> {
             _TopBar(
               currentStep: _currentStep,
               totalSteps: _totalSteps,
-              onBack: null,
-              onSkip: _currentStep == 0 ? _skipToCatalog : null,
+              onBack: _currentStep == 0
+                  ? () => Navigator.pop(context)
+                  : null,
+              onSkip: null,
             ),
             // ── Pages ──
             Expanded(
