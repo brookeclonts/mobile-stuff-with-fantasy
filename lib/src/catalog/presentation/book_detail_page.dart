@@ -21,17 +21,20 @@ class _BookDetailPageState extends State<BookDetailPage> {
   late Book _book = widget.book;
   List<Book> _similarBooks = [];
   bool _descriptionExpanded = false;
+  bool _isSaved = false;
+  bool _saveBusy = false;
 
   @override
   void initState() {
     super.initState();
+    _isSaved = ServiceLocator.readingListRepository.contains(widget.book.id);
     _loadFullDetail();
     _loadSimilarBooks();
+    _syncReadingListState();
   }
 
   Future<void> _loadFullDetail() async {
-    final result =
-        await ServiceLocator.bookRepository.getBook(widget.book.id);
+    final result = await ServiceLocator.bookRepository.getBook(widget.book.id);
     if (!mounted) return;
     result.when(
       success: (book) => setState(() => _book = book),
@@ -40,8 +43,9 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   Future<void> _loadSimilarBooks() async {
-    final result =
-        await ServiceLocator.bookRepository.getSimilarBooks(widget.book.id);
+    final result = await ServiceLocator.bookRepository.getSimilarBooks(
+      widget.book.id,
+    );
     if (!mounted) return;
     result.when(
       success: (books) => setState(() => _similarBooks = books),
@@ -54,6 +58,65 @@ class _BookDetailPageState extends State<BookDetailPage> {
     if (uri != null && await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+
+  Future<void> _syncReadingListState() async {
+    if (!ServiceLocator.sessionStore.isAuthenticated) return;
+
+    final result = await ServiceLocator.readingListRepository
+        .fetchReadingList();
+    if (!mounted) return;
+
+    result.when(
+      success: (_) {
+        setState(() {
+          _isSaved = ServiceLocator.readingListRepository.contains(_book.id);
+        });
+      },
+      failure: (message, statusCode) {},
+    );
+  }
+
+  Future<void> _toggleReadingList() async {
+    if (!ServiceLocator.sessionStore.isAuthenticated) {
+      _showSignUpPrompt();
+      return;
+    }
+
+    setState(() => _saveBusy = true);
+    final result = _isSaved
+        ? await ServiceLocator.readingListRepository.remove(_book.id)
+        : await ServiceLocator.readingListRepository.save(_book);
+    if (!mounted) return;
+
+    result.when(
+      success: (_) {
+        setState(() {
+          _isSaved = ServiceLocator.readingListRepository.contains(_book.id);
+          _saveBusy = false;
+        });
+      },
+      failure: (message, statusCode) {
+        setState(() => _saveBusy = false);
+        if (statusCode == 401) {
+          _showSignUpPrompt();
+          return;
+        }
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      },
+    );
+  }
+
+  void _showSignUpPrompt() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Create an account from your profile to save books to your reading list.',
+        ),
+      ),
+    );
   }
 
   @override
@@ -78,8 +141,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     Image.network(
                       _book.imageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) =>
-                          _buildCoverFallback(theme),
+                      errorBuilder: (_, _, _) => _buildCoverFallback(theme),
                     )
                   else
                     _buildCoverFallback(theme),
@@ -126,11 +188,15 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   _StatsRow(book: _book),
                   const SizedBox(height: 20),
 
-                  // Action buttons
-                  _ActionButtons(
-                    book: _book,
-                    onOpenLink: _openLink,
+                  _ReadingListButton(
+                    isSaved: _isSaved,
+                    isLoading: _saveBusy,
+                    onPressed: _toggleReadingList,
                   ),
+                  const SizedBox(height: 12),
+
+                  // Action buttons
+                  _ActionButtons(book: _book, onOpenLink: _openLink),
                   const SizedBox(height: 24),
 
                   // Subgenres
@@ -141,11 +207,13 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       spacing: 8,
                       runSpacing: 8,
                       children: _book.subgenres
-                          .map((s) => _Chip(
-                                label: s,
-                                color: SwfColors.spicinessPill,
-                                textColor: SwfColors.color3,
-                              ))
+                          .map(
+                            (s) => _Chip(
+                              label: s,
+                              color: SwfColors.spicinessPill,
+                              textColor: SwfColors.color3,
+                            ),
+                          )
                           .toList(),
                     ),
                     const SizedBox(height: 20),
@@ -159,11 +227,13 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       spacing: 8,
                       runSpacing: 8,
                       children: _book.tropes
-                          .map((t) => _Chip(
-                                label: t,
-                                color: SwfColors.tropePill,
-                                textColor: SwfColors.color3,
-                              ))
+                          .map(
+                            (t) => _Chip(
+                              label: t,
+                              color: SwfColors.tropePill,
+                              textColor: SwfColors.color3,
+                            ),
+                          )
                           .toList(),
                     ),
                     const SizedBox(height: 20),
@@ -177,11 +247,13 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       spacing: 8,
                       runSpacing: 8,
                       children: _book.representations
-                          .map((r) => _Chip(
-                                label: r,
-                                color: SwfColors.representationPill,
-                                textColor: SwfColors.color7,
-                              ))
+                          .map(
+                            (r) => _Chip(
+                              label: r,
+                              color: SwfColors.representationPill,
+                              textColor: SwfColors.color7,
+                            ),
+                          )
                           .toList(),
                     ),
                     const SizedBox(height: 20),
@@ -193,7 +265,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     const SizedBox(height: 8),
                     GestureDetector(
                       onTap: () => setState(
-                          () => _descriptionExpanded = !_descriptionExpanded),
+                        () => _descriptionExpanded = !_descriptionExpanded,
+                      ),
                       child: AnimatedCrossFade(
                         duration: const Duration(milliseconds: 250),
                         crossFadeState: _descriptionExpanded
@@ -282,8 +355,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
       [SwfColors.color7, SwfColors.color3],
       [SwfColors.darkNavy, SwfColors.color4],
     ];
-    final colors =
-        palettes[_book.id.hashCode.abs() % palettes.length];
+    final colors = palettes[_book.id.hashCode.abs() % palettes.length];
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -435,6 +507,57 @@ class _VerticalDivider extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Reading list button
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _ReadingListButton extends StatelessWidget {
+  const _ReadingListButton({
+    required this.isSaved,
+    required this.isLoading,
+    required this.onPressed,
+  });
+
+  final bool isSaved;
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: isSaved
+          ? OutlinedButton.icon(
+              onPressed: isLoading ? null : onPressed,
+              icon: isLoading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.bookmark_remove_outlined, size: 18),
+              label: Text(
+                isLoading ? 'Updating...' : 'Remove from Reading List',
+              ),
+            )
+          : FilledButton.icon(
+              onPressed: isLoading ? null : onPressed,
+              icon: isLoading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.bookmark_add_outlined, size: 18),
+              label: Text(isLoading ? 'Saving...' : 'Save to Reading List'),
+            ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Action buttons — Buy / Audiobook
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -489,9 +612,9 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
+      style: Theme.of(
+        context,
+      ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
     );
   }
 }
@@ -519,9 +642,9 @@ class _Chip extends StatelessWidget {
       child: Text(
         label,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: isDark ? color : textColor,
-              fontWeight: FontWeight.w500,
-            ),
+          color: isDark ? color : textColor,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
@@ -556,8 +679,7 @@ class _SimilarBookCard extends StatelessWidget {
                         book.imageUrl,
                         fit: BoxFit.cover,
                         width: 120,
-                        errorBuilder: (_, _, _) =>
-                            _miniGradient(book, theme),
+                        errorBuilder: (_, _, _) => _miniGradient(book, theme),
                       )
                     : _miniGradient(book, theme),
               ),

@@ -18,9 +18,11 @@ import 'package:swf_app/src/creators/data/creator_repository.dart';
 import 'package:swf_app/src/creators/models/creator.dart';
 import 'package:swf_app/src/creators/presentation/creator_detail_page.dart';
 import 'package:swf_app/src/creators/presentation/widgets/featured_creators_row.dart';
+import 'package:swf_app/src/events/models/event.dart';
+import 'package:swf_app/src/events/presentation/event_detail_page.dart';
+import 'package:swf_app/src/events/presentation/widgets/event_banner.dart';
 import 'package:swf_app/src/profile/presentation/profile_page.dart';
-// TODO: re-enable when library/reader is ready
-// import 'package:swf_app/src/reader/presentation/library_page.dart';
+import 'package:swf_app/src/reader/presentation/library_page.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
 class CatalogPage extends StatefulWidget {
@@ -53,10 +55,12 @@ class _CatalogPageState extends State<CatalogPage> {
   bool _isLoading = true;
   bool _isLoadingMore = false;
   String? _error;
+  Set<String> _savedBookIds = <String>{};
   Timer? _searchDebounce;
   int _requestToken = 0;
 
   List<Creator> _featuredCreators = [];
+  Event? _nextEvent;
 
   @override
   void initState() {
@@ -66,6 +70,8 @@ class _CatalogPageState extends State<CatalogPage> {
     _scrollController.addListener(_onScroll);
     _initializeCatalog();
     _loadFeaturedCreators();
+    _loadNextEvent();
+    _loadReadingList();
   }
 
   @override
@@ -206,6 +212,24 @@ class _CatalogPageState extends State<CatalogPage> {
     );
   }
 
+  Future<void> _loadNextEvent() async {
+    final result = await ServiceLocator.eventRepository.fetchNextEvent();
+    if (!mounted) return;
+    result.when(
+      success: (event) => setState(() => _nextEvent = event),
+      failure: (_, _) {},
+    );
+  }
+
+  void _openEventDetail(Event event) {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => EventDetailPage(event: event),
+      ),
+    );
+  }
+
   void _openCreatorDetail(Creator creator) {
     Navigator.push<void>(
       context,
@@ -217,6 +241,8 @@ class _CatalogPageState extends State<CatalogPage> {
 
   Future<void> _onRefresh() async {
     unawaited(_loadFeaturedCreators());
+    unawaited(_loadNextEvent());
+    unawaited(_loadReadingList(forceRefresh: true));
     final taxonomyResult = await _repo.loadTaxonomy();
     if (!mounted) return;
 
@@ -251,6 +277,17 @@ class _CatalogPageState extends State<CatalogPage> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  void _showSignUpPrompt() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Create an account to save books to your reading list.',
+        ),
+        action: SnackBarAction(label: 'Profile', onPressed: _openProfile),
+      ),
+    );
+  }
+
   AuthRepository? _resolveAuthRepository() {
     if (widget.authRepository != null) return widget.authRepository;
     try {
@@ -269,8 +306,8 @@ class _CatalogPageState extends State<CatalogPage> {
     }
   }
 
-  void _openProfile() {
-    Navigator.push<void>(
+  Future<void> _openProfile() async {
+    await Navigator.push<void>(
       context,
       MaterialPageRoute<void>(
         builder: (_) => ProfilePage(
@@ -279,9 +316,61 @@ class _CatalogPageState extends State<CatalogPage> {
         ),
       ),
     );
+    if (!mounted) return;
+    await _loadReadingList(forceRefresh: true);
   }
 
   User? _currentUser() => _resolveSessionStore()?.user;
+
+  Future<void> _loadReadingList({bool forceRefresh = false}) async {
+    if (_currentUser() == null) {
+      if (!mounted) return;
+      setState(() => _savedBookIds = <String>{});
+      return;
+    }
+
+    final result = await ServiceLocator.readingListRepository.fetchReadingList(
+      forceRefresh: forceRefresh,
+    );
+    if (!mounted) return;
+
+    result.when(
+      success: (_) {
+        setState(() {
+          _savedBookIds = ServiceLocator.readingListRepository.savedIds;
+        });
+      },
+      failure: (message, statusCode) {},
+    );
+  }
+
+  Future<void> _toggleReadingList(Book book) async {
+    if (_currentUser() == null) {
+      _showSignUpPrompt();
+      return;
+    }
+
+    final isSaved = _savedBookIds.contains(book.id);
+    final result = isSaved
+        ? await ServiceLocator.readingListRepository.remove(book.id)
+        : await ServiceLocator.readingListRepository.save(book);
+    if (!mounted) return;
+
+    result.when(
+      success: (_) {
+        setState(() {
+          _savedBookIds = ServiceLocator.readingListRepository.savedIds;
+        });
+      },
+      failure: (message, statusCode) {
+        if (statusCode == 401) {
+          _showSignUpPrompt();
+          return;
+        }
+        _showMessage(message);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -300,18 +389,15 @@ class _CatalogPageState extends State<CatalogPage> {
           ),
         ),
         actions: [
-          // TODO: re-enable when library/reader is ready
-          // IconButton(
-          //   icon: const Icon(Icons.auto_stories_outlined, size: 22),
-          //   tooltip: 'Library',
-          //   color: SwfColors.color8,
-          //   onPressed: () => Navigator.push<void>(
-          //     context,
-          //     MaterialPageRoute<void>(
-          //       builder: (_) => const LibraryPage(),
-          //     ),
-          //   ),
-          // ),
+          IconButton(
+            icon: const Icon(Icons.bookmarks_outlined, size: 22),
+            tooltip: 'Reading list',
+            color: SwfColors.color8,
+            onPressed: () => Navigator.push<void>(
+              context,
+              MaterialPageRoute<void>(builder: (_) => const LibraryPage()),
+            ).then((_) => _loadReadingList(forceRefresh: true)),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: Tooltip(
@@ -361,7 +447,7 @@ class _CatalogPageState extends State<CatalogPage> {
             onClearAll: _clearFilters,
             onOpenFilterSheet: _showFilterSheet,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Expanded(child: _buildBody()),
         ],
       ),
@@ -396,11 +482,19 @@ class _CatalogPageState extends State<CatalogPage> {
           return CustomScrollView(
             controller: _scrollController,
             slivers: [
+              // Event banner
+              if (_nextEvent != null)
+                SliverToBoxAdapter(
+                  child: EventBanner(
+                    event: _nextEvent!,
+                    onTap: () => _openEventDetail(_nextEvent!),
+                  ),
+                ),
               // Featured creators row
               if (_featuredCreators.isNotEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
+                    padding: const EdgeInsets.only(bottom: 2),
                     child: FeaturedCreatorsRow(
                       creators: _featuredCreators,
                       onCreatorTap: _openCreatorDetail,
@@ -414,10 +508,8 @@ class _CatalogPageState extends State<CatalogPage> {
                   child: Text(
                     '$_totalBooks ${_totalBooks == 1 ? 'book' : 'books'}',
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ),
@@ -425,29 +517,28 @@ class _CatalogPageState extends State<CatalogPage> {
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                 sliver: SliverGrid(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index >= _books.length) {
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        );
-                      }
-                      final book = _books[index];
-                      return BookTile(
-                        book: book,
-                        onTap: () => Navigator.push<void>(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (_) => BookDetailPage(book: book),
-                          ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    if (index >= _books.length) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                       );
-                    },
-                    childCount: _books.length + (_isLoadingMore ? 1 : 0),
-                  ),
+                    }
+                    final book = _books[index];
+                    return BookTile(
+                      book: book,
+                      isSaved: _savedBookIds.contains(book.id),
+                      onSaveTap: () => _toggleReadingList(book),
+                      onTap: () => Navigator.push<void>(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => BookDetailPage(book: book),
+                        ),
+                      ).then((_) => _loadReadingList(forceRefresh: true)),
+                    );
+                  }, childCount: _books.length + (_isLoadingMore ? 1 : 0)),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: crossAxisCount,
                     mainAxisSpacing: 12,

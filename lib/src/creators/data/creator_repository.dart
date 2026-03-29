@@ -7,16 +7,17 @@ class CreatorRepository {
 
   final ApiClient _api;
 
-  /// Hardcoded featured creator slugs, in display order.
+  /// Hardcoded featured creator IDs, in display order.
   /// Replace with a server-driven list when sponsorship/featuring is built.
-  static const _featuredSlugs = <String>[
-    // TODO: add real slugs here once you pick the featured creators
+  static const _featuredIds = <String>[
+    '67fe0661f40e6ff07af89ce2', // Brooke Clonts
   ];
 
   /// Fetch the featured creators for the stories-style row.
   ///
   /// Pulls the full influencer list and filters to the hardcoded featured set,
-  /// preserving display order.
+  /// preserving display order. When the featured list has entries, only those
+  /// creators are shown; remaining creators follow in their original order.
   Future<ApiResult<List<Creator>>> getFeaturedCreators() async {
     final result = await _api.get<List<Creator>>(
       '/api/influencers',
@@ -31,18 +32,20 @@ class CreatorRepository {
 
     return result.when(
       success: (all) {
-        if (_featuredSlugs.isEmpty) {
-          // No curated list yet — show all creators.
-          return Success(all);
-        }
-        final bySlug = {for (final c in all) c.slug: c};
-        final featured = _featuredSlugs
-            .map((slug) => bySlug[slug])
+        if (_featuredIds.isEmpty) return Success(all);
+
+        final byId = {for (final c in all) c.id: c};
+        // Pinned creators first, in declared order.
+        final pinned = _featuredIds
+            .map((id) => byId[id])
             .whereType<Creator>()
             .toList();
-        return Success(featured);
+        // Everyone else after.
+        final rest = all.where((c) => !_featuredIds.contains(c.id)).toList();
+        return Success([...pinned, ...rest]);
       },
-      failure: (message, statusCode) => Failure(message, statusCode: statusCode),
+      failure: (message, statusCode) =>
+          Failure(message, statusCode: statusCode),
     );
   }
 

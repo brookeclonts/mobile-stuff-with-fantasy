@@ -3,10 +3,18 @@ import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
 class BookTile extends StatelessWidget {
-  const BookTile({super.key, required this.book, this.onTap});
+  const BookTile({
+    super.key,
+    required this.book,
+    this.onTap,
+    this.isSaved = false,
+    this.onSaveTap,
+  });
 
   final Book book;
   final VoidCallback? onTap;
+  final bool isSaved;
+  final VoidCallback? onSaveTap;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +29,46 @@ class BookTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // ── Cover image ──
-            Expanded(child: _CoverImage(book: book)),
+            Expanded(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  _CoverImage(book: book),
+                  if (onSaveTap != null)
+                    Positioned(
+                      right: 8,
+                      bottom: 8,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: onSaveTap,
+                          borderRadius: BorderRadius.circular(999),
+                          child: Ink(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: isSaved
+                                  ? SwfColors.color4
+                                  : Colors.black.withAlpha(110),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white.withAlpha(120),
+                              ),
+                            ),
+                            child: Icon(
+                              isSaved
+                                  ? Icons.bookmark_rounded
+                                  : Icons.bookmark_border_rounded,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
 
             // ── Info section ──
             Padding(
@@ -47,8 +94,9 @@ class BookTile extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color:
-                          isDark ? SwfColors.lightGray : SwfColors.mediumGray,
+                      color: isDark
+                          ? SwfColors.lightGray
+                          : SwfColors.mediumGray,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -127,7 +175,7 @@ class _CoverImage extends StatelessWidget {
                       strokeWidth: 2,
                       value: progress.expectedTotalBytes != null
                           ? progress.cumulativeBytesLoaded /
-                              progress.expectedTotalBytes!
+                                progress.expectedTotalBytes!
                           : null,
                       color: Colors.white54,
                     ),
@@ -162,8 +210,11 @@ class _CoverImage extends StatelessWidget {
             top: 6,
             left: 6,
             child: _Badge(
-              child: Icon(Icons.headphones_rounded,
-                  color: Colors.white, size: 13),
+              child: Icon(
+                Icons.headphones_rounded,
+                color: Colors.white,
+                size: 13,
+              ),
             ),
           ),
         if (book.kindleUnlimited)
@@ -223,9 +274,9 @@ class _GradientFallback extends StatelessWidget {
             book.title,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),
@@ -264,9 +315,7 @@ class _TropeChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: isDark
-            ? SwfColors.tropePill.withAlpha(40)
-            : SwfColors.tropePill,
+        color: isDark ? SwfColors.tropePill.withAlpha(40) : SwfColors.tropePill,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
