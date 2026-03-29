@@ -213,47 +213,29 @@ class AuthRepository {
 
   Future<ApiResult<void>> signOut() async {
     final token = _sessionStore.token;
+
+    // Always clear local session first — sign-out must never leave the user
+    // stuck in an authenticated state regardless of server response.
+    _clearSession();
+
     if (token == null || token.isEmpty) {
-      _clearSession();
       return const Success<void>(null);
     }
 
+    // Best-effort server-side session invalidation.
     try {
-      final response = await _http.post(
+      await _http.post(
         Uri.parse('$_baseUrl/api/auth/sign-out'),
         headers: {
           ..._jsonHeaders,
           HttpHeaders.authorizationHeader: 'Bearer $token',
         },
       );
-
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        _clearSession();
-        return const Success<void>(null);
-      }
-
-      if (response.statusCode == 401) {
-        _clearSession();
-        return const Success<void>(null);
-      }
-
-      return Failure(
-        _parseErrorResponse(response) ?? 'Failed to sign out',
-        statusCode: response.statusCode,
-      );
     } catch (e) {
-      debugPrint('AuthRepository.signOut error: $e');
-      if (e is SocketException) {
-        return const Failure('No internet connection');
-      }
-      if (e is HttpException) {
-        return const Failure('Server unreachable');
-      }
-      if (e is FormatException) {
-        return const Failure('Invalid response from server');
-      }
-      return Failure('Unexpected error: $e');
+      debugPrint('AuthRepository.signOut: server sign-out failed (ignored): $e');
     }
+
+    return const Success<void>(null);
   }
 
   /// Pull a human-readable error from various response shapes.
@@ -262,21 +244,6 @@ class AuthRepository {
     if (body['message'] is String) return body['message'] as String;
     // Standard envelope: { error: "..." }
     if (body['error'] is String) return body['error'] as String;
-    return null;
-  }
-
-  String? _parseErrorResponse(http.Response response) {
-    if (response.body.isEmpty) return null;
-
-    try {
-      final body = jsonDecode(response.body);
-      if (body is Map<String, Object?>) {
-        return _parseError(body);
-      }
-    } on FormatException {
-      return null;
-    }
-
     return null;
   }
 

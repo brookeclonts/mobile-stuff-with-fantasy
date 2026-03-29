@@ -557,27 +557,18 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() => _isSigningOut = true);
 
     final authRepository = _authRepository;
-    final result = authRepository != null
-        ? await authRepository.signOut()
-        : const Success<void>(null);
+    if (authRepository != null) {
+      await authRepository.signOut();
+    } else {
+      _sessionStore?.clear();
+    }
 
     if (!mounted) return;
 
-    result.when(
-      success: (_) {
-        _sessionStore?.clear();
-        Navigator.pushAndRemoveUntil<void>(
-          context,
-          MaterialPageRoute<void>(builder: (_) => const CatalogPage()),
-          (_) => false,
-        );
-      },
-      failure: (message, _) {
-        setState(() => _isSigningOut = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(message)));
-      },
+    Navigator.pushAndRemoveUntil<void>(
+      context,
+      MaterialPageRoute<void>(builder: (_) => const CatalogPage()),
+      (_) => false,
     );
   }
 
