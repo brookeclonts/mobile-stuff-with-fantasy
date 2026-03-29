@@ -24,6 +24,7 @@ Build the Flutter iOS app and upload to App Store Connect for TestFlight distrib
      --export-options-plist=ios/ExportOptions.plist
    ```
    Timeout: 5 minutes. If the build fails, show the error and stop.
+   This is the provisional build number for the archive. App Store Connect may still auto-increment the exported IPA build number if needed.
 
 5. **Upload to App Store Connect** by running:
    ```bash
@@ -35,7 +36,19 @@ Build the Flutter iOS app and upload to App Store Connect for TestFlight distrib
    ```
    Timeout: 5 minutes. Use the Second Star App Store Connect key for this app.
 
-6. **Report the result** — version number, build number, and whether the upload succeeded.
+6. **Capture the delivery UUID** from the successful upload output, then fetch the final processed build metadata:
+   ```bash
+   xcrun altool --build-status \
+     --delivery-id <DELIVERY_UUID> \
+     --output-format json \
+     --api-key JJZ779Q67V \
+     --api-issuer 119abbe0-5bda-4086-aa55-fd7781f0b3b3
+   ```
+
+7. **Sync `pubspec.yaml` to the final uploaded build number** from `app-store-attributes.version`.
+   If App Store Connect auto-incremented the uploaded build number, update `pubspec.yaml` so the repo matches TestFlight before committing.
+
+8. **Report the result** — version number, final uploaded build number, delivery UUID, and whether the upload succeeded.
 
 ## Configuration
 
@@ -47,10 +60,11 @@ Build the Flutter iOS app and upload to App Store Connect for TestFlight distrib
 - **API Issuer ID:** `119abbe0-5bda-4086-aa55-fd7781f0b3b3`
 - **API Key Path:** `~/.private_keys/AuthKey_JJZ779Q67V.p8`
 - **pubspec.yaml:** `pubspec.yaml`
-- **Auto-manage build numbers:** disabled in `ios/ExportOptions.plist`
+- **Auto-manage build numbers:** enabled in `ios/ExportOptions.plist`
 
 ## Notes
 
 - The `XLDQ97MTSN` key can authenticate, but it does not map to the `com.secondstar.stuffwithfantasy` app in App Store Connect.
 - The `JJZ779Q67V` key is the verified working key for TestFlight uploads for this bundle ID.
-- Keep `manageAppVersionAndBuildNumber` set to `false` so the exported IPA matches the Flutter build number you set.
+- Keep `manageAppVersionAndBuildNumber` set to `true` so App Store Connect can auto-increment when needed.
+- After upload, always sync `pubspec.yaml` to the final processed build number returned by `altool --build-status`.
