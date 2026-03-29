@@ -425,11 +425,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: main
-      resolved-ref: "0dfe08afa6a8bff76dff1c70257ad720f4b13430"
-      url: "https://github.com/sethgw/pretext.git"
+      ref: "v0.4.0"
+      resolved-ref: "5e4dd1ec26b93ae43073f5b22734bdbb9a6977cf"
+      url: "git@github.com:sethgw/pretext.git"
     source: git
-    version: "0.2.0"
+    version: "0.4.0"
   pub_semver:
     dependency: transitive
     description:
