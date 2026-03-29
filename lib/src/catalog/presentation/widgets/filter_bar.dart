@@ -202,34 +202,16 @@ class FilterBar extends StatelessWidget {
           ),
         ),
 
-        // Active filter pills + result count
+        // Clear-all row (only when filters active)
         if (filters.hasActiveFilters)
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: Row(
-              children: [
-                Text(
-                  '$resultCount ${resultCount == 1 ? 'book' : 'books'}',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: onClearAll,
-                  icon: const Icon(Icons.clear_all, size: 16),
-                  label: const Text('Clear all'),
-                ),
-              ],
-            ),
-          )
-        else
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: Text(
-              '$resultCount ${resultCount == 1 ? 'book' : 'books'}',
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: onClearAll,
+                icon: const Icon(Icons.clear_all, size: 16),
+                label: const Text('Clear all'),
               ),
             ),
           ),

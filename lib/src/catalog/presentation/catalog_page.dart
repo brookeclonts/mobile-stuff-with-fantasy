@@ -14,8 +14,13 @@ import 'package:swf_app/src/catalog/presentation/book_detail_page.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/book_tile.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/filter_bar.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/filter_sheet.dart';
+import 'package:swf_app/src/creators/data/creator_repository.dart';
+import 'package:swf_app/src/creators/models/creator.dart';
+import 'package:swf_app/src/creators/presentation/creator_detail_page.dart';
+import 'package:swf_app/src/creators/presentation/widgets/featured_creators_row.dart';
 import 'package:swf_app/src/profile/presentation/profile_page.dart';
-import 'package:swf_app/src/reader/presentation/library_page.dart';
+// TODO: re-enable when library/reader is ready
+// import 'package:swf_app/src/reader/presentation/library_page.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
 class CatalogPage extends StatefulWidget {
@@ -36,6 +41,7 @@ class CatalogPage extends StatefulWidget {
 
 class _CatalogPageState extends State<CatalogPage> {
   late final BookRepository _repo;
+  late final CreatorRepository _creatorRepo;
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
@@ -50,12 +56,16 @@ class _CatalogPageState extends State<CatalogPage> {
   Timer? _searchDebounce;
   int _requestToken = 0;
 
+  List<Creator> _featuredCreators = [];
+
   @override
   void initState() {
     super.initState();
     _repo = widget.repository ?? ServiceLocator.bookRepository;
+    _creatorRepo = ServiceLocator.creatorRepository;
     _scrollController.addListener(_onScroll);
     _initializeCatalog();
+    _loadFeaturedCreators();
   }
 
   @override
@@ -187,7 +197,26 @@ class _CatalogPageState extends State<CatalogPage> {
     }
   }
 
+  Future<void> _loadFeaturedCreators() async {
+    final result = await _creatorRepo.getFeaturedCreators();
+    if (!mounted) return;
+    result.when(
+      success: (creators) => setState(() => _featuredCreators = creators),
+      failure: (_, _) {},
+    );
+  }
+
+  void _openCreatorDetail(Creator creator) {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => CreatorDetailPage(creator: creator),
+      ),
+    );
+  }
+
   Future<void> _onRefresh() async {
+    unawaited(_loadFeaturedCreators());
     final taxonomyResult = await _repo.loadTaxonomy();
     if (!mounted) return;
 
@@ -271,17 +300,18 @@ class _CatalogPageState extends State<CatalogPage> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.auto_stories_outlined, size: 22),
-            tooltip: 'Library',
-            color: SwfColors.color8,
-            onPressed: () => Navigator.push<void>(
-              context,
-              MaterialPageRoute<void>(
-                builder: (_) => const LibraryPage(),
-              ),
-            ),
-          ),
+          // TODO: re-enable when library/reader is ready
+          // IconButton(
+          //   icon: const Icon(Icons.auto_stories_outlined, size: 22),
+          //   tooltip: 'Library',
+          //   color: SwfColors.color8,
+          //   onPressed: () => Navigator.push<void>(
+          //     context,
+          //     MaterialPageRoute<void>(
+          //       builder: (_) => const LibraryPage(),
+          //     ),
+          //   ),
+          // ),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: Tooltip(
@@ -331,7 +361,7 @@ class _CatalogPageState extends State<CatalogPage> {
             onClearAll: _clearFilters,
             onOpenFilterSheet: _showFilterSheet,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Expanded(child: _buildBody()),
         ],
       ),
@@ -363,36 +393,70 @@ class _CatalogPageState extends State<CatalogPage> {
             >= 600 => 3,
             _ => 2,
           };
-          return GridView.builder(
+          return CustomScrollView(
             controller: _scrollController,
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 0.48,
-            ),
-            itemCount: _books.length + (_isLoadingMore ? 1 : 0),
-            itemBuilder: (context, index) {
-              if (index >= _books.length) {
-                return const Center(
+            slivers: [
+              // Featured creators row
+              if (_featuredCreators.isNotEmpty)
+                SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                );
-              }
-              final book = _books[index];
-              return BookTile(
-                book: book,
-                onTap: () => Navigator.push<void>(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => BookDetailPage(book: book),
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: FeaturedCreatorsRow(
+                      creators: _featuredCreators,
+                      onCreatorTap: _openCreatorDetail,
+                    ),
                   ),
                 ),
-              );
-            },
+              // Result count
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
+                  child: Text(
+                    '$_totalBooks ${_totalBooks == 1 ? 'book' : 'books'}',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurfaceVariant,
+                        ),
+                  ),
+                ),
+              ),
+              // Book grid
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                sliver: SliverGrid(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index >= _books.length) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        );
+                      }
+                      final book = _books[index];
+                      return BookTile(
+                        book: book,
+                        onTap: () => Navigator.push<void>(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => BookDetailPage(book: book),
+                          ),
+                        ),
+                      );
+                    },
+                    childCount: _books.length + (_isLoadingMore ? 1 : 0),
+                  ),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.48,
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),

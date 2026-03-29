@@ -3,6 +3,7 @@ import 'package:swf_app/src/api/api_config.dart';
 import 'package:swf_app/src/auth/data/auth_repository.dart';
 import 'package:swf_app/src/auth/data/session_store.dart';
 import 'package:swf_app/src/catalog/data/book_repository.dart';
+import 'package:swf_app/src/creators/data/creator_repository.dart';
 import 'package:swf_app/src/profile/data/profile_repository.dart';
 import 'package:swf_app/src/reader/data/reader_repository.dart';
 
@@ -18,11 +19,13 @@ abstract final class ServiceLocator {
   static late final BookRepository _bookRepository;
   static late final SessionStore _sessionStore;
   static late final AuthRepository _authRepository;
+  static late final CreatorRepository _creatorRepository;
   static late final ProfileRepository _profileRepository;
   static late final ReaderRepository _readerRepository;
 
   static ApiClient get apiClient => _apiClient;
   static BookRepository get bookRepository => _bookRepository;
+  static CreatorRepository get creatorRepository => _creatorRepository;
   static SessionStore get sessionStore => _sessionStore;
   static AuthRepository get authRepository => _authRepository;
   static ProfileRepository get profileRepository => _profileRepository;
@@ -33,6 +36,7 @@ abstract final class ServiceLocator {
     final resolvedBaseUrl = baseUrl ?? ApiConfig.baseUrl;
     _apiClient = ApiClient(baseUrl: resolvedBaseUrl);
     _bookRepository = BookRepository(apiClient: _apiClient);
+    _creatorRepository = CreatorRepository(apiClient: _apiClient);
     _sessionStore = SessionStore();
     _authRepository = AuthRepository(
       baseUrl: resolvedBaseUrl,

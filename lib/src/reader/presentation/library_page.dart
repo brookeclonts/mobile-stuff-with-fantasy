@@ -125,11 +125,7 @@ class _LibraryPageState extends State<LibraryPage> {
         actions: [
           GestureDetector(
             onLongPress: _loadSampleBooks,
-            child: Container(
-              width: 48,
-              height: 48,
-              color: Colors.red.withAlpha(100),
-            ),
+            child: const SizedBox(width: 48, height: 48),
           ),
         ],
       ),
