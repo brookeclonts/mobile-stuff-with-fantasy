@@ -12,205 +12,208 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appTitle => 'StuffWithFantasy';
 
   @override
-  String get bookSingular => 'book';
+  String get bookSingular => 'книга';
 
   @override
-  String get bookPlural => 'books';
+  String get bookPlural => 'книги';
 
   @override
   String booksCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count books',
-      one: '1 book',
+      other: '$count книг',
+      many: '$count книг',
+      few: '$count книги',
+      one: '1 книга',
     );
     return '$_temp0';
   }
 
   @override
   String get catalogSignUpPrompt =>
-      'Create an account to save books to your reading list.';
+      'Создайте аккаунт, чтобы сохранять книги в список чтения.';
 
   @override
-  String get catalogSnackbarActionProfile => 'Profile';
+  String get catalogSnackbarActionProfile => 'Профиль';
 
   @override
-  String get catalogTooltipLibrary => 'Library';
+  String get catalogTooltipLibrary => 'Библиотека';
 
   @override
-  String get catalogTooltipProfile => 'Profile';
+  String get catalogTooltipProfile => 'Профиль';
 
   @override
   String get catalogFiltersUnavailable =>
-      'Filters are unavailable until taxonomy loads successfully.';
+      'Фильтры недоступны, пока таксономия не загрузится.';
 
   @override
-  String get catalogRetry => 'Retry';
+  String get catalogRetry => 'Повторить';
 
   @override
-  String get catalogEmptyFiltered => 'No books match your filters';
+  String get catalogEmptyFiltered => 'Нет книг, соответствующих вашим фильтрам';
 
   @override
-  String get catalogEmptyNoBooks => 'No books yet';
+  String get catalogEmptyNoBooks => 'Книг пока нет';
 
   @override
-  String get catalogClearFilters => 'Clear Filters';
+  String get catalogClearFilters => 'Сбросить фильтры';
 
   @override
   String get bookDetailSignUpPrompt =>
-      'Create an account from your profile to save books to your reading list.';
+      'Создайте аккаунт в профиле, чтобы сохранять книги в список чтения.';
 
   @override
   String bookDetailByAuthor(String author) {
-    return 'by $author';
+    return 'автор: $author';
   }
 
   @override
-  String get bookDetailSectionSubgenres => 'Subgenres';
+  String get bookDetailSectionSubgenres => 'Поджанры';
 
   @override
-  String get bookDetailSectionTropes => 'Tropes';
+  String get bookDetailSectionTropes => 'Тропы';
 
   @override
-  String get bookDetailSectionRepresentation => 'Representation';
+  String get bookDetailSectionRepresentation => 'Репрезентация';
 
   @override
-  String get bookDetailSectionAbout => 'About this book';
+  String get bookDetailSectionAbout => 'Об этой книге';
 
   @override
-  String get bookDetailReadMore => 'Read more';
+  String get bookDetailReadMore => 'Читать далее';
 
   @override
-  String get bookDetailSectionSimilar => 'You might also like';
+  String get bookDetailSectionSimilar => 'Вам также может понравиться';
 
   @override
   String get bookDetailBadgeKu => 'KU';
 
   @override
-  String get bookDetailUpdating => 'Updating...';
+  String get bookDetailUpdating => 'Обновление...';
 
   @override
-  String get bookDetailRemoveFromList => 'Remove from Reading List';
+  String get bookDetailRemoveFromList => 'Удалить из списка чтения';
 
   @override
-  String get bookDetailSaving => 'Saving...';
+  String get bookDetailSaving => 'Сохранение...';
 
   @override
-  String get bookDetailSaveToList => 'Save to Reading List';
+  String get bookDetailSaveToList => 'Сохранить в список чтения';
 
   @override
-  String get bookDetailOpening => 'Opening...';
+  String get bookDetailOpening => 'Открытие...';
 
   @override
-  String get bookDetailReadInApp => 'Read in App';
+  String get bookDetailReadInApp => 'Читать в приложении';
 
   @override
-  String get bookDetailGetBook => 'Get this Book';
+  String get bookDetailGetBook => 'Получить книгу';
 
   @override
   String get bookDetailAmazon => 'Amazon US';
 
   @override
-  String get bookDetailAllRetailers => 'View all retailers';
+  String get bookDetailAllRetailers => 'Все магазины';
 
   @override
-  String get bookDetailAudiobook => 'Audiobook';
+  String get bookDetailAudiobook => 'Аудиокнига';
 
   @override
-  String get filterSearchHint => 'Search by title or author...';
+  String get filterSearchHint => 'Поиск по названию или автору...';
 
   @override
   String get filterChipKu => 'KU';
 
   @override
-  String get filterChipAudiobook => 'Audiobook';
+  String get filterChipAudiobook => 'Аудиокнига';
 
   @override
-  String get filterClearAll => 'Clear all';
+  String get filterClearAll => 'Сбросить все';
 
   @override
-  String get filterSheetTitle => 'Filters';
+  String get filterSheetTitle => 'Фильтры';
 
   @override
-  String get filterSheetReset => 'Reset';
+  String get filterSheetReset => 'Сбросить';
 
   @override
-  String get filterSheetSubgenres => 'Subgenres';
+  String get filterSheetSubgenres => 'Поджанры';
 
   @override
-  String get filterSheetTropes => 'Tropes';
+  String get filterSheetTropes => 'Тропы';
 
   @override
-  String get filterSheetSpiceLevel => 'Spice Level';
+  String get filterSheetSpiceLevel => 'Уровень пикантности';
 
   @override
-  String get filterSheetAgeCategory => 'Age Category';
+  String get filterSheetAgeCategory => 'Возрастная категория';
 
   @override
-  String get filterSheetRepresentation => 'Representation';
+  String get filterSheetRepresentation => 'Репрезентация';
 
   @override
-  String get filterSheetLanguageLevel => 'Language Level';
+  String get filterSheetLanguageLevel => 'Уровень лексики';
 
   @override
   String filterSheetApplyWithCount(int count) {
-    return 'Apply Filters ($count)';
+    return 'Применить фильтры ($count)';
   }
 
   @override
-  String get filterSheetApply => 'Apply Filters';
+  String get filterSheetApply => 'Применить фильтры';
 
   @override
-  String get signUpSkip => 'Skip';
+  String get signUpSkip => 'Пропустить';
 
   @override
-  String get rolePickerHeadline => 'I am a...';
+  String get rolePickerHeadline => 'Я...';
 
   @override
   String get rolePickerSubtitle =>
-      'Choose how you want to use StuffWithFantasy';
+      'Выберите, как вы хотите использовать StuffWithFantasy';
 
   @override
-  String get rolePickerContinue => 'Continue';
+  String get rolePickerContinue => 'Продолжить';
 
   @override
-  String get interestStepHeadline => 'What else brings you here?';
+  String get interestStepHeadline => 'Что ещё привело вас сюда?';
 
   @override
-  String get interestStepSubtitle => 'Select any that apply — or skip ahead.';
+  String get interestStepSubtitle =>
+      'Выберите подходящие варианты — или пропустите.';
 
   @override
-  String get interestCardAuthorTitle => 'I\'m an Author';
+  String get interestCardAuthorTitle => 'Я автор';
 
   @override
   String get interestCardAuthorDescription =>
-      'I want to get my books discovered by fantasy readers.';
+      'Я хочу, чтобы читатели фэнтези находили мои книги.';
 
   @override
-  String get interestCardInfluencerTitle => 'I\'m an Influencer';
+  String get interestCardInfluencerTitle => 'Я инфлюенсер';
 
   @override
   String get interestCardInfluencerDescription =>
-      'I create content and want to share fantasy books with my audience.';
+      'Я создаю контент и хочу делиться книгами фэнтези со своей аудиторией.';
 
   @override
-  String get interestStepContinue => 'Continue';
+  String get interestStepContinue => 'Продолжить';
 
   @override
-  String get signUpFormHeadline => 'Create your account';
+  String get signUpFormHeadline => 'Создайте аккаунт';
 
   @override
-  String get signUpFormSubtitle => 'Just a few details and you\'re in';
+  String get signUpFormSubtitle => 'Пара деталей — и вы в деле';
 
   @override
-  String get signUpFieldNameLabel => 'Display name';
+  String get signUpFieldNameLabel => 'Отображаемое имя';
 
   @override
-  String get signUpFieldNameHint => 'How should we call you?';
+  String get signUpFieldNameHint => 'Как нам вас называть?';
 
   @override
-  String get signUpValidatorEnterName => 'Enter your name';
+  String get signUpValidatorEnterName => 'Введите ваше имя';
 
   @override
   String get signUpFieldEmailLabel => 'Email';
@@ -219,287 +222,286 @@ class AppLocalizationsRu extends AppLocalizations {
   String get signUpFieldEmailHint => 'you@example.com';
 
   @override
-  String get signUpValidatorEnterEmail => 'Enter your email';
+  String get signUpValidatorEnterEmail => 'Введите ваш email';
 
   @override
-  String get signUpValidatorInvalidEmail => 'Enter a valid email';
+  String get signUpValidatorInvalidEmail => 'Введите корректный email';
 
   @override
-  String get signUpFieldPasswordLabel => 'Password';
+  String get signUpFieldPasswordLabel => 'Пароль';
 
   @override
-  String get signUpFieldPasswordHint => 'At least 8 characters';
+  String get signUpFieldPasswordHint => 'Минимум 8 символов';
 
   @override
-  String get signUpValidatorEnterPassword => 'Enter a password';
+  String get signUpValidatorEnterPassword => 'Введите пароль';
 
   @override
-  String get signUpValidatorPasswordTooShort => 'Must be at least 8 characters';
+  String get signUpValidatorPasswordTooShort => 'Минимум 8 символов';
 
   @override
-  String get signUpButtonCreateAccount => 'Create Account';
+  String get signUpButtonCreateAccount => 'Создать аккаунт';
 
   @override
   String welcomeStepHeadline(String name) {
-    return 'Welcome, $name!';
+    return 'Добро пожаловать, $name!';
   }
 
   @override
   String get welcomeStepSubtitle =>
-      'Your next great fantasy adventure is waiting for you.';
+      'Ваше следующее великое фэнтези-приключение ждёт вас.';
 
   @override
-  String get welcomeStepGetStarted => 'Get Started';
+  String get welcomeStepGetStarted => 'Начать';
 
   @override
-  String get profileUnknownRank => 'Unknown Rank';
+  String get profileUnknownRank => 'Неизвестный ранг';
 
   @override
-  String get profileAppBarTitle => 'Guild Hall';
+  String get profileAppBarTitle => 'Гильдейский зал';
 
   @override
-  String get profileSectionRunes => 'Runes';
+  String get profileSectionRunes => 'Руны';
 
   @override
   String get profileSectionRunesSubtitle =>
-      'Seal quests to engrave ability runes.';
+      'Завершайте квесты, чтобы выгравировать руны способностей.';
 
   @override
-  String get profileSectionQuestLog => 'Quest Log';
+  String get profileSectionQuestLog => 'Журнал квестов';
 
   @override
   String get profileSectionQuestLogSubtitle =>
-      'Unfurl scrolls to track and seal objectives.';
+      'Разворачивайте свитки, чтобы отслеживать и выполнять задания.';
 
   @override
-  String get profileSectionRelicVault => 'Relic Vault';
+  String get profileSectionRelicVault => 'Хранилище реликвий';
 
   @override
   String get profileSectionRelicVaultSubtitle =>
-      'Seal scrolls to claim relics for your vault.';
+      'Завершайте свитки, чтобы получить реликвии в хранилище.';
 
   @override
-  String get profileSectionCharacterSheet => 'Character Sheet';
+  String get profileSectionCharacterSheet => 'Лист персонажа';
 
   @override
   String get profileSnackbarRuneComingSoon =>
-      'This rune will be configurable soon.';
+      'Настройка этой руны скоро будет доступна.';
 
   @override
-  String get profileDeleteAccountTitle => 'Delete Account';
+  String get profileDeleteAccountTitle => 'Удалить аккаунт';
 
   @override
   String get profileDeleteAccountBody =>
-      'This will permanently delete your account and all associated data. This cannot be undone.';
+      'Это навсегда удалит ваш аккаунт и все связанные данные. Это действие нельзя отменить.';
 
   @override
-  String get profileDeleteCancel => 'Cancel';
+  String get profileDeleteCancel => 'Отмена';
 
   @override
-  String get profileDeleteConfirm => 'Delete';
+  String get profileDeleteConfirm => 'Удалить';
 
   @override
-  String get profileSigningOut => 'Leaving the realm...';
+  String get profileSigningOut => 'Покидаем мир...';
 
   @override
-  String get profileSignOut => 'Exit the Realm';
+  String get profileSignOut => 'Покинуть мир';
 
   @override
-  String get profileDeletingAccount => 'Deleting account...';
+  String get profileDeletingAccount => 'Удаление аккаунта...';
 
   @override
-  String get profileDeleteAccount => 'Delete Account';
+  String get profileDeleteAccount => 'Удалить аккаунт';
 
   @override
-  String get profileRetry => 'Retry';
+  String get profileRetry => 'Повторить';
 
   @override
-  String get profileErrorHeadline => 'The quest board failed to load';
+  String get profileErrorHeadline => 'Не удалось загрузить доску заданий';
 
   @override
-  String get profileTryAgain => 'Try again';
+  String get profileTryAgain => 'Попробовать снова';
 
   @override
-  String get guestGuildHallLabel => 'GUILD HALL';
+  String get guestGuildHallLabel => 'ГИЛЬДЕЙСКИЙ ЗАЛ';
 
   @override
-  String get guestGuildHeadline => 'Begin your quest';
+  String get guestGuildHeadline => 'Начните ваш квест';
 
   @override
   String get guestGuildBody =>
-      'Create an account to track your reading quests, unlock ability runes, and collect relics as you explore the realm.';
+      'Создайте аккаунт, чтобы отслеживать квесты чтения, открывать руны способностей и собирать реликвии, исследуя мир.';
 
   @override
-  String get guestGuildButtonCreateAccount => 'Create account to begin';
+  String get guestGuildButtonCreateAccount => 'Создать аккаунт';
 
   @override
-  String get runeStatusEngraved => 'ENGRAVED';
+  String get runeStatusEngraved => 'ВЫГРАВИРОВАНА';
 
   @override
-  String get runeStatusLocked => 'LOCKED';
+  String get runeStatusLocked => 'ЗАБЛОКИРОВАНА';
 
   @override
   String get runeDetailLockedHint =>
-      'Complete the linked quest to engrave this rune';
+      'Завершите связанный квест, чтобы выгравировать эту руну';
 
   @override
-  String get runeDetailConfigure => 'Configure';
+  String get runeDetailConfigure => 'Настроить';
 
   @override
-  String get arcShieldTitle => 'ARC Shield';
+  String get arcShieldTitle => 'Щит ARC';
 
   @override
   String get arcShieldDescription =>
-      'When active, authors and publishers can find you as an ARC reader.';
+      'Когда активен, авторы и издатели могут найти вас как ARC-читателя.';
 
   @override
-  String get arcShieldSectionAvailability => 'Availability';
+  String get arcShieldSectionAvailability => 'Доступность';
 
   @override
-  String get arcShieldToggleOpenLabel => 'Open to ARCs';
+  String get arcShieldToggleOpenLabel => 'Открыт для ARC';
 
   @override
-  String get arcShieldToggleClosedLabel => 'Not accepting ARCs';
+  String get arcShieldToggleClosedLabel => 'Не принимаю ARC';
 
   @override
-  String get arcShieldToggleOpenSubtitle => 'Authors can reach out to you';
+  String get arcShieldToggleOpenSubtitle => 'Авторы могут связаться с вами';
 
   @override
-  String get arcShieldToggleClosedSubtitle =>
-      'Your profile is hidden from ARC searches';
+  String get arcShieldToggleClosedSubtitle => 'Ваш профиль скрыт от поиска ARC';
 
   @override
-  String get genreAttunementTitle => 'Genre Attunement';
+  String get genreAttunementTitle => 'Настройка жанров';
 
   @override
   String get genreAttunementDescription =>
-      'Select the genres and tropes that call to you. The realm will learn what to surface.';
+      'Выберите жанры и тропы, которые вам близки. Мир подстроится под ваши предпочтения.';
 
   @override
-  String get genreAttunementSectionGenres => 'Genres';
+  String get genreAttunementSectionGenres => 'Жанры';
 
   @override
-  String get genreAttunementSectionTropes => 'Tropes';
+  String get genreAttunementSectionTropes => 'Тропы';
 
   @override
   String genreAttunementCountAttuned(int count) {
-    return '$count attuned';
+    return '$count настроено';
   }
 
   @override
-  String get genreEpicFantasy => 'Epic Fantasy';
+  String get genreEpicFantasy => 'Эпическое фэнтези';
 
   @override
-  String get genreDarkFantasy => 'Dark Fantasy';
+  String get genreDarkFantasy => 'Тёмное фэнтези';
 
   @override
-  String get genreUrbanFantasy => 'Urban Fantasy';
+  String get genreUrbanFantasy => 'Городское фэнтези';
 
   @override
-  String get genreRomantasy => 'Romantasy';
+  String get genreRomantasy => 'Романтическое фэнтези';
 
   @override
-  String get genreCozyFantasy => 'Cozy Fantasy';
+  String get genreCozyFantasy => 'Уютное фэнтези';
 
   @override
-  String get genreGrimdark => 'Grimdark';
+  String get genreGrimdark => 'Гримдарк';
 
   @override
   String get genreLitRpg => 'LitRPG';
 
   @override
-  String get genreSwordAndSorcery => 'Sword & Sorcery';
+  String get genreSwordAndSorcery => 'Меч и магия';
 
   @override
-  String get genreMythicFantasy => 'Mythic Fantasy';
+  String get genreMythicFantasy => 'Мифическое фэнтези';
 
   @override
-  String get genrePortalFantasy => 'Portal Fantasy';
+  String get genrePortalFantasy => 'Попаданцы';
 
   @override
-  String get tropeFoundFamily => 'Found Family';
+  String get tropeFoundFamily => 'Обретённая семья';
 
   @override
-  String get tropeEnemiesToLovers => 'Enemies to Lovers';
+  String get tropeEnemiesToLovers => 'От врагов к влюблённым';
 
   @override
-  String get tropeChosenOne => 'Chosen One';
+  String get tropeChosenOne => 'Избранный';
 
   @override
-  String get tropeMagicSchools => 'Magic Schools';
+  String get tropeMagicSchools => 'Магические школы';
 
   @override
-  String get tropeMorallyGrey => 'Morally Grey';
+  String get tropeMorallyGrey => 'Морально неоднозначный';
 
   @override
-  String get tropeSlowBurn => 'Slow Burn';
+  String get tropeSlowBurn => 'Медленное развитие';
 
   @override
-  String get tropePoliticalIntrigue => 'Political Intrigue';
+  String get tropePoliticalIntrigue => 'Политические интриги';
 
   @override
-  String get tropeQuestJourney => 'Quest Journey';
+  String get tropeQuestJourney => 'Путешествие-квест';
 
   @override
-  String get tropeHiddenRoyalty => 'Hidden Royalty';
+  String get tropeHiddenRoyalty => 'Скрытое происхождение';
 
   @override
-  String get tropeRevengeArc => 'Revenge Arc';
+  String get tropeRevengeArc => 'Арка мести';
 
   @override
-  String get eventWatchtowerTitle => 'Event Watchtower';
+  String get eventWatchtowerTitle => 'Сторожевая башня';
 
   @override
   String get eventWatchtowerDescription =>
-      'Choose which signals reach you from the realm.';
+      'Выберите, какие сигналы из мира будут доходить до вас.';
 
   @override
-  String get eventWatchtowerSectionSignals => 'Signals';
+  String get eventWatchtowerSectionSignals => 'Сигналы';
 
   @override
-  String get notifNewEventsTitle => 'New Events';
+  String get notifNewEventsTitle => 'Новые события';
 
   @override
   String get notifNewEventsDescription =>
-      'When a Stuff Your Kindle event launches';
+      'Когда запускается событие Stuff Your Kindle';
 
   @override
-  String get notifBookDropsTitle => 'Book Drops';
+  String get notifBookDropsTitle => 'Новинки';
 
   @override
   String get notifBookDropsDescription =>
-      'When new books are added to the catalog';
+      'Когда в каталог добавляются новые книги';
 
   @override
-  String get notifRecommendationsTitle => 'Recommendations';
+  String get notifRecommendationsTitle => 'Рекомендации';
 
   @override
   String get notifRecommendationsDescription =>
-      'Personalized picks based on your attunement';
+      'Персональные подборки на основе ваших предпочтений';
 
   @override
-  String get rewardRevealBarrierLabel => 'Reward reveal';
+  String get rewardRevealBarrierLabel => 'Награда';
 
   @override
-  String get rewardRevealLegendRelicClaimed => 'LEGEND RELIC CLAIMED';
+  String get rewardRevealLegendRelicClaimed => 'ЛЕГЕНДАРНАЯ РЕЛИКВИЯ ПОЛУЧЕНА';
 
   @override
-  String get rewardRevealRelicUnlocked => 'RELIC UNLOCKED';
+  String get rewardRevealRelicUnlocked => 'РЕЛИКВИЯ ОТКРЫТА';
 
   @override
-  String get rewardRevealContinue => 'Continue questing';
+  String get rewardRevealContinue => 'Продолжить путешествие';
 
   @override
-  String get characterSheetHeaderLabel => 'CHARACTER SHEET';
+  String get characterSheetHeaderLabel => 'ЛИСТ ПЕРСОНАЖА';
 
   @override
-  String get characterSheetStatName => 'Name';
+  String get characterSheetStatName => 'Имя';
 
   @override
-  String get characterSheetStatRank => 'Rank';
+  String get characterSheetStatRank => 'Ранг';
 
   @override
-  String get characterSheetStatQuests => 'Quests';
+  String get characterSheetStatQuests => 'Квесты';
 
   @override
   String characterSheetStatQuestsValue(int completed, int total) {
@@ -507,7 +509,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get characterSheetStatRelics => 'Relics';
+  String get characterSheetStatRelics => 'Реликвии';
 
   @override
   String characterSheetStatRelicsValue(int collected, int total) {
@@ -515,176 +517,179 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get characterSheetStatSignal => 'Signal';
+  String get characterSheetStatSignal => 'Сигнал';
 
   @override
-  String get realmMapCurrentQuest => 'CURRENT QUEST';
+  String get realmMapCurrentQuest => 'ТЕКУЩИЙ КВЕСТ';
 
   @override
-  String get questScrollSealed => 'Sealed';
+  String get questScrollSealed => 'Завершён';
 
   @override
-  String get questScrollActive => 'ACTIVE';
+  String get questScrollActive => 'АКТИВЕН';
 
   @override
-  String get questScrollReward => 'REWARD';
+  String get questScrollReward => 'НАГРАДА';
 
   @override
   String get relicVaultLockedTitle => '???';
 
   @override
-  String get relicVaultLegendRelic => 'Legend relic';
+  String get relicVaultLegendRelic => 'Легендарная реликвия';
 
   @override
-  String get relicVaultClaimed => 'Claimed';
+  String get relicVaultClaimed => 'Получена';
 
   @override
-  String get relicVaultSealed => 'Sealed';
+  String get relicVaultSealed => 'Запечатана';
 
   @override
-  String get libraryAppBarTitle => 'Library';
+  String get libraryAppBarTitle => 'Библиотека';
 
   @override
-  String get libraryTabMyBooks => 'My Books';
+  String get libraryTabMyBooks => 'Мои книги';
 
   @override
-  String get libraryTabReadingList => 'Reading List';
+  String get libraryTabReadingList => 'Список чтения';
 
   @override
-  String get libraryMyBooksSignInTitle => 'Your bookshelf awaits';
+  String get libraryMyBooksSignInTitle => 'Ваша книжная полка ждёт';
 
   @override
   String get libraryMyBooksSignInMessage =>
-      'Sign in to access books you\'ve purchased, claimed, or uploaded — ready to read right here.';
+      'Войдите, чтобы получить доступ к купленным, полученным или загруженным книгам — готовым к чтению прямо здесь.';
 
   @override
-  String get libraryMyBooksEmptyTitle => 'No readable books yet';
+  String get libraryMyBooksEmptyTitle => 'Книг для чтения пока нет';
 
   @override
   String get libraryMyBooksEmptyMessage =>
-      'Books you buy, claim, or upload will show up here when they are ready to read.';
+      'Книги, которые вы купите, получите или загрузите, появятся здесь, когда будут готовы к чтению.';
 
   @override
-  String get libraryReadingListSignInTitle => 'Start your reading list';
+  String get libraryReadingListSignInTitle => 'Начните список чтения';
 
   @override
   String get libraryReadingListSignInMessage =>
-      'Sign in to save books from the catalog and build your personal reading list.';
+      'Войдите, чтобы сохранять книги из каталога и создавать свой список чтения.';
 
   @override
-  String get libraryReadingListEmptyTitle => 'Nothing saved yet';
+  String get libraryReadingListEmptyTitle => 'Пока ничего не сохранено';
 
   @override
   String get libraryReadingListEmptyMessage =>
-      'Save books from the catalog to build your reading list.';
+      'Сохраняйте книги из каталога, чтобы создать свой список чтения.';
 
   @override
-  String get libraryButtonSignIn => 'Sign In';
+  String get libraryButtonSignIn => 'Войти';
 
   @override
-  String get libraryRetry => 'Retry';
+  String get libraryRetry => 'Повторить';
 
   @override
   String readerProgressRead(String progress) {
-    return '$progress read';
+    return '$progress прочитано';
   }
 
   @override
-  String get readerHintSwipeToTurn => 'Swipe to turn pages';
+  String get readerHintSwipeToTurn => 'Проведите, чтобы перевернуть страницу';
 
   @override
-  String get readerHintOpeningBook => 'Opening book…';
+  String get readerHintOpeningBook => 'Открытие книги…';
 
   @override
-  String get readerHintTapToHide => 'Tap the center to hide controls';
+  String get readerHintTapToHide =>
+      'Нажмите в центр, чтобы скрыть элементы управления';
 
   @override
-  String get readerTooltipBack => 'Back';
+  String get readerTooltipBack => 'Назад';
 
   @override
-  String get readerTooltipChapters => 'Chapters';
+  String get readerTooltipChapters => 'Главы';
 
   @override
-  String get readerTooltipReadingSettings => 'Reading settings';
+  String get readerTooltipReadingSettings => 'Настройки чтения';
 
   @override
-  String get readerTooltipPreviousPage => 'Previous page';
+  String get readerTooltipPreviousPage => 'Предыдущая страница';
 
   @override
-  String get readerButtonPrev => 'Prev';
+  String get readerButtonPrev => 'Назад';
 
   @override
-  String get readerTooltipNextPage => 'Next page';
+  String get readerTooltipNextPage => 'Следующая страница';
 
   @override
-  String get readerButtonNext => 'Next';
+  String get readerButtonNext => 'Далее';
 
   @override
-  String get readerChaptersTitle => 'Chapters';
+  String get readerChaptersTitle => 'Главы';
 
   @override
-  String get readerSettingsTitle => 'Reading settings';
+  String get readerSettingsTitle => 'Настройки чтения';
 
   @override
-  String get readerSettingsTextSize => 'Text size';
+  String get readerSettingsTextSize => 'Размер текста';
 
   @override
-  String get readerTooltipSmallerText => 'Smaller text';
+  String get readerTooltipSmallerText => 'Уменьшить текст';
 
   @override
   String readerFontSizeLabel(int size) {
-    return '$size pt';
+    return '$size пт';
   }
 
   @override
-  String get readerTooltipLargerText => 'Larger text';
+  String get readerTooltipLargerText => 'Увеличить текст';
 
   @override
-  String get readerSettingsPageTheme => 'Page theme';
+  String get readerSettingsPageTheme => 'Тема страницы';
 
   @override
-  String get readerAppearancePaper => 'Paper';
+  String get readerAppearancePaper => 'Бумага';
 
   @override
-  String get readerAppearanceSepia => 'Sepia';
+  String get readerAppearanceSepia => 'Сепия';
 
   @override
-  String get readerAppearanceNight => 'Night';
+  String get readerAppearanceNight => 'Ночь';
 
   @override
-  String get eventDetailLoadingBooks => 'Loading books...';
+  String get eventDetailLoadingBooks => 'Загрузка книг...';
 
   @override
   String eventDetailBookCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count books in this event',
-      one: '1 book in this event',
+      other: '$count книг в этом событии',
+      many: '$count книг в этом событии',
+      few: '$count книги в этом событии',
+      one: '1 книга в этом событии',
     );
     return '$_temp0';
   }
 
   @override
-  String get eventDetailNoBooksYet => 'No books in this event yet.';
+  String get eventDetailNoBooksYet => 'В этом событии пока нет книг.';
 
   @override
-  String get creatorDetailNoBooksYet => 'No books to show yet.';
+  String get creatorDetailNoBooksYet => 'Книг пока нет.';
 
   @override
-  String get creatorDetailFavoriteBookLabel => 'Favorite book: ';
+  String get creatorDetailFavoriteBookLabel => 'Любимая книга: ';
 
   @override
-  String get creatorDetailLovesLabel => 'Loves: ';
+  String get creatorDetailLovesLabel => 'Увлечения: ';
 
   @override
   String creatorDetailBooksBy(String name) {
-    return 'Books by $name';
+    return 'Книги автора $name';
   }
 
   @override
   String creatorDetailRecommendedBy(String name) {
-    return 'Recommended by $name';
+    return 'Рекомендовано: $name';
   }
 
   @override
@@ -712,170 +717,178 @@ class AppLocalizationsRu extends AppLocalizations {
   String get socialLinkFacebook => 'Facebook';
 
   @override
-  String get socialLinkWebsite => 'Website';
+  String get socialLinkWebsite => 'Веб-сайт';
 
   @override
-  String get userRoleReader => 'Reader';
+  String get userRoleReader => 'Читатель';
 
   @override
   String get userRoleReaderDescription =>
-      'Discover your next favorite fantasy book';
+      'Откройте для себя следующую любимую фэнтези-книгу';
 
   @override
-  String get creatorRoleAuthor => 'Author';
+  String get creatorRoleAuthor => 'Автор';
 
   @override
-  String get creatorRoleInfluencer => 'Influencer';
+  String get creatorRoleInfluencer => 'Инфлюенсер';
 
   @override
-  String get readAccessOwner => 'Your upload';
+  String get readAccessOwner => 'Ваша загрузка';
 
   @override
-  String get readAccessPurchased => 'Purchased';
+  String get readAccessPurchased => 'Куплено';
 
   @override
-  String get readAccessNone => 'No access';
+  String get readAccessNone => 'Нет доступа';
 
   @override
-  String get eventStatusLastDay => 'Last day!';
+  String get eventStatusLastDay => 'Последний день!';
 
   @override
-  String get eventStatusHappeningNow => 'Happening now';
+  String get eventStatusHappeningNow => 'Идёт сейчас';
 
   @override
-  String get eventStatusStartsToday => 'Starts today';
+  String get eventStatusStartsToday => 'Начинается сегодня';
 
   @override
-  String get eventStatusStartsTomorrow => 'Starts tomorrow';
+  String get eventStatusStartsTomorrow => 'Начинается завтра';
 
   @override
   String eventStatusStartsInDays(int days) {
-    return 'Starts in $days days';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Начинается через $days дней',
+      many: 'Начинается через $days дней',
+      few: 'Начинается через $days дня',
+      one: 'Начинается через 1 день',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get spiceLevelNone => 'No Spice';
+  String get spiceLevelNone => 'Без пикантности';
 
   @override
-  String get spiceLevelMild => 'Mild Spice';
+  String get spiceLevelMild => 'Слегка пикантно';
 
   @override
-  String get spiceLevelMedium => 'Medium Spice';
+  String get spiceLevelMedium => 'Умеренно пикантно';
 
   @override
-  String get spiceLevelHot => 'Hot';
+  String get spiceLevelHot => 'Горячо';
 
   @override
-  String get spiceLevelScorching => 'Scorching';
+  String get spiceLevelScorching => 'Обжигающе';
 
   @override
-  String get languageLevelClean => 'Clean';
+  String get languageLevelClean => 'Без ненормативной лексики';
 
   @override
-  String get languageLevelMild => 'Mild Language';
+  String get languageLevelMild => 'Мягкая лексика';
 
   @override
-  String get languageLevelModerate => 'Moderate Language';
+  String get languageLevelModerate => 'Умеренная лексика';
 
   @override
-  String get languageLevelStrong => 'Strong Language';
+  String get languageLevelStrong => 'Грубая лексика';
 
   @override
   String get homeHeadline => 'Stuff With Fantasy';
 
   @override
-  String get homeTagline => 'Your fantasy reading companion.';
+  String get homeTagline => 'Ваш компаньон в мире фэнтези.';
 
   @override
   String get homeSubtitle =>
-      'Discover, track, and share the fantasy books you love.';
+      'Открывайте, отслеживайте и делитесь любимыми книгами фэнтези.';
 
   @override
   String get homeChipMaterial3 => 'Material 3';
 
   @override
-  String get homeChipStructuredStarter => 'Structured starter';
+  String get homeChipStructuredStarter => 'Структурированный шаблон';
 
   @override
-  String get homeChipWidgetTests => 'Widget tests';
+  String get homeChipWidgetTests => 'Тесты виджетов';
 
   @override
-  String get homeCardWhatIsReadyTitle => 'What is ready';
+  String get homeCardWhatIsReadyTitle => 'Что уже готово';
 
   @override
   String get homeCardWhatIsReadyItem1 =>
-      'A branded app shell with light and dark themes.';
+      'Брендированная оболочка приложения со светлой и тёмной темами.';
 
   @override
   String get homeCardWhatIsReadyItem2 =>
-      'A stricter analyzer baseline using flutter_lints.';
+      'Строгая базовая конфигурация анализатора на основе flutter_lints.';
 
   @override
   String get homeCardWhatIsReadyItem3 =>
-      'A widget test to protect the starter experience.';
+      'Тест виджетов для проверки начального опыта.';
 
   @override
-  String get homeCardWhereToGoNextTitle => 'Where to go next';
+  String get homeCardWhereToGoNextTitle => 'Что делать дальше';
 
   @override
   String get homeCardWhereToGoNextItem1 =>
-      'Add features under lib/src by domain instead of growing main.dart.';
+      'Добавляйте функции в lib/src по доменам, а не расширяйте main.dart.';
 
   @override
   String get homeCardWhereToGoNextItem2 =>
-      'Replace placeholder assets, launcher icons, and product copy.';
+      'Замените заглушки ассетов, иконок и текстов.';
 
   @override
   String get homeCardWhereToGoNextItem3 =>
-      'Run flutter analyze and flutter test as you add screens.';
+      'Запускайте flutter analyze и flutter test по мере добавления экранов.';
 
   @override
-  String get homeGetStarted => 'Get Started';
+  String get homeGetStarted => 'Начать';
 
   @override
-  String get homeBrowseBooks => 'Browse Books';
+  String get homeBrowseBooks => 'Каталог книг';
 
   @override
-  String get monthJan => 'Jan';
+  String get monthJan => 'Янв';
 
   @override
-  String get monthFeb => 'Feb';
+  String get monthFeb => 'Фев';
 
   @override
-  String get monthMar => 'Mar';
+  String get monthMar => 'Мар';
 
   @override
-  String get monthApr => 'Apr';
+  String get monthApr => 'Апр';
 
   @override
-  String get monthMay => 'May';
+  String get monthMay => 'Май';
 
   @override
-  String get monthJun => 'Jun';
+  String get monthJun => 'Июн';
 
   @override
-  String get monthJul => 'Jul';
+  String get monthJul => 'Июл';
 
   @override
-  String get monthAug => 'Aug';
+  String get monthAug => 'Авг';
 
   @override
-  String get monthSep => 'Sep';
+  String get monthSep => 'Сен';
 
   @override
-  String get monthOct => 'Oct';
+  String get monthOct => 'Окт';
 
   @override
-  String get monthNov => 'Nov';
+  String get monthNov => 'Ноя';
 
   @override
-  String get monthDec => 'Dec';
+  String get monthDec => 'Дек';
 
   @override
-  String get profileSectionLanguage => 'Language';
+  String get profileSectionLanguage => 'Язык';
 
   @override
-  String get languageSystemDefault => 'System default';
+  String get languageSystemDefault => 'По умолчанию (системный)';
 
   @override
   String get languageEnglish => 'English';
@@ -899,289 +912,291 @@ class AppLocalizationsRu extends AppLocalizations {
   String get languageJapanese => '日本語';
 
   @override
-  String get profileSectionReadingChronicle => 'Reading Chronicle';
+  String get profileSectionReadingChronicle => 'Хроника чтения';
 
   @override
   String get profileSectionReadingChronicleSubtitle =>
-      'Your journey through the pages, mapped in ink.';
+      'Ваш путь сквозь страницы, запечатлённый чернилами.';
 
   @override
-  String get profileSectionTomeCounter => 'Tome Counter';
+  String get profileSectionTomeCounter => 'Счётчик томов';
 
   @override
   String get profileSectionTomeCounterSubtitle =>
-      'Your accumulated reading feats.';
+      'Ваши накопленные читательские достижения.';
 
   @override
-  String get profileSectionAchievementSigils => 'Achievement Sigils';
+  String get profileSectionAchievementSigils => 'Печати достижений';
 
   @override
   String get profileSectionAchievementSigilsSubtitle =>
-      'Milestones forged through dedication.';
+      'Вехи, выкованные упорством.';
 
   @override
   String chroniclePagesThisWeek(int count) {
-    return '~$count pages this week';
+    return '~$count страниц за неделю';
   }
 
   @override
   String chronicleStreak(int count) {
-    return '$count-day streak';
+    return '$count-дневная серия';
   }
 
   @override
-  String get chronicleLess => 'Less';
+  String get chronicleLess => 'Меньше';
 
   @override
-  String get chronicleMore => 'More';
+  String get chronicleMore => 'Больше';
 
   @override
-  String get tomeCounterBooks => 'Tomes Conquered';
+  String get tomeCounterBooks => 'Покорённые тома';
 
   @override
-  String get tomeCounterPages => 'Pages Turned';
+  String get tomeCounterPages => 'Перевёрнутые страницы';
 
   @override
-  String get tomeCounterTime => 'Time in Realm';
+  String get tomeCounterTime => 'Время в мире';
 
   @override
   String tomeCounterHoursMinutes(int hours, int minutes) {
-    return '${hours}h ${minutes}m';
+    return '$hoursч $minutesм';
   }
 
   @override
   String tomeCounterMinutes(int minutes) {
-    return '${minutes}m';
+    return '$minutesм';
   }
 
   @override
-  String get achievementLocked => 'SEALED';
+  String get achievementLocked => 'ЗАПЕЧАТАНО';
 
   @override
-  String get achievementUnlocked => 'EARNED';
+  String get achievementUnlocked => 'ПОЛУЧЕНО';
 
   @override
-  String get achievementFirstPageTitle => 'First Page';
+  String get achievementFirstPageTitle => 'Первая страница';
 
   @override
-  String get achievementFirstPageDesc => 'Open a book and begin reading.';
+  String get achievementFirstPageDesc => 'Откройте книгу и начните читать.';
 
   @override
-  String get achievementBookwormTitle => 'Bookworm Awakens';
+  String get achievementBookwormTitle => 'Пробуждение книжного червя';
 
   @override
-  String get achievementBookwormDesc => 'Finish your first book.';
+  String get achievementBookwormDesc => 'Закончите свою первую книгу.';
 
   @override
-  String get achievementDailyRitualTitle => 'Daily Ritual';
+  String get achievementDailyRitualTitle => 'Ежедневный ритуал';
 
   @override
-  String get achievementDailyRitualDesc => 'Read for 3 days in a row.';
+  String get achievementDailyRitualDesc => 'Читайте 3 дня подряд.';
 
   @override
-  String get achievementPageTurnerTitle => 'Page Turner';
+  String get achievementPageTurnerTitle => 'Любитель страниц';
 
   @override
-  String get achievementPageTurnerDesc => 'Read approximately 100 pages.';
+  String get achievementPageTurnerDesc => 'Прочитайте около 100 страниц.';
 
   @override
-  String get achievementHourGlassTitle => 'Hour Glass';
+  String get achievementHourGlassTitle => 'Песочные часы';
 
   @override
-  String get achievementHourGlassDesc => 'Spend 1 hour reading.';
+  String get achievementHourGlassDesc => 'Проведите 1 час за чтением.';
 
   @override
-  String get achievementChapterChampionTitle => 'Chapter Champion';
+  String get achievementChapterChampionTitle => 'Чемпион глав';
 
   @override
-  String get achievementChapterChampionDesc => 'Finish 3 books.';
+  String get achievementChapterChampionDesc => 'Закончите 3 книги.';
 
   @override
-  String get achievementFlameKeeperTitle => 'Flame Keeper';
+  String get achievementFlameKeeperTitle => 'Хранитель пламени';
 
   @override
-  String get achievementFlameKeeperDesc => 'Read for 7 days in a row.';
+  String get achievementFlameKeeperDesc => 'Читайте 7 дней подряд.';
 
   @override
-  String get achievementTomeScholarTitle => 'Tome Scholar';
+  String get achievementTomeScholarTitle => 'Учёный томов';
 
   @override
-  String get achievementTomeScholarDesc => 'Read approximately 1,000 pages.';
+  String get achievementTomeScholarDesc => 'Прочитайте около 1 000 страниц.';
 
   @override
-  String get achievementDevotedReaderTitle => 'Devoted Reader';
+  String get achievementDevotedReaderTitle => 'Преданный читатель';
 
   @override
-  String get achievementDevotedReaderDesc => 'Spend 10 hours reading.';
+  String get achievementDevotedReaderDesc => 'Проведите 10 часов за чтением.';
 
   @override
-  String get achievementFiveRealmsTitle => 'Five Realms';
+  String get achievementFiveRealmsTitle => 'Пять миров';
 
   @override
-  String get achievementFiveRealmsDesc => 'Start reading 5 different books.';
+  String get achievementFiveRealmsDesc => 'Начните читать 5 разных книг.';
 
   @override
-  String get achievementGrandLibrarianTitle => 'Grand Librarian';
+  String get achievementGrandLibrarianTitle => 'Великий библиотекарь';
 
   @override
-  String get achievementGrandLibrarianDesc => 'Finish 10 books.';
+  String get achievementGrandLibrarianDesc => 'Закончите 10 книг.';
 
   @override
-  String get achievementEternalFlameTitle => 'Eternal Flame';
+  String get achievementEternalFlameTitle => 'Вечное пламя';
 
   @override
-  String get achievementEternalFlameDesc => 'Maintain a 30-day reading streak.';
+  String get achievementEternalFlameDesc =>
+      'Поддерживайте 30-дневную серию чтения.';
 
   @override
-  String get achievementMythicScribeTitle => 'Mythic Scribe';
+  String get achievementMythicScribeTitle => 'Мифический писец';
 
   @override
-  String get achievementMythicScribeDesc => 'Spend 100 hours reading.';
+  String get achievementMythicScribeDesc => 'Проведите 100 часов за чтением.';
 
   @override
-  String get achievementRealmWalkerTitle => 'Realm Walker';
+  String get achievementRealmWalkerTitle => 'Странник миров';
 
   @override
-  String get achievementRealmWalkerDesc => 'Start reading 10 different books.';
+  String get achievementRealmWalkerDesc => 'Начните читать 10 разных книг.';
 
   @override
-  String get oathAppBarTitle => 'Oath Stone';
+  String get oathAppBarTitle => 'Камень клятв';
 
   @override
-  String get oathSectionTitle => 'Oath Stone';
+  String get oathSectionTitle => 'Камень клятв';
 
   @override
-  String get oathSectionSubtitle => 'Your sworn reading pledge';
+  String get oathSectionSubtitle => 'Ваш торжественный читательский обет';
 
   @override
-  String get oathSwearCta => 'Swear an Oath';
+  String get oathSwearCta => 'Принести клятву';
 
   @override
   String get oathSwearSubtitle =>
-      'Set a public reading goal and track your progress';
+      'Поставьте публичную цель чтения и отслеживайте прогресс';
 
   @override
-  String get oathSwearPageTitle => 'Inscribe Your Oath';
+  String get oathSwearPageTitle => 'Начертайте клятву';
 
   @override
-  String get oathFieldTitle => 'Your pledge';
+  String get oathFieldTitle => 'Ваш обет';
 
   @override
-  String get oathFieldTitleHint => 'I will read 24 books in 2026';
+  String get oathFieldTitleHint => 'Я прочитаю 24 книги в 2026 году';
 
   @override
-  String get oathFieldTarget => 'Target books';
+  String get oathFieldTarget => 'Целевое количество книг';
 
   @override
-  String get oathFieldYear => 'Year';
+  String get oathFieldYear => 'Год';
 
   @override
-  String get oathFieldPublic => 'Public oath';
+  String get oathFieldPublic => 'Публичная клятва';
 
   @override
-  String get oathFieldPublicSubtitle => 'Visible on the Lore Board';
+  String get oathFieldPublicSubtitle => 'Видна на Доске знаний';
 
   @override
-  String get oathSwearButton => 'Swear This Oath';
+  String get oathSwearButton => 'Принести эту клятву';
 
   @override
-  String get oathSwearing => 'Inscribing...';
+  String get oathSwearing => 'Начертание...';
 
   @override
   String oathProgressLabel(int current, int target) {
-    return '$current of $target';
+    return '$current из $target';
   }
 
   @override
-  String get oathProgressComplete => 'Oath Fulfilled!';
+  String get oathProgressComplete => 'Клятва исполнена!';
 
   @override
-  String get oathEntryLogged => 'Rune carved!';
+  String get oathEntryLogged => 'Руна выгравирована!';
 
   @override
-  String get oathEntryRemoved => 'Entry removed';
+  String get oathEntryRemoved => 'Запись удалена';
 
   @override
-  String get oathDeleteConfirmTitle => 'Break This Oath?';
+  String get oathDeleteConfirmTitle => 'Нарушить клятву?';
 
   @override
   String get oathDeleteConfirmBody =>
-      'This will permanently remove your oath and all logged entries.';
+      'Это навсегда удалит вашу клятву и все записанные данные.';
 
   @override
-  String get oathDeleteCancel => 'Keep Oath';
+  String get oathDeleteCancel => 'Сохранить клятву';
 
   @override
-  String get oathDeleteConfirm => 'Break Oath';
+  String get oathDeleteConfirm => 'Нарушить клятву';
 
   @override
-  String get oathDeleted => 'Oath broken';
+  String get oathDeleted => 'Клятва нарушена';
 
   @override
-  String get oathCompleteTitle => 'OATH FULFILLED';
+  String get oathCompleteTitle => 'КЛЯТВА ИСПОЛНЕНА';
 
   @override
-  String get oathCompleteHeadline => 'Your Oath is Sealed';
+  String get oathCompleteHeadline => 'Ваша клятва запечатана';
 
   @override
-  String get oathCompleteBody =>
-      'You have honored your pledge. The runes are complete.';
+  String get oathCompleteBody => 'Вы сдержали обет. Руны завершены.';
 
   @override
-  String get oathCompleteContinue => 'Continue';
+  String get oathCompleteContinue => 'Продолжить';
 
   @override
-  String get oathEmptyEntries => 'No books logged yet';
+  String get oathEmptyEntries => 'Книги ещё не записаны';
 
   @override
-  String get oathLogBookAction => 'Log toward Oath';
+  String get oathLogBookAction => 'Записать в клятву';
 
   @override
   String oathLogBookConfirm(String title) {
-    return 'Log \"$title\" toward your oath?';
+    return 'Записать «$title» в вашу клятву?';
   }
 
   @override
-  String get oathLogBookButton => 'Log It';
+  String get oathLogBookButton => 'Записать';
 
   @override
-  String get oathAlreadyLogged => 'Already logged toward your oath';
+  String get oathAlreadyLogged => 'Уже записано в клятву';
 
   @override
-  String get oathEditButton => 'Edit Oath';
+  String get oathEditButton => 'Изменить клятву';
 
   @override
-  String get oathUpdated => 'Oath updated';
+  String get oathUpdated => 'Клятва обновлена';
 
   @override
-  String get oathErrorCreate => 'Failed to create oath';
+  String get oathErrorCreate => 'Не удалось создать клятву';
 
   @override
-  String get oathErrorLoad => 'Failed to load oath';
+  String get oathErrorLoad => 'Не удалось загрузить клятву';
 
   @override
-  String get oathGuestHeadline => 'The Oath Stone Awaits';
+  String get oathGuestHeadline => 'Камень клятв ждёт';
 
   @override
   String get oathGuestBody =>
-      'Create an account to swear a reading oath and track your progress.';
+      'Создайте аккаунт, чтобы принести читательскую клятву и отслеживать прогресс.';
 
   @override
-  String get seasonalCampaignLabel => 'Seasonal Campaign';
+  String get seasonalCampaignLabel => 'Сезонная кампания';
 
   @override
-  String get seasonalCampaignExpired => 'Expedition ended';
+  String get seasonalCampaignExpired => 'Экспедиция завершена';
 
   @override
-  String get seasonalCampaignLastDay => 'Last day!';
+  String get seasonalCampaignLastDay => 'Последний день!';
 
   @override
   String seasonalCampaignCountdownDays(int days) {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '$days days remaining',
-      one: '1 day remaining',
+      other: 'Осталось $days дней',
+      many: 'Осталось $days дней',
+      few: 'Осталось $days дня',
+      one: 'Остался 1 день',
     );
     return '$_temp0';
   }
@@ -1191,8 +1206,10 @@ class AppLocalizationsRu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       months,
       locale: localeName,
-      other: '$months months remaining',
-      one: '1 month remaining',
+      other: 'Осталось $months месяцев',
+      many: 'Осталось $months месяцев',
+      few: 'Осталось $months месяца',
+      one: 'Остался 1 месяц',
     );
     return '$_temp0';
   }
@@ -1202,97 +1219,102 @@ class AppLocalizationsRu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       months,
       locale: localeName,
-      other: '$months months',
-      one: '1 month',
+      other: '$months месяцев',
+      many: '$months месяцев',
+      few: '$months месяца',
+      one: '1 месяц',
     );
     String _temp1 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '$days days remaining',
-      one: '1 day remaining',
+      other: 'осталось $days дней',
+      many: 'осталось $days дней',
+      few: 'осталось $days дня',
+      one: 'остался 1 день',
     );
     return '$_temp0, $_temp1';
   }
 
   @override
-  String get seasonalRelicSectionTitle => 'Seasonal Relics';
+  String get seasonalRelicSectionTitle => 'Сезонные реликвии';
 
   @override
-  String get profileSectionSeasonalQuests => 'Seasonal Quests';
+  String get profileSectionSeasonalQuests => 'Сезонные квесты';
 
   @override
   String get profileSectionSeasonalQuestsSubtitle =>
-      'Time-limited expeditions with exclusive relics.';
+      'Ограниченные по времени экспедиции с эксклюзивными реликвиями.';
 
   @override
-  String get realmRankingsTitle => 'Realm Rankings';
+  String get realmRankingsTitle => 'Рейтинг мира';
 
   @override
-  String get leaderboardMetricQuests => 'Quests';
+  String get leaderboardMetricQuests => 'Квесты';
 
   @override
-  String get leaderboardMetricBooks => 'Books';
+  String get leaderboardMetricBooks => 'Книги';
 
   @override
-  String get leaderboardMetricRelics => 'Relics';
+  String get leaderboardMetricRelics => 'Реликвии';
 
   @override
   String leaderboardTotalParticipants(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count adventurers ranked',
-      one: '1 adventurer ranked',
+      other: '$count искателей приключений в рейтинге',
+      many: '$count искателей приключений в рейтинге',
+      few: '$count искателя приключений в рейтинге',
+      one: '1 искатель приключений в рейтинге',
     );
     return '$_temp0';
   }
 
   @override
-  String get leaderboardYourPosition => 'YOUR POSITION';
+  String get leaderboardYourPosition => 'ВАША ПОЗИЦИЯ';
 
   @override
   String leaderboardPositionOfTotal(int position, int total) {
-    return '#$position of $total';
+    return '#$position из $total';
   }
 
   @override
-  String get leaderboardErrorHeadline => 'The rankings failed to load';
+  String get leaderboardErrorHeadline => 'Не удалось загрузить рейтинг';
 
   @override
-  String get leaderboardOptInTitle => 'Realm Rankings';
+  String get leaderboardOptInTitle => 'Рейтинг мира';
 
   @override
   String get leaderboardOptInDescription =>
-      'Compete with fellow adventurers by joining the realm leaderboard. Your ranking is based on quests sealed, books read, and relics collected.';
+      'Соревнуйтесь с другими искателями приключений, присоединившись к рейтингу мира. Ваш рейтинг основан на завершённых квестах, прочитанных книгах и собранных реликвиях.';
 
   @override
-  String get leaderboardOptInPrivacy =>
-      'Only your display name and rank are visible to others.';
+  String get leaderboardOptInPrivacy => 'Другим видны только ваше имя и ранг.';
 
   @override
-  String get leaderboardOptInActive => 'Ranked in the realm';
+  String get leaderboardOptInActive => 'Участвует в рейтинге';
 
   @override
-  String get leaderboardOptInInactive => 'Not ranked';
+  String get leaderboardOptInInactive => 'Не в рейтинге';
 
   @override
-  String get leaderboardOptInJoinButton => 'Join the Rankings';
+  String get leaderboardOptInJoinButton => 'Присоединиться к рейтингу';
 
   @override
-  String get leaderboardOptInLeaveButton => 'Leave the Rankings';
+  String get leaderboardOptInLeaveButton => 'Покинуть рейтинг';
 
   @override
-  String get characterSheetStatRealmRank => 'Realm';
+  String get characterSheetStatRealmRank => 'Мир';
 
   @override
-  String get characterSheetRealmRankJoin => 'Join Rankings';
+  String get characterSheetRealmRankJoin => 'Вступить в рейтинг';
 
   @override
-  String get skillTreeSectionTitle => 'Skill Tree';
+  String get skillTreeSectionTitle => 'Древо навыков';
 
   @override
   String get skillTreeSectionSubtitle =>
-      'Grow your genre mastery through reading.';
+      'Развивайте мастерство жанров через чтение.';
 
   @override
   String skillTreeXpProgress(int current, int next) {
@@ -1305,166 +1327,168 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get skillTreeTiersLabel => 'Tiers';
+  String get skillTreeTiersLabel => 'Уровни';
 
   @override
-  String get skillTreeTierUnlocked => 'UNLOCKED';
+  String get skillTreeTierUnlocked => 'ОТКРЫТ';
 
   @override
-  String get skillTreeTierCurrent => 'IN PROGRESS';
+  String get skillTreeTierCurrent => 'В ПРОЦЕССЕ';
 
   @override
-  String get skillTreeTierLocked => 'LOCKED';
+  String get skillTreeTierLocked => 'ЗАБЛОКИРОВАН';
 
   @override
   String skillTreeRuneUnlocked(String runeTitle) {
-    return 'Rune Unlocked: $runeTitle';
+    return 'Руна открыта: $runeTitle';
   }
 
   @override
   String skillTreeRuneLockedAt(String runeTitle) {
-    return 'Unlocks: $runeTitle';
+    return 'Откроется: $runeTitle';
   }
 
   @override
-  String get loreBoardTitle => 'Lore Board';
+  String get loreBoardTitle => 'Доска знаний';
 
   @override
-  String get loreBoardGlobalTab => 'Global';
+  String get loreBoardGlobalTab => 'Глобально';
 
   @override
-  String get loreBoardFriendsTab => 'Friends';
+  String get loreBoardFriendsTab => 'Друзья';
 
   @override
   String get loreBoardEmpty =>
-      'The board is bare... no tales have been posted yet.';
+      'Доска пуста... ещё ни одной истории не опубликовано.';
 
   @override
-  String get loreBoardTooltip => 'Lore Board';
+  String get loreBoardTooltip => 'Доска знаний';
 
   @override
-  String get guildHubTitle => 'Guild Hall';
+  String get guildHubTitle => 'Гильдейский зал';
 
   @override
   String get guildHubEmpty =>
-      'You haven\'t joined any guilds yet. Found your own or discover existing ones.';
+      'Вы ещё не вступили ни в одну гильдию. Основайте свою или найдите существующие.';
 
   @override
-  String get guildCreateButton => 'Found a New Guild';
+  String get guildCreateButton => 'Основать гильдию';
 
   @override
-  String get guildDiscoverButton => 'Discover Guilds';
+  String get guildDiscoverButton => 'Найти гильдии';
 
   @override
-  String get guildDetailCompanions => 'Companions';
+  String get guildDetailCompanions => 'Соратники';
 
   @override
-  String get guildDetailLedger => 'Party Ledger';
+  String get guildDetailLedger => 'Книга гильдии';
 
   @override
-  String get guildDetailLedgerEmpty => 'No books in the ledger yet.';
+  String get guildDetailLedgerEmpty => 'В книге гильдии пока нет записей.';
 
   @override
-  String get guildJoinButton => 'Join Guild';
+  String get guildJoinButton => 'Вступить в гильдию';
 
   @override
-  String get guildJoined => 'You have joined the guild!';
+  String get guildJoined => 'Вы вступили в гильдию!';
 
   @override
-  String get guildLeaveButton => 'Leave Guild';
+  String get guildLeaveButton => 'Покинуть гильдию';
 
   @override
-  String get guildLeft => 'You have left the guild.';
+  String get guildLeft => 'Вы покинули гильдию.';
 
   @override
-  String get guildDeleteConfirmTitle => 'Disband This Guild?';
+  String get guildDeleteConfirmTitle => 'Распустить гильдию?';
 
   @override
   String get guildDeleteConfirmBody =>
-      'This will permanently remove the guild and all its data. This cannot be undone.';
+      'Это навсегда удалит гильдию и все её данные. Это действие нельзя отменить.';
 
   @override
-  String get guildDeleteCancel => 'Keep Guild';
+  String get guildDeleteCancel => 'Сохранить гильдию';
 
   @override
-  String get guildDeleteConfirm => 'Disband Guild';
+  String get guildDeleteConfirm => 'Распустить гильдию';
 
   @override
-  String get guildDeleted => 'Guild disbanded';
+  String get guildDeleted => 'Гильдия распущена';
 
   @override
-  String get guildCreated => 'Guild founded!';
+  String get guildCreated => 'Гильдия основана!';
 
   @override
-  String get guildUpdated => 'Guild updated';
+  String get guildUpdated => 'Гильдия обновлена';
 
   @override
-  String get guildCreatePageTitle => 'Found a Guild';
+  String get guildCreatePageTitle => 'Основать гильдию';
 
   @override
-  String get guildFieldName => 'Guild Name';
+  String get guildFieldName => 'Название гильдии';
 
   @override
-  String get guildFieldNameHint => 'The Fellowship of Pages';
+  String get guildFieldNameHint => 'Братство страниц';
 
   @override
-  String get guildFieldDescription => 'Description';
+  String get guildFieldDescription => 'Описание';
 
   @override
-  String get guildFieldDescriptionHint => 'What is your guild about?';
+  String get guildFieldDescriptionHint => 'Чем занимается ваша гильдия?';
 
   @override
-  String get guildFieldPublic => 'Public guild';
+  String get guildFieldPublic => 'Публичная гильдия';
 
   @override
   String get guildFieldPublicSubtitle =>
-      'Visible on the Guild Board for anyone to join';
+      'Видна на Доске гильдий — любой может вступить';
 
   @override
-  String get guildCreateSubmit => 'Found This Guild';
+  String get guildCreateSubmit => 'Основать гильдию';
 
   @override
-  String get guildCreating => 'Founding...';
+  String get guildCreating => 'Основание...';
 
   @override
-  String get guildDiscoverTitle => 'Guild Board';
+  String get guildDiscoverTitle => 'Доска гильдий';
 
   @override
-  String get guildDiscoverEmpty => 'No guilds to discover yet.';
+  String get guildDiscoverEmpty => 'Гильдий пока нет.';
 
   @override
   String guildMemberCountLabel(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count companions',
-      one: '1 companion',
+      other: '$count соратников',
+      many: '$count соратников',
+      few: '$count соратника',
+      one: '1 соратник',
     );
     return '$_temp0';
   }
 
   @override
-  String get guildRoleGuildmaster => 'Guildmaster';
+  String get guildRoleGuildmaster => 'Глава гильдии';
 
   @override
-  String get guildRoleCompanion => 'Companion';
+  String get guildRoleCompanion => 'Соратник';
 
   @override
-  String get guildGuestHeadline => 'The Guild Hall Awaits';
+  String get guildGuestHeadline => 'Гильдейский зал ждёт';
 
   @override
   String get guildGuestBody =>
-      'Create an account to found guilds, join reading parties, and build ledgers with fellow adventurers.';
+      'Создайте аккаунт, чтобы основывать гильдии, вступать в читательские отряды и вести книги вместе с другими искателями приключений.';
 
   @override
-  String get guildAddToLedger => 'Add to Ledger';
+  String get guildAddToLedger => 'Добавить в книгу гильдии';
 
   @override
-  String get guildBookAdded => 'Book added to the ledger!';
+  String get guildBookAdded => 'Книга добавлена в книгу гильдии!';
 
   @override
-  String get guildBookRemoved => 'Book removed from the ledger.';
+  String get guildBookRemoved => 'Книга удалена из книги гильдии.';
 
   @override
-  String get guildAlreadyMember => 'You are already a member of this guild.';
+  String get guildAlreadyMember => 'Вы уже состоите в этой гильдии.';
 }

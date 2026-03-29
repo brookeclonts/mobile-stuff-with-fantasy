@@ -12,382 +12,386 @@ class AppLocalizationsDe extends AppLocalizations {
   String get appTitle => 'StuffWithFantasy';
 
   @override
-  String get bookSingular => 'book';
+  String get bookSingular => 'Buch';
 
   @override
-  String get bookPlural => 'books';
+  String get bookPlural => 'Bücher';
 
   @override
   String booksCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count books',
-      one: '1 book',
+      other: '$count Bücher',
+      one: '1 Buch',
     );
     return '$_temp0';
   }
 
   @override
   String get catalogSignUpPrompt =>
-      'Create an account to save books to your reading list.';
+      'Erstelle ein Konto, um Bücher auf deiner Leseliste zu speichern.';
 
   @override
-  String get catalogSnackbarActionProfile => 'Profile';
+  String get catalogSnackbarActionProfile => 'Profil';
 
   @override
-  String get catalogTooltipLibrary => 'Library';
+  String get catalogTooltipLibrary => 'Bibliothek';
 
   @override
-  String get catalogTooltipProfile => 'Profile';
+  String get catalogTooltipProfile => 'Profil';
 
   @override
   String get catalogFiltersUnavailable =>
-      'Filters are unavailable until taxonomy loads successfully.';
+      'Filter sind nicht verfügbar, bis die Taxonomie erfolgreich geladen wurde.';
 
   @override
-  String get catalogRetry => 'Retry';
+  String get catalogRetry => 'Erneut versuchen';
 
   @override
-  String get catalogEmptyFiltered => 'No books match your filters';
+  String get catalogEmptyFiltered => 'Keine Bücher entsprechen deinen Filtern';
 
   @override
-  String get catalogEmptyNoBooks => 'No books yet';
+  String get catalogEmptyNoBooks => 'Noch keine Bücher';
 
   @override
-  String get catalogClearFilters => 'Clear Filters';
+  String get catalogClearFilters => 'Filter zurücksetzen';
 
   @override
   String get bookDetailSignUpPrompt =>
-      'Create an account from your profile to save books to your reading list.';
+      'Erstelle ein Konto über dein Profil, um Bücher auf deiner Leseliste zu speichern.';
 
   @override
   String bookDetailByAuthor(String author) {
-    return 'by $author';
+    return 'von $author';
   }
 
   @override
   String get bookDetailSectionSubgenres => 'Subgenres';
 
   @override
-  String get bookDetailSectionTropes => 'Tropes';
+  String get bookDetailSectionTropes => 'Tropen';
 
   @override
-  String get bookDetailSectionRepresentation => 'Representation';
+  String get bookDetailSectionRepresentation => 'Repräsentation';
 
   @override
-  String get bookDetailSectionAbout => 'About this book';
+  String get bookDetailSectionAbout => 'Über dieses Buch';
 
   @override
-  String get bookDetailReadMore => 'Read more';
+  String get bookDetailReadMore => 'Mehr lesen';
 
   @override
-  String get bookDetailSectionSimilar => 'You might also like';
+  String get bookDetailSectionSimilar => 'Das könnte dir auch gefallen';
 
   @override
   String get bookDetailBadgeKu => 'KU';
 
   @override
-  String get bookDetailUpdating => 'Updating...';
+  String get bookDetailUpdating => 'Wird aktualisiert...';
 
   @override
-  String get bookDetailRemoveFromList => 'Remove from Reading List';
+  String get bookDetailRemoveFromList => 'Von der Leseliste entfernen';
 
   @override
-  String get bookDetailSaving => 'Saving...';
+  String get bookDetailSaving => 'Wird gespeichert...';
 
   @override
-  String get bookDetailSaveToList => 'Save to Reading List';
+  String get bookDetailSaveToList => 'Auf die Leseliste setzen';
 
   @override
-  String get bookDetailOpening => 'Opening...';
+  String get bookDetailOpening => 'Wird geöffnet...';
 
   @override
-  String get bookDetailReadInApp => 'Read in App';
+  String get bookDetailReadInApp => 'In der App lesen';
 
   @override
-  String get bookDetailGetBook => 'Get this Book';
+  String get bookDetailGetBook => 'Buch kaufen';
 
   @override
-  String get bookDetailAmazon => 'Amazon US';
+  String get bookDetailAmazon => 'Amazon DE';
 
   @override
-  String get bookDetailAllRetailers => 'View all retailers';
+  String get bookDetailAllRetailers => 'Alle Händler anzeigen';
 
   @override
-  String get bookDetailAudiobook => 'Audiobook';
+  String get bookDetailAudiobook => 'Hörbuch';
 
   @override
-  String get filterSearchHint => 'Search by title or author...';
+  String get filterSearchHint => 'Nach Titel oder Autor suchen...';
 
   @override
   String get filterChipKu => 'KU';
 
   @override
-  String get filterChipAudiobook => 'Audiobook';
+  String get filterChipAudiobook => 'Hörbuch';
 
   @override
-  String get filterClearAll => 'Clear all';
+  String get filterClearAll => 'Alle zurücksetzen';
 
   @override
-  String get filterSheetTitle => 'Filters';
+  String get filterSheetTitle => 'Filter';
 
   @override
-  String get filterSheetReset => 'Reset';
+  String get filterSheetReset => 'Zurücksetzen';
 
   @override
   String get filterSheetSubgenres => 'Subgenres';
 
   @override
-  String get filterSheetTropes => 'Tropes';
+  String get filterSheetTropes => 'Tropen';
 
   @override
-  String get filterSheetSpiceLevel => 'Spice Level';
+  String get filterSheetSpiceLevel => 'Schärfegrad';
 
   @override
-  String get filterSheetAgeCategory => 'Age Category';
+  String get filterSheetAgeCategory => 'Alterskategorie';
 
   @override
-  String get filterSheetRepresentation => 'Representation';
+  String get filterSheetRepresentation => 'Repräsentation';
 
   @override
-  String get filterSheetLanguageLevel => 'Language Level';
+  String get filterSheetLanguageLevel => 'Sprachniveau';
 
   @override
   String filterSheetApplyWithCount(int count) {
-    return 'Apply Filters ($count)';
+    return 'Filter anwenden ($count)';
   }
 
   @override
-  String get filterSheetApply => 'Apply Filters';
+  String get filterSheetApply => 'Filter anwenden';
 
   @override
-  String get signUpSkip => 'Skip';
+  String get signUpSkip => 'Überspringen';
 
   @override
-  String get rolePickerHeadline => 'I am a...';
+  String get rolePickerHeadline => 'Ich bin ein/e...';
 
   @override
   String get rolePickerSubtitle =>
-      'Choose how you want to use StuffWithFantasy';
+      'Wähle, wie du StuffWithFantasy nutzen möchtest';
 
   @override
-  String get rolePickerContinue => 'Continue';
+  String get rolePickerContinue => 'Weiter';
 
   @override
-  String get interestStepHeadline => 'What else brings you here?';
+  String get interestStepHeadline => 'Was führt dich noch hierher?';
 
   @override
-  String get interestStepSubtitle => 'Select any that apply — or skip ahead.';
+  String get interestStepSubtitle =>
+      'Wähle aus, was zutrifft — oder überspringe diesen Schritt.';
 
   @override
-  String get interestCardAuthorTitle => 'I\'m an Author';
+  String get interestCardAuthorTitle => 'Ich bin Autor/in';
 
   @override
   String get interestCardAuthorDescription =>
-      'I want to get my books discovered by fantasy readers.';
+      'Ich möchte, dass Fantasy-Leser meine Bücher entdecken.';
 
   @override
-  String get interestCardInfluencerTitle => 'I\'m an Influencer';
+  String get interestCardInfluencerTitle => 'Ich bin Influencer/in';
 
   @override
   String get interestCardInfluencerDescription =>
-      'I create content and want to share fantasy books with my audience.';
+      'Ich erstelle Inhalte und möchte Fantasy-Bücher mit meinem Publikum teilen.';
 
   @override
-  String get interestStepContinue => 'Continue';
+  String get interestStepContinue => 'Weiter';
 
   @override
-  String get signUpFormHeadline => 'Create your account';
+  String get signUpFormHeadline => 'Erstelle dein Konto';
 
   @override
-  String get signUpFormSubtitle => 'Just a few details and you\'re in';
+  String get signUpFormSubtitle => 'Nur ein paar Angaben und du bist dabei';
 
   @override
-  String get signUpFieldNameLabel => 'Display name';
+  String get signUpFieldNameLabel => 'Anzeigename';
 
   @override
-  String get signUpFieldNameHint => 'How should we call you?';
+  String get signUpFieldNameHint => 'Wie sollen wir dich nennen?';
 
   @override
-  String get signUpValidatorEnterName => 'Enter your name';
+  String get signUpValidatorEnterName => 'Gib deinen Namen ein';
 
   @override
-  String get signUpFieldEmailLabel => 'Email';
+  String get signUpFieldEmailLabel => 'E-Mail';
 
   @override
-  String get signUpFieldEmailHint => 'you@example.com';
+  String get signUpFieldEmailHint => 'du@beispiel.de';
 
   @override
-  String get signUpValidatorEnterEmail => 'Enter your email';
+  String get signUpValidatorEnterEmail => 'Gib deine E-Mail-Adresse ein';
 
   @override
-  String get signUpValidatorInvalidEmail => 'Enter a valid email';
+  String get signUpValidatorInvalidEmail =>
+      'Gib eine gültige E-Mail-Adresse ein';
 
   @override
-  String get signUpFieldPasswordLabel => 'Password';
+  String get signUpFieldPasswordLabel => 'Passwort';
 
   @override
-  String get signUpFieldPasswordHint => 'At least 8 characters';
+  String get signUpFieldPasswordHint => 'Mindestens 8 Zeichen';
 
   @override
-  String get signUpValidatorEnterPassword => 'Enter a password';
+  String get signUpValidatorEnterPassword => 'Gib ein Passwort ein';
 
   @override
-  String get signUpValidatorPasswordTooShort => 'Must be at least 8 characters';
+  String get signUpValidatorPasswordTooShort =>
+      'Muss mindestens 8 Zeichen lang sein';
 
   @override
-  String get signUpButtonCreateAccount => 'Create Account';
+  String get signUpButtonCreateAccount => 'Konto erstellen';
 
   @override
   String welcomeStepHeadline(String name) {
-    return 'Welcome, $name!';
+    return 'Willkommen, $name!';
   }
 
   @override
   String get welcomeStepSubtitle =>
-      'Your next great fantasy adventure is waiting for you.';
+      'Dein nächstes großes Fantasy-Abenteuer wartet auf dich.';
 
   @override
-  String get welcomeStepGetStarted => 'Get Started';
+  String get welcomeStepGetStarted => 'Los geht\'s';
 
   @override
-  String get profileUnknownRank => 'Unknown Rank';
+  String get profileUnknownRank => 'Unbekannter Rang';
 
   @override
-  String get profileAppBarTitle => 'Guild Hall';
+  String get profileAppBarTitle => 'Gildenhalle';
 
   @override
-  String get profileSectionRunes => 'Runes';
+  String get profileSectionRunes => 'Runen';
 
   @override
   String get profileSectionRunesSubtitle =>
-      'Seal quests to engrave ability runes.';
+      'Schließe Quests ab, um Fähigkeitsrunen einzugravieren.';
 
   @override
-  String get profileSectionQuestLog => 'Quest Log';
+  String get profileSectionQuestLog => 'Questlog';
 
   @override
   String get profileSectionQuestLogSubtitle =>
-      'Unfurl scrolls to track and seal objectives.';
+      'Entrolle Schriftrollen, um Ziele zu verfolgen und zu besiegeln.';
 
   @override
-  String get profileSectionRelicVault => 'Relic Vault';
+  String get profileSectionRelicVault => 'Reliktgewölbe';
 
   @override
   String get profileSectionRelicVaultSubtitle =>
-      'Seal scrolls to claim relics for your vault.';
+      'Besiegle Schriftrollen, um Relikte für dein Gewölbe zu erhalten.';
 
   @override
-  String get profileSectionCharacterSheet => 'Character Sheet';
+  String get profileSectionCharacterSheet => 'Charakterbogen';
 
   @override
   String get profileSnackbarRuneComingSoon =>
-      'This rune will be configurable soon.';
+      'Diese Rune wird bald konfigurierbar sein.';
 
   @override
-  String get profileDeleteAccountTitle => 'Delete Account';
+  String get profileDeleteAccountTitle => 'Konto löschen';
 
   @override
   String get profileDeleteAccountBody =>
-      'This will permanently delete your account and all associated data. This cannot be undone.';
+      'Dadurch wird dein Konto und alle zugehörigen Daten dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.';
 
   @override
-  String get profileDeleteCancel => 'Cancel';
+  String get profileDeleteCancel => 'Abbrechen';
 
   @override
-  String get profileDeleteConfirm => 'Delete';
+  String get profileDeleteConfirm => 'Löschen';
 
   @override
-  String get profileSigningOut => 'Leaving the realm...';
+  String get profileSigningOut => 'Verlasse das Reich...';
 
   @override
-  String get profileSignOut => 'Exit the Realm';
+  String get profileSignOut => 'Das Reich verlassen';
 
   @override
-  String get profileDeletingAccount => 'Deleting account...';
+  String get profileDeletingAccount => 'Konto wird gelöscht...';
 
   @override
-  String get profileDeleteAccount => 'Delete Account';
+  String get profileDeleteAccount => 'Konto löschen';
 
   @override
-  String get profileRetry => 'Retry';
+  String get profileRetry => 'Erneut versuchen';
 
   @override
-  String get profileErrorHeadline => 'The quest board failed to load';
+  String get profileErrorHeadline =>
+      'Das Questbrett konnte nicht geladen werden';
 
   @override
-  String get profileTryAgain => 'Try again';
+  String get profileTryAgain => 'Erneut versuchen';
 
   @override
-  String get guestGuildHallLabel => 'GUILD HALL';
+  String get guestGuildHallLabel => 'GILDENHALLE';
 
   @override
-  String get guestGuildHeadline => 'Begin your quest';
+  String get guestGuildHeadline => 'Beginne deine Quest';
 
   @override
   String get guestGuildBody =>
-      'Create an account to track your reading quests, unlock ability runes, and collect relics as you explore the realm.';
+      'Erstelle ein Konto, um deine Lesequests zu verfolgen, Fähigkeitsrunen freizuschalten und Relikte zu sammeln, während du das Reich erkundest.';
 
   @override
-  String get guestGuildButtonCreateAccount => 'Create account to begin';
+  String get guestGuildButtonCreateAccount => 'Konto erstellen und loslegen';
 
   @override
-  String get runeStatusEngraved => 'ENGRAVED';
+  String get runeStatusEngraved => 'EINGRAVIERT';
 
   @override
-  String get runeStatusLocked => 'LOCKED';
+  String get runeStatusLocked => 'GESPERRT';
 
   @override
   String get runeDetailLockedHint =>
-      'Complete the linked quest to engrave this rune';
+      'Schließe die verknüpfte Quest ab, um diese Rune einzugravieren';
 
   @override
-  String get runeDetailConfigure => 'Configure';
+  String get runeDetailConfigure => 'Konfigurieren';
 
   @override
-  String get arcShieldTitle => 'ARC Shield';
+  String get arcShieldTitle => 'ARC-Schild';
 
   @override
   String get arcShieldDescription =>
-      'When active, authors and publishers can find you as an ARC reader.';
+      'Wenn aktiv, können Autoren und Verlage dich als ARC-Leser finden.';
 
   @override
-  String get arcShieldSectionAvailability => 'Availability';
+  String get arcShieldSectionAvailability => 'Verfügbarkeit';
 
   @override
-  String get arcShieldToggleOpenLabel => 'Open to ARCs';
+  String get arcShieldToggleOpenLabel => 'Offen für ARCs';
 
   @override
-  String get arcShieldToggleClosedLabel => 'Not accepting ARCs';
+  String get arcShieldToggleClosedLabel => 'Keine ARCs annehmen';
 
   @override
-  String get arcShieldToggleOpenSubtitle => 'Authors can reach out to you';
+  String get arcShieldToggleOpenSubtitle => 'Autoren können dich kontaktieren';
 
   @override
   String get arcShieldToggleClosedSubtitle =>
-      'Your profile is hidden from ARC searches';
+      'Dein Profil ist bei ARC-Suchen verborgen';
 
   @override
-  String get genreAttunementTitle => 'Genre Attunement';
+  String get genreAttunementTitle => 'Genre-Einstimmung';
 
   @override
   String get genreAttunementDescription =>
-      'Select the genres and tropes that call to you. The realm will learn what to surface.';
+      'Wähle die Genres und Tropen, die dich ansprechen. Das Reich lernt, was es dir zeigen soll.';
 
   @override
   String get genreAttunementSectionGenres => 'Genres';
 
   @override
-  String get genreAttunementSectionTropes => 'Tropes';
+  String get genreAttunementSectionTropes => 'Tropen';
 
   @override
   String genreAttunementCountAttuned(int count) {
-    return '$count attuned';
+    return '$count eingestimmt';
   }
 
   @override
-  String get genreEpicFantasy => 'Epic Fantasy';
+  String get genreEpicFantasy => 'Epische Fantasy';
 
   @override
   String get genreDarkFantasy => 'Dark Fantasy';
@@ -408,95 +412,95 @@ class AppLocalizationsDe extends AppLocalizations {
   String get genreLitRpg => 'LitRPG';
 
   @override
-  String get genreSwordAndSorcery => 'Sword & Sorcery';
+  String get genreSwordAndSorcery => 'Schwert & Magie';
 
   @override
-  String get genreMythicFantasy => 'Mythic Fantasy';
+  String get genreMythicFantasy => 'Mythische Fantasy';
 
   @override
-  String get genrePortalFantasy => 'Portal Fantasy';
+  String get genrePortalFantasy => 'Portal-Fantasy';
 
   @override
-  String get tropeFoundFamily => 'Found Family';
+  String get tropeFoundFamily => 'Wahlfamilie';
 
   @override
-  String get tropeEnemiesToLovers => 'Enemies to Lovers';
+  String get tropeEnemiesToLovers => 'Vom Feind zum Geliebten';
 
   @override
-  String get tropeChosenOne => 'Chosen One';
+  String get tropeChosenOne => 'Der Auserwählte';
 
   @override
-  String get tropeMagicSchools => 'Magic Schools';
+  String get tropeMagicSchools => 'Magieschulen';
 
   @override
-  String get tropeMorallyGrey => 'Morally Grey';
+  String get tropeMorallyGrey => 'Moralisch grau';
 
   @override
   String get tropeSlowBurn => 'Slow Burn';
 
   @override
-  String get tropePoliticalIntrigue => 'Political Intrigue';
+  String get tropePoliticalIntrigue => 'Politische Intrigen';
 
   @override
-  String get tropeQuestJourney => 'Quest Journey';
+  String get tropeQuestJourney => 'Quest-Reise';
 
   @override
-  String get tropeHiddenRoyalty => 'Hidden Royalty';
+  String get tropeHiddenRoyalty => 'Verborgene Königlichkeit';
 
   @override
-  String get tropeRevengeArc => 'Revenge Arc';
+  String get tropeRevengeArc => 'Rachegeschichte';
 
   @override
-  String get eventWatchtowerTitle => 'Event Watchtower';
+  String get eventWatchtowerTitle => 'Ereigniswachturm';
 
   @override
   String get eventWatchtowerDescription =>
-      'Choose which signals reach you from the realm.';
+      'Wähle, welche Signale dich aus dem Reich erreichen.';
 
   @override
-  String get eventWatchtowerSectionSignals => 'Signals';
+  String get eventWatchtowerSectionSignals => 'Signale';
 
   @override
-  String get notifNewEventsTitle => 'New Events';
+  String get notifNewEventsTitle => 'Neue Ereignisse';
 
   @override
   String get notifNewEventsDescription =>
-      'When a Stuff Your Kindle event launches';
+      'Wenn ein Stuff Your Kindle-Event startet';
 
   @override
-  String get notifBookDropsTitle => 'Book Drops';
+  String get notifBookDropsTitle => 'Neue Bücher';
 
   @override
   String get notifBookDropsDescription =>
-      'When new books are added to the catalog';
+      'Wenn neue Bücher zum Katalog hinzugefügt werden';
 
   @override
-  String get notifRecommendationsTitle => 'Recommendations';
+  String get notifRecommendationsTitle => 'Empfehlungen';
 
   @override
   String get notifRecommendationsDescription =>
-      'Personalized picks based on your attunement';
+      'Personalisierte Vorschläge basierend auf deiner Einstimmung';
 
   @override
-  String get rewardRevealBarrierLabel => 'Reward reveal';
+  String get rewardRevealBarrierLabel => 'Belohnungsenthüllung';
 
   @override
-  String get rewardRevealLegendRelicClaimed => 'LEGEND RELIC CLAIMED';
+  String get rewardRevealLegendRelicClaimed => 'LEGENDÄRES RELIKT ERHALTEN';
 
   @override
-  String get rewardRevealRelicUnlocked => 'RELIC UNLOCKED';
+  String get rewardRevealRelicUnlocked => 'RELIKT FREIGESCHALTET';
 
   @override
-  String get rewardRevealContinue => 'Continue questing';
+  String get rewardRevealContinue => 'Weiter auf der Quest';
 
   @override
-  String get characterSheetHeaderLabel => 'CHARACTER SHEET';
+  String get characterSheetHeaderLabel => 'CHARAKTERBOGEN';
 
   @override
   String get characterSheetStatName => 'Name';
 
   @override
-  String get characterSheetStatRank => 'Rank';
+  String get characterSheetStatRank => 'Rang';
 
   @override
   String get characterSheetStatQuests => 'Quests';
@@ -507,7 +511,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get characterSheetStatRelics => 'Relics';
+  String get characterSheetStatRelics => 'Relikte';
 
   @override
   String characterSheetStatRelicsValue(int collected, int total) {
@@ -518,118 +522,119 @@ class AppLocalizationsDe extends AppLocalizations {
   String get characterSheetStatSignal => 'Signal';
 
   @override
-  String get realmMapCurrentQuest => 'CURRENT QUEST';
+  String get realmMapCurrentQuest => 'AKTUELLE QUEST';
 
   @override
-  String get questScrollSealed => 'Sealed';
+  String get questScrollSealed => 'Besiegelt';
 
   @override
-  String get questScrollActive => 'ACTIVE';
+  String get questScrollActive => 'AKTIV';
 
   @override
-  String get questScrollReward => 'REWARD';
+  String get questScrollReward => 'BELOHNUNG';
 
   @override
   String get relicVaultLockedTitle => '???';
 
   @override
-  String get relicVaultLegendRelic => 'Legend relic';
+  String get relicVaultLegendRelic => 'Legendäres Relikt';
 
   @override
-  String get relicVaultClaimed => 'Claimed';
+  String get relicVaultClaimed => 'Erhalten';
 
   @override
-  String get relicVaultSealed => 'Sealed';
+  String get relicVaultSealed => 'Besiegelt';
 
   @override
-  String get libraryAppBarTitle => 'Library';
+  String get libraryAppBarTitle => 'Bibliothek';
 
   @override
-  String get libraryTabMyBooks => 'My Books';
+  String get libraryTabMyBooks => 'Meine Bücher';
 
   @override
-  String get libraryTabReadingList => 'Reading List';
+  String get libraryTabReadingList => 'Leseliste';
 
   @override
-  String get libraryMyBooksSignInTitle => 'Your bookshelf awaits';
+  String get libraryMyBooksSignInTitle => 'Dein Bücherregal wartet';
 
   @override
   String get libraryMyBooksSignInMessage =>
-      'Sign in to access books you\'ve purchased, claimed, or uploaded — ready to read right here.';
+      'Melde dich an, um auf Bücher zuzugreifen, die du gekauft, beansprucht oder hochgeladen hast — bereit zum Lesen direkt hier.';
 
   @override
-  String get libraryMyBooksEmptyTitle => 'No readable books yet';
+  String get libraryMyBooksEmptyTitle => 'Noch keine lesbaren Bücher';
 
   @override
   String get libraryMyBooksEmptyMessage =>
-      'Books you buy, claim, or upload will show up here when they are ready to read.';
+      'Bücher, die du kaufst, beanspruchst oder hochlädst, erscheinen hier, wenn sie lesebereit sind.';
 
   @override
-  String get libraryReadingListSignInTitle => 'Start your reading list';
+  String get libraryReadingListSignInTitle => 'Starte deine Leseliste';
 
   @override
   String get libraryReadingListSignInMessage =>
-      'Sign in to save books from the catalog and build your personal reading list.';
+      'Melde dich an, um Bücher aus dem Katalog zu speichern und deine persönliche Leseliste aufzubauen.';
 
   @override
-  String get libraryReadingListEmptyTitle => 'Nothing saved yet';
+  String get libraryReadingListEmptyTitle => 'Noch nichts gespeichert';
 
   @override
   String get libraryReadingListEmptyMessage =>
-      'Save books from the catalog to build your reading list.';
+      'Speichere Bücher aus dem Katalog, um deine Leseliste aufzubauen.';
 
   @override
-  String get libraryButtonSignIn => 'Sign In';
+  String get libraryButtonSignIn => 'Anmelden';
 
   @override
-  String get libraryRetry => 'Retry';
+  String get libraryRetry => 'Erneut versuchen';
 
   @override
   String readerProgressRead(String progress) {
-    return '$progress read';
+    return '$progress gelesen';
   }
 
   @override
-  String get readerHintSwipeToTurn => 'Swipe to turn pages';
+  String get readerHintSwipeToTurn => 'Wische, um Seiten umzublättern';
 
   @override
-  String get readerHintOpeningBook => 'Opening book…';
+  String get readerHintOpeningBook => 'Buch wird geöffnet…';
 
   @override
-  String get readerHintTapToHide => 'Tap the center to hide controls';
+  String get readerHintTapToHide =>
+      'Tippe in die Mitte, um die Steuerung auszublenden';
 
   @override
-  String get readerTooltipBack => 'Back';
+  String get readerTooltipBack => 'Zurück';
 
   @override
-  String get readerTooltipChapters => 'Chapters';
+  String get readerTooltipChapters => 'Kapitel';
 
   @override
-  String get readerTooltipReadingSettings => 'Reading settings';
+  String get readerTooltipReadingSettings => 'Leseeinstellungen';
 
   @override
-  String get readerTooltipPreviousPage => 'Previous page';
+  String get readerTooltipPreviousPage => 'Vorherige Seite';
 
   @override
-  String get readerButtonPrev => 'Prev';
+  String get readerButtonPrev => 'Zurück';
 
   @override
-  String get readerTooltipNextPage => 'Next page';
+  String get readerTooltipNextPage => 'Nächste Seite';
 
   @override
-  String get readerButtonNext => 'Next';
+  String get readerButtonNext => 'Weiter';
 
   @override
-  String get readerChaptersTitle => 'Chapters';
+  String get readerChaptersTitle => 'Kapitel';
 
   @override
-  String get readerSettingsTitle => 'Reading settings';
+  String get readerSettingsTitle => 'Leseeinstellungen';
 
   @override
-  String get readerSettingsTextSize => 'Text size';
+  String get readerSettingsTextSize => 'Textgröße';
 
   @override
-  String get readerTooltipSmallerText => 'Smaller text';
+  String get readerTooltipSmallerText => 'Kleinerer Text';
 
   @override
   String readerFontSizeLabel(int size) {
@@ -637,54 +642,54 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get readerTooltipLargerText => 'Larger text';
+  String get readerTooltipLargerText => 'Größerer Text';
 
   @override
-  String get readerSettingsPageTheme => 'Page theme';
+  String get readerSettingsPageTheme => 'Seitendesign';
 
   @override
-  String get readerAppearancePaper => 'Paper';
+  String get readerAppearancePaper => 'Papier';
 
   @override
   String get readerAppearanceSepia => 'Sepia';
 
   @override
-  String get readerAppearanceNight => 'Night';
+  String get readerAppearanceNight => 'Nacht';
 
   @override
-  String get eventDetailLoadingBooks => 'Loading books...';
+  String get eventDetailLoadingBooks => 'Bücher werden geladen...';
 
   @override
   String eventDetailBookCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count books in this event',
-      one: '1 book in this event',
+      other: '$count Bücher in diesem Event',
+      one: '1 Buch in diesem Event',
     );
     return '$_temp0';
   }
 
   @override
-  String get eventDetailNoBooksYet => 'No books in this event yet.';
+  String get eventDetailNoBooksYet => 'Noch keine Bücher in diesem Event.';
 
   @override
-  String get creatorDetailNoBooksYet => 'No books to show yet.';
+  String get creatorDetailNoBooksYet => 'Noch keine Bücher vorhanden.';
 
   @override
-  String get creatorDetailFavoriteBookLabel => 'Favorite book: ';
+  String get creatorDetailFavoriteBookLabel => 'Lieblingsbuch: ';
 
   @override
-  String get creatorDetailLovesLabel => 'Loves: ';
+  String get creatorDetailLovesLabel => 'Liebt: ';
 
   @override
   String creatorDetailBooksBy(String name) {
-    return 'Books by $name';
+    return 'Bücher von $name';
   }
 
   @override
   String creatorDetailRecommendedBy(String name) {
-    return 'Recommended by $name';
+    return 'Empfohlen von $name';
   }
 
   @override
@@ -712,128 +717,128 @@ class AppLocalizationsDe extends AppLocalizations {
   String get socialLinkFacebook => 'Facebook';
 
   @override
-  String get socialLinkWebsite => 'Website';
+  String get socialLinkWebsite => 'Webseite';
 
   @override
-  String get userRoleReader => 'Reader';
+  String get userRoleReader => 'Leser/in';
 
   @override
   String get userRoleReaderDescription =>
-      'Discover your next favorite fantasy book';
+      'Entdecke dein nächstes Fantasy-Lieblingsbuch';
 
   @override
-  String get creatorRoleAuthor => 'Author';
+  String get creatorRoleAuthor => 'Autor/in';
 
   @override
-  String get creatorRoleInfluencer => 'Influencer';
+  String get creatorRoleInfluencer => 'Influencer/in';
 
   @override
-  String get readAccessOwner => 'Your upload';
+  String get readAccessOwner => 'Dein Upload';
 
   @override
-  String get readAccessPurchased => 'Purchased';
+  String get readAccessPurchased => 'Gekauft';
 
   @override
-  String get readAccessNone => 'No access';
+  String get readAccessNone => 'Kein Zugriff';
 
   @override
-  String get eventStatusLastDay => 'Last day!';
+  String get eventStatusLastDay => 'Letzter Tag!';
 
   @override
-  String get eventStatusHappeningNow => 'Happening now';
+  String get eventStatusHappeningNow => 'Läuft gerade';
 
   @override
-  String get eventStatusStartsToday => 'Starts today';
+  String get eventStatusStartsToday => 'Startet heute';
 
   @override
-  String get eventStatusStartsTomorrow => 'Starts tomorrow';
+  String get eventStatusStartsTomorrow => 'Startet morgen';
 
   @override
   String eventStatusStartsInDays(int days) {
-    return 'Starts in $days days';
+    return 'Startet in $days Tagen';
   }
 
   @override
-  String get spiceLevelNone => 'No Spice';
+  String get spiceLevelNone => 'Keine Schärfe';
 
   @override
-  String get spiceLevelMild => 'Mild Spice';
+  String get spiceLevelMild => 'Leichte Schärfe';
 
   @override
-  String get spiceLevelMedium => 'Medium Spice';
+  String get spiceLevelMedium => 'Mittlere Schärfe';
 
   @override
-  String get spiceLevelHot => 'Hot';
+  String get spiceLevelHot => 'Scharf';
 
   @override
-  String get spiceLevelScorching => 'Scorching';
+  String get spiceLevelScorching => 'Sehr scharf';
 
   @override
-  String get languageLevelClean => 'Clean';
+  String get languageLevelClean => 'Ohne Kraftausdrücke';
 
   @override
-  String get languageLevelMild => 'Mild Language';
+  String get languageLevelMild => 'Leichte Sprache';
 
   @override
-  String get languageLevelModerate => 'Moderate Language';
+  String get languageLevelModerate => 'Mäßige Sprache';
 
   @override
-  String get languageLevelStrong => 'Strong Language';
+  String get languageLevelStrong => 'Derbe Sprache';
 
   @override
   String get homeHeadline => 'Stuff With Fantasy';
 
   @override
-  String get homeTagline => 'Your fantasy reading companion.';
+  String get homeTagline => 'Dein Fantasy-Lesebegleiter.';
 
   @override
   String get homeSubtitle =>
-      'Discover, track, and share the fantasy books you love.';
+      'Entdecke, verfolge und teile die Fantasy-Bücher, die du liebst.';
 
   @override
   String get homeChipMaterial3 => 'Material 3';
 
   @override
-  String get homeChipStructuredStarter => 'Structured starter';
+  String get homeChipStructuredStarter => 'Strukturierter Starter';
 
   @override
-  String get homeChipWidgetTests => 'Widget tests';
+  String get homeChipWidgetTests => 'Widget-Tests';
 
   @override
-  String get homeCardWhatIsReadyTitle => 'What is ready';
+  String get homeCardWhatIsReadyTitle => 'Was bereits fertig ist';
 
   @override
   String get homeCardWhatIsReadyItem1 =>
-      'A branded app shell with light and dark themes.';
+      'Eine gebrandete App-Hülle mit hellem und dunklem Design.';
 
   @override
   String get homeCardWhatIsReadyItem2 =>
-      'A stricter analyzer baseline using flutter_lints.';
+      'Eine strengere Analyzer-Basis mit flutter_lints.';
 
   @override
   String get homeCardWhatIsReadyItem3 =>
-      'A widget test to protect the starter experience.';
+      'Ein Widget-Test zum Schutz der Starter-Erfahrung.';
 
   @override
-  String get homeCardWhereToGoNextTitle => 'Where to go next';
+  String get homeCardWhereToGoNextTitle => 'Nächste Schritte';
 
   @override
   String get homeCardWhereToGoNextItem1 =>
-      'Add features under lib/src by domain instead of growing main.dart.';
+      'Füge Features unter lib/src nach Domäne hinzu, statt main.dart wachsen zu lassen.';
 
   @override
   String get homeCardWhereToGoNextItem2 =>
-      'Replace placeholder assets, launcher icons, and product copy.';
+      'Ersetze Platzhalter-Assets, Launcher-Icons und Produkttexte.';
 
   @override
   String get homeCardWhereToGoNextItem3 =>
-      'Run flutter analyze and flutter test as you add screens.';
+      'Führe flutter analyze und flutter test aus, wenn du Screens hinzufügst.';
 
   @override
-  String get homeGetStarted => 'Get Started';
+  String get homeGetStarted => 'Los geht\'s';
 
   @override
-  String get homeBrowseBooks => 'Browse Books';
+  String get homeBrowseBooks => 'Bücher durchstöbern';
 
   @override
   String get monthJan => 'Jan';
@@ -842,13 +847,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get monthFeb => 'Feb';
 
   @override
-  String get monthMar => 'Mar';
+  String get monthMar => 'Mär';
 
   @override
   String get monthApr => 'Apr';
 
   @override
-  String get monthMay => 'May';
+  String get monthMay => 'Mai';
 
   @override
   String get monthJun => 'Jun';
@@ -863,19 +868,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get monthSep => 'Sep';
 
   @override
-  String get monthOct => 'Oct';
+  String get monthOct => 'Okt';
 
   @override
   String get monthNov => 'Nov';
 
   @override
-  String get monthDec => 'Dec';
+  String get monthDec => 'Dez';
 
   @override
-  String get profileSectionLanguage => 'Language';
+  String get profileSectionLanguage => 'Sprache';
 
   @override
-  String get languageSystemDefault => 'System default';
+  String get languageSystemDefault => 'Systemstandard';
 
   @override
   String get languageEnglish => 'English';
@@ -899,289 +904,292 @@ class AppLocalizationsDe extends AppLocalizations {
   String get languageJapanese => '日本語';
 
   @override
-  String get profileSectionReadingChronicle => 'Reading Chronicle';
+  String get profileSectionReadingChronicle => 'Lesechronik';
 
   @override
   String get profileSectionReadingChronicleSubtitle =>
-      'Your journey through the pages, mapped in ink.';
+      'Deine Reise durch die Seiten, festgehalten in Tinte.';
 
   @override
-  String get profileSectionTomeCounter => 'Tome Counter';
+  String get profileSectionTomeCounter => 'Folianten-Zähler';
 
   @override
   String get profileSectionTomeCounterSubtitle =>
-      'Your accumulated reading feats.';
+      'Deine gesammelten Leseleistungen.';
 
   @override
-  String get profileSectionAchievementSigils => 'Achievement Sigils';
+  String get profileSectionAchievementSigils => 'Errungenschafts-Siegel';
 
   @override
   String get profileSectionAchievementSigilsSubtitle =>
-      'Milestones forged through dedication.';
+      'Meilensteine, geschmiedet durch Hingabe.';
 
   @override
   String chroniclePagesThisWeek(int count) {
-    return '~$count pages this week';
+    return '~$count Seiten diese Woche';
   }
 
   @override
   String chronicleStreak(int count) {
-    return '$count-day streak';
+    return '$count-Tage-Serie';
   }
 
   @override
-  String get chronicleLess => 'Less';
+  String get chronicleLess => 'Weniger';
 
   @override
-  String get chronicleMore => 'More';
+  String get chronicleMore => 'Mehr';
 
   @override
-  String get tomeCounterBooks => 'Tomes Conquered';
+  String get tomeCounterBooks => 'Bezwungene Folianten';
 
   @override
-  String get tomeCounterPages => 'Pages Turned';
+  String get tomeCounterPages => 'Umgeblätterte Seiten';
 
   @override
-  String get tomeCounterTime => 'Time in Realm';
+  String get tomeCounterTime => 'Zeit im Reich';
 
   @override
   String tomeCounterHoursMinutes(int hours, int minutes) {
-    return '${hours}h ${minutes}m';
+    return '$hours Std. $minutes Min.';
   }
 
   @override
   String tomeCounterMinutes(int minutes) {
-    return '${minutes}m';
+    return '$minutes Min.';
   }
 
   @override
-  String get achievementLocked => 'SEALED';
+  String get achievementLocked => 'VERSIEGELT';
 
   @override
-  String get achievementUnlocked => 'EARNED';
+  String get achievementUnlocked => 'ERRUNGEN';
 
   @override
-  String get achievementFirstPageTitle => 'First Page';
+  String get achievementFirstPageTitle => 'Erste Seite';
 
   @override
-  String get achievementFirstPageDesc => 'Open a book and begin reading.';
+  String get achievementFirstPageDesc => 'Öffne ein Buch und beginne zu lesen.';
 
   @override
-  String get achievementBookwormTitle => 'Bookworm Awakens';
+  String get achievementBookwormTitle => 'Bücherwurm erwacht';
 
   @override
-  String get achievementBookwormDesc => 'Finish your first book.';
+  String get achievementBookwormDesc => 'Beende dein erstes Buch.';
 
   @override
-  String get achievementDailyRitualTitle => 'Daily Ritual';
+  String get achievementDailyRitualTitle => 'Tägliches Ritual';
 
   @override
-  String get achievementDailyRitualDesc => 'Read for 3 days in a row.';
+  String get achievementDailyRitualDesc => 'Lies 3 Tage hintereinander.';
 
   @override
-  String get achievementPageTurnerTitle => 'Page Turner';
+  String get achievementPageTurnerTitle => 'Seitenumblätterer';
 
   @override
-  String get achievementPageTurnerDesc => 'Read approximately 100 pages.';
+  String get achievementPageTurnerDesc => 'Lies ungefähr 100 Seiten.';
 
   @override
-  String get achievementHourGlassTitle => 'Hour Glass';
+  String get achievementHourGlassTitle => 'Sanduhr';
 
   @override
-  String get achievementHourGlassDesc => 'Spend 1 hour reading.';
+  String get achievementHourGlassDesc => 'Verbringe 1 Stunde mit Lesen.';
 
   @override
-  String get achievementChapterChampionTitle => 'Chapter Champion';
+  String get achievementChapterChampionTitle => 'Kapitelmeister';
 
   @override
-  String get achievementChapterChampionDesc => 'Finish 3 books.';
+  String get achievementChapterChampionDesc => 'Beende 3 Bücher.';
 
   @override
-  String get achievementFlameKeeperTitle => 'Flame Keeper';
+  String get achievementFlameKeeperTitle => 'Flammenhüter';
 
   @override
-  String get achievementFlameKeeperDesc => 'Read for 7 days in a row.';
+  String get achievementFlameKeeperDesc => 'Lies 7 Tage hintereinander.';
 
   @override
-  String get achievementTomeScholarTitle => 'Tome Scholar';
+  String get achievementTomeScholarTitle => 'Folianten-Gelehrter';
 
   @override
-  String get achievementTomeScholarDesc => 'Read approximately 1,000 pages.';
+  String get achievementTomeScholarDesc => 'Lies ungefähr 1.000 Seiten.';
 
   @override
-  String get achievementDevotedReaderTitle => 'Devoted Reader';
+  String get achievementDevotedReaderTitle => 'Hingebungsvoller Leser';
 
   @override
-  String get achievementDevotedReaderDesc => 'Spend 10 hours reading.';
+  String get achievementDevotedReaderDesc => 'Verbringe 10 Stunden mit Lesen.';
 
   @override
-  String get achievementFiveRealmsTitle => 'Five Realms';
+  String get achievementFiveRealmsTitle => 'Fünf Reiche';
 
   @override
-  String get achievementFiveRealmsDesc => 'Start reading 5 different books.';
+  String get achievementFiveRealmsDesc =>
+      'Beginne 5 verschiedene Bücher zu lesen.';
 
   @override
-  String get achievementGrandLibrarianTitle => 'Grand Librarian';
+  String get achievementGrandLibrarianTitle => 'Großbibliothekar';
 
   @override
-  String get achievementGrandLibrarianDesc => 'Finish 10 books.';
+  String get achievementGrandLibrarianDesc => 'Beende 10 Bücher.';
 
   @override
-  String get achievementEternalFlameTitle => 'Eternal Flame';
+  String get achievementEternalFlameTitle => 'Ewige Flamme';
 
   @override
-  String get achievementEternalFlameDesc => 'Maintain a 30-day reading streak.';
+  String get achievementEternalFlameDesc =>
+      'Halte eine 30-Tage-Leseserie aufrecht.';
 
   @override
-  String get achievementMythicScribeTitle => 'Mythic Scribe';
+  String get achievementMythicScribeTitle => 'Mythischer Schreiber';
 
   @override
-  String get achievementMythicScribeDesc => 'Spend 100 hours reading.';
+  String get achievementMythicScribeDesc => 'Verbringe 100 Stunden mit Lesen.';
 
   @override
-  String get achievementRealmWalkerTitle => 'Realm Walker';
+  String get achievementRealmWalkerTitle => 'Reichswanderer';
 
   @override
-  String get achievementRealmWalkerDesc => 'Start reading 10 different books.';
+  String get achievementRealmWalkerDesc =>
+      'Beginne 10 verschiedene Bücher zu lesen.';
 
   @override
-  String get oathAppBarTitle => 'Oath Stone';
+  String get oathAppBarTitle => 'Eidstein';
 
   @override
-  String get oathSectionTitle => 'Oath Stone';
+  String get oathSectionTitle => 'Eidstein';
 
   @override
-  String get oathSectionSubtitle => 'Your sworn reading pledge';
+  String get oathSectionSubtitle => 'Dein geschworenes Lesegelöbnis';
 
   @override
-  String get oathSwearCta => 'Swear an Oath';
+  String get oathSwearCta => 'Einen Eid schwören';
 
   @override
   String get oathSwearSubtitle =>
-      'Set a public reading goal and track your progress';
+      'Setze dir ein öffentliches Leseziel und verfolge deinen Fortschritt';
 
   @override
-  String get oathSwearPageTitle => 'Inscribe Your Oath';
+  String get oathSwearPageTitle => 'Deinen Eid einritzen';
 
   @override
-  String get oathFieldTitle => 'Your pledge';
+  String get oathFieldTitle => 'Dein Gelöbnis';
 
   @override
-  String get oathFieldTitleHint => 'I will read 24 books in 2026';
+  String get oathFieldTitleHint => 'Ich werde 2026 24 Bücher lesen';
 
   @override
-  String get oathFieldTarget => 'Target books';
+  String get oathFieldTarget => 'Zielbücher';
 
   @override
-  String get oathFieldYear => 'Year';
+  String get oathFieldYear => 'Jahr';
 
   @override
-  String get oathFieldPublic => 'Public oath';
+  String get oathFieldPublic => 'Öffentlicher Eid';
 
   @override
-  String get oathFieldPublicSubtitle => 'Visible on the Lore Board';
+  String get oathFieldPublicSubtitle => 'Sichtbar auf der Lore-Tafel';
 
   @override
-  String get oathSwearButton => 'Swear This Oath';
+  String get oathSwearButton => 'Diesen Eid schwören';
 
   @override
-  String get oathSwearing => 'Inscribing...';
+  String get oathSwearing => 'Wird eingeritzt...';
 
   @override
   String oathProgressLabel(int current, int target) {
-    return '$current of $target';
+    return '$current von $target';
   }
 
   @override
-  String get oathProgressComplete => 'Oath Fulfilled!';
+  String get oathProgressComplete => 'Eid erfüllt!';
 
   @override
-  String get oathEntryLogged => 'Rune carved!';
+  String get oathEntryLogged => 'Rune eingeritzt!';
 
   @override
-  String get oathEntryRemoved => 'Entry removed';
+  String get oathEntryRemoved => 'Eintrag entfernt';
 
   @override
-  String get oathDeleteConfirmTitle => 'Break This Oath?';
+  String get oathDeleteConfirmTitle => 'Diesen Eid brechen?';
 
   @override
   String get oathDeleteConfirmBody =>
-      'This will permanently remove your oath and all logged entries.';
+      'Dadurch werden dein Eid und alle protokollierten Einträge dauerhaft gelöscht.';
 
   @override
-  String get oathDeleteCancel => 'Keep Oath';
+  String get oathDeleteCancel => 'Eid behalten';
 
   @override
-  String get oathDeleteConfirm => 'Break Oath';
+  String get oathDeleteConfirm => 'Eid brechen';
 
   @override
-  String get oathDeleted => 'Oath broken';
+  String get oathDeleted => 'Eid gebrochen';
 
   @override
-  String get oathCompleteTitle => 'OATH FULFILLED';
+  String get oathCompleteTitle => 'EID ERFÜLLT';
 
   @override
-  String get oathCompleteHeadline => 'Your Oath is Sealed';
+  String get oathCompleteHeadline => 'Dein Eid ist besiegelt';
 
   @override
   String get oathCompleteBody =>
-      'You have honored your pledge. The runes are complete.';
+      'Du hast dein Gelöbnis eingehalten. Die Runen sind vollständig.';
 
   @override
-  String get oathCompleteContinue => 'Continue';
+  String get oathCompleteContinue => 'Weiter';
 
   @override
-  String get oathEmptyEntries => 'No books logged yet';
+  String get oathEmptyEntries => 'Noch keine Bücher eingetragen';
 
   @override
-  String get oathLogBookAction => 'Log toward Oath';
+  String get oathLogBookAction => 'Für den Eid eintragen';
 
   @override
   String oathLogBookConfirm(String title) {
-    return 'Log \"$title\" toward your oath?';
+    return '„$title“ für deinen Eid eintragen?';
   }
 
   @override
-  String get oathLogBookButton => 'Log It';
+  String get oathLogBookButton => 'Eintragen';
 
   @override
-  String get oathAlreadyLogged => 'Already logged toward your oath';
+  String get oathAlreadyLogged => 'Bereits für deinen Eid eingetragen';
 
   @override
-  String get oathEditButton => 'Edit Oath';
+  String get oathEditButton => 'Eid bearbeiten';
 
   @override
-  String get oathUpdated => 'Oath updated';
+  String get oathUpdated => 'Eid aktualisiert';
 
   @override
-  String get oathErrorCreate => 'Failed to create oath';
+  String get oathErrorCreate => 'Eid konnte nicht erstellt werden';
 
   @override
-  String get oathErrorLoad => 'Failed to load oath';
+  String get oathErrorLoad => 'Eid konnte nicht geladen werden';
 
   @override
-  String get oathGuestHeadline => 'The Oath Stone Awaits';
+  String get oathGuestHeadline => 'Der Eidstein wartet';
 
   @override
   String get oathGuestBody =>
-      'Create an account to swear a reading oath and track your progress.';
+      'Erstelle ein Konto, um einen Leseeid zu schwören und deinen Fortschritt zu verfolgen.';
 
   @override
-  String get seasonalCampaignLabel => 'Seasonal Campaign';
+  String get seasonalCampaignLabel => 'Saisonale Kampagne';
 
   @override
-  String get seasonalCampaignExpired => 'Expedition ended';
+  String get seasonalCampaignExpired => 'Expedition beendet';
 
   @override
-  String get seasonalCampaignLastDay => 'Last day!';
+  String get seasonalCampaignLastDay => 'Letzter Tag!';
 
   @override
   String seasonalCampaignCountdownDays(int days) {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '$days days remaining',
-      one: '1 day remaining',
+      other: '$days Tage verbleibend',
+      one: '1 Tag verbleibend',
     );
     return '$_temp0';
   }
@@ -1191,8 +1199,8 @@ class AppLocalizationsDe extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       months,
       locale: localeName,
-      other: '$months months remaining',
-      one: '1 month remaining',
+      other: '$months Monate verbleibend',
+      one: '1 Monat verbleibend',
     );
     return '$_temp0';
   }
@@ -1202,97 +1210,98 @@ class AppLocalizationsDe extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       months,
       locale: localeName,
-      other: '$months months',
-      one: '1 month',
+      other: '$months Monate',
+      one: '1 Monat',
     );
     String _temp1 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '$days days remaining',
-      one: '1 day remaining',
+      other: '$days Tage verbleibend',
+      one: '1 Tag verbleibend',
     );
     return '$_temp0, $_temp1';
   }
 
   @override
-  String get seasonalRelicSectionTitle => 'Seasonal Relics';
+  String get seasonalRelicSectionTitle => 'Saisonale Relikte';
 
   @override
-  String get profileSectionSeasonalQuests => 'Seasonal Quests';
+  String get profileSectionSeasonalQuests => 'Saisonale Quests';
 
   @override
   String get profileSectionSeasonalQuestsSubtitle =>
-      'Time-limited expeditions with exclusive relics.';
+      'Zeitlich begrenzte Expeditionen mit exklusiven Relikten.';
 
   @override
-  String get realmRankingsTitle => 'Realm Rankings';
+  String get realmRankingsTitle => 'Reichsrangliste';
 
   @override
   String get leaderboardMetricQuests => 'Quests';
 
   @override
-  String get leaderboardMetricBooks => 'Books';
+  String get leaderboardMetricBooks => 'Bücher';
 
   @override
-  String get leaderboardMetricRelics => 'Relics';
+  String get leaderboardMetricRelics => 'Relikte';
 
   @override
   String leaderboardTotalParticipants(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count adventurers ranked',
-      one: '1 adventurer ranked',
+      other: '$count Abenteurer platziert',
+      one: '1 Abenteurer platziert',
     );
     return '$_temp0';
   }
 
   @override
-  String get leaderboardYourPosition => 'YOUR POSITION';
+  String get leaderboardYourPosition => 'DEINE POSITION';
 
   @override
   String leaderboardPositionOfTotal(int position, int total) {
-    return '#$position of $total';
+    return '#$position von $total';
   }
 
   @override
-  String get leaderboardErrorHeadline => 'The rankings failed to load';
+  String get leaderboardErrorHeadline =>
+      'Die Rangliste konnte nicht geladen werden';
 
   @override
-  String get leaderboardOptInTitle => 'Realm Rankings';
+  String get leaderboardOptInTitle => 'Reichsrangliste';
 
   @override
   String get leaderboardOptInDescription =>
-      'Compete with fellow adventurers by joining the realm leaderboard. Your ranking is based on quests sealed, books read, and relics collected.';
+      'Tritt gegen andere Abenteurer an, indem du der Reichsrangliste beitrittst. Deine Platzierung basiert auf abgeschlossenen Quests, gelesenen Büchern und gesammelten Relikten.';
 
   @override
   String get leaderboardOptInPrivacy =>
-      'Only your display name and rank are visible to others.';
+      'Nur dein Anzeigename und Rang sind für andere sichtbar.';
 
   @override
-  String get leaderboardOptInActive => 'Ranked in the realm';
+  String get leaderboardOptInActive => 'Im Reich platziert';
 
   @override
-  String get leaderboardOptInInactive => 'Not ranked';
+  String get leaderboardOptInInactive => 'Nicht platziert';
 
   @override
-  String get leaderboardOptInJoinButton => 'Join the Rankings';
+  String get leaderboardOptInJoinButton => 'Der Rangliste beitreten';
 
   @override
-  String get leaderboardOptInLeaveButton => 'Leave the Rankings';
+  String get leaderboardOptInLeaveButton => 'Rangliste verlassen';
 
   @override
-  String get characterSheetStatRealmRank => 'Realm';
+  String get characterSheetStatRealmRank => 'Reich';
 
   @override
-  String get characterSheetRealmRankJoin => 'Join Rankings';
+  String get characterSheetRealmRankJoin => 'Rangliste beitreten';
 
   @override
-  String get skillTreeSectionTitle => 'Skill Tree';
+  String get skillTreeSectionTitle => 'Fähigkeitenbaum';
 
   @override
   String get skillTreeSectionSubtitle =>
-      'Grow your genre mastery through reading.';
+      'Steigere deine Genre-Meisterschaft durch Lesen.';
 
   @override
   String skillTreeXpProgress(int current, int next) {
@@ -1305,166 +1314,166 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get skillTreeTiersLabel => 'Tiers';
+  String get skillTreeTiersLabel => 'Stufen';
 
   @override
-  String get skillTreeTierUnlocked => 'UNLOCKED';
+  String get skillTreeTierUnlocked => 'FREIGESCHALTET';
 
   @override
-  String get skillTreeTierCurrent => 'IN PROGRESS';
+  String get skillTreeTierCurrent => 'IN BEARBEITUNG';
 
   @override
-  String get skillTreeTierLocked => 'LOCKED';
+  String get skillTreeTierLocked => 'GESPERRT';
 
   @override
   String skillTreeRuneUnlocked(String runeTitle) {
-    return 'Rune Unlocked: $runeTitle';
+    return 'Rune freigeschaltet: $runeTitle';
   }
 
   @override
   String skillTreeRuneLockedAt(String runeTitle) {
-    return 'Unlocks: $runeTitle';
+    return 'Schaltet frei: $runeTitle';
   }
 
   @override
-  String get loreBoardTitle => 'Lore Board';
+  String get loreBoardTitle => 'Lore-Tafel';
 
   @override
   String get loreBoardGlobalTab => 'Global';
 
   @override
-  String get loreBoardFriendsTab => 'Friends';
+  String get loreBoardFriendsTab => 'Freunde';
 
   @override
   String get loreBoardEmpty =>
-      'The board is bare... no tales have been posted yet.';
+      'Die Tafel ist leer... noch wurden keine Geschichten geteilt.';
 
   @override
-  String get loreBoardTooltip => 'Lore Board';
+  String get loreBoardTooltip => 'Lore-Tafel';
 
   @override
-  String get guildHubTitle => 'Guild Hall';
+  String get guildHubTitle => 'Gildenhalle';
 
   @override
   String get guildHubEmpty =>
-      'You haven\'t joined any guilds yet. Found your own or discover existing ones.';
+      'Du bist noch keiner Gilde beigetreten. Gründe deine eigene oder entdecke bestehende.';
 
   @override
-  String get guildCreateButton => 'Found a New Guild';
+  String get guildCreateButton => 'Neue Gilde gründen';
 
   @override
-  String get guildDiscoverButton => 'Discover Guilds';
+  String get guildDiscoverButton => 'Gilden entdecken';
 
   @override
-  String get guildDetailCompanions => 'Companions';
+  String get guildDetailCompanions => 'Gefährten';
 
   @override
-  String get guildDetailLedger => 'Party Ledger';
+  String get guildDetailLedger => 'Gruppenbuch';
 
   @override
-  String get guildDetailLedgerEmpty => 'No books in the ledger yet.';
+  String get guildDetailLedgerEmpty => 'Noch keine Bücher im Gruppenbuch.';
 
   @override
-  String get guildJoinButton => 'Join Guild';
+  String get guildJoinButton => 'Gilde beitreten';
 
   @override
-  String get guildJoined => 'You have joined the guild!';
+  String get guildJoined => 'Du bist der Gilde beigetreten!';
 
   @override
-  String get guildLeaveButton => 'Leave Guild';
+  String get guildLeaveButton => 'Gilde verlassen';
 
   @override
-  String get guildLeft => 'You have left the guild.';
+  String get guildLeft => 'Du hast die Gilde verlassen.';
 
   @override
-  String get guildDeleteConfirmTitle => 'Disband This Guild?';
+  String get guildDeleteConfirmTitle => 'Diese Gilde auflösen?';
 
   @override
   String get guildDeleteConfirmBody =>
-      'This will permanently remove the guild and all its data. This cannot be undone.';
+      'Dadurch werden die Gilde und alle zugehörigen Daten dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.';
 
   @override
-  String get guildDeleteCancel => 'Keep Guild';
+  String get guildDeleteCancel => 'Gilde behalten';
 
   @override
-  String get guildDeleteConfirm => 'Disband Guild';
+  String get guildDeleteConfirm => 'Gilde auflösen';
 
   @override
-  String get guildDeleted => 'Guild disbanded';
+  String get guildDeleted => 'Gilde aufgelöst';
 
   @override
-  String get guildCreated => 'Guild founded!';
+  String get guildCreated => 'Gilde gegründet!';
 
   @override
-  String get guildUpdated => 'Guild updated';
+  String get guildUpdated => 'Gilde aktualisiert';
 
   @override
-  String get guildCreatePageTitle => 'Found a Guild';
+  String get guildCreatePageTitle => 'Eine Gilde gründen';
 
   @override
-  String get guildFieldName => 'Guild Name';
+  String get guildFieldName => 'Gildenname';
 
   @override
-  String get guildFieldNameHint => 'The Fellowship of Pages';
+  String get guildFieldNameHint => 'Die Gemeinschaft der Seiten';
 
   @override
-  String get guildFieldDescription => 'Description';
+  String get guildFieldDescription => 'Beschreibung';
 
   @override
-  String get guildFieldDescriptionHint => 'What is your guild about?';
+  String get guildFieldDescriptionHint => 'Worum geht es in deiner Gilde?';
 
   @override
-  String get guildFieldPublic => 'Public guild';
+  String get guildFieldPublic => 'Öffentliche Gilde';
 
   @override
   String get guildFieldPublicSubtitle =>
-      'Visible on the Guild Board for anyone to join';
+      'Auf der Gildentafel sichtbar, damit jeder beitreten kann';
 
   @override
-  String get guildCreateSubmit => 'Found This Guild';
+  String get guildCreateSubmit => 'Diese Gilde gründen';
 
   @override
-  String get guildCreating => 'Founding...';
+  String get guildCreating => 'Wird gegründet...';
 
   @override
-  String get guildDiscoverTitle => 'Guild Board';
+  String get guildDiscoverTitle => 'Gildentafel';
 
   @override
-  String get guildDiscoverEmpty => 'No guilds to discover yet.';
+  String get guildDiscoverEmpty => 'Noch keine Gilden zu entdecken.';
 
   @override
   String guildMemberCountLabel(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count companions',
-      one: '1 companion',
+      other: '$count Gefährten',
+      one: '1 Gefährte',
     );
     return '$_temp0';
   }
 
   @override
-  String get guildRoleGuildmaster => 'Guildmaster';
+  String get guildRoleGuildmaster => 'Gildenmeister';
 
   @override
-  String get guildRoleCompanion => 'Companion';
+  String get guildRoleCompanion => 'Gefährte';
 
   @override
-  String get guildGuestHeadline => 'The Guild Hall Awaits';
+  String get guildGuestHeadline => 'Die Gildenhalle wartet';
 
   @override
   String get guildGuestBody =>
-      'Create an account to found guilds, join reading parties, and build ledgers with fellow adventurers.';
+      'Erstelle ein Konto, um Gilden zu gründen, Lesegruppen beizutreten und gemeinsam mit anderen Abenteurern Bücherlisten zu führen.';
 
   @override
-  String get guildAddToLedger => 'Add to Ledger';
+  String get guildAddToLedger => 'Zum Gruppenbuch hinzufügen';
 
   @override
-  String get guildBookAdded => 'Book added to the ledger!';
+  String get guildBookAdded => 'Buch zum Gruppenbuch hinzugefügt!';
 
   @override
-  String get guildBookRemoved => 'Book removed from the ledger.';
+  String get guildBookRemoved => 'Buch aus dem Gruppenbuch entfernt.';
 
   @override
-  String get guildAlreadyMember => 'You are already a member of this guild.';
+  String get guildAlreadyMember => 'Du bist bereits Mitglied dieser Gilde.';
 }
