@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/api/api_result.dart';
 import 'package:swf_app/src/api/service_locator.dart';
+import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/auth/data/auth_repository.dart';
 import 'package:swf_app/src/auth/data/session_store.dart';
 import 'package:swf_app/src/auth/models/user.dart';
@@ -10,9 +12,12 @@ import 'package:swf_app/src/auth/presentation/sign_up_flow.dart';
 import 'package:swf_app/src/catalog/presentation/catalog_page.dart';
 import 'package:swf_app/src/profile/data/quest_compendium.dart';
 import 'package:swf_app/src/profile/data/rune_compendium.dart';
+import 'package:swf_app/src/profile/data/skill_tree_compendium.dart';
+import 'package:swf_app/src/profile/data/seasonal_compendium.dart';
 import 'package:swf_app/src/profile/models/daily_reading_entry.dart';
 import 'package:swf_app/src/profile/models/quest_campaign.dart';
 import 'package:swf_app/src/profile/models/reading_stats.dart';
+import 'package:swf_app/src/profile/models/skill_tree.dart';
 import 'package:swf_app/src/profile/presentation/widgets/achievement_sigils.dart';
 import 'package:swf_app/src/profile/presentation/widgets/character_sheet.dart';
 import 'package:swf_app/src/profile/presentation/widgets/guest_guild_state.dart';
@@ -22,11 +27,35 @@ import 'package:swf_app/src/profile/presentation/widgets/realm_map.dart';
 import 'package:swf_app/src/profile/presentation/widgets/relic_vault.dart';
 import 'package:swf_app/src/profile/presentation/widgets/reward_reveal_dialog.dart';
 import 'package:swf_app/src/profile/presentation/widgets/rune_config_sheets.dart';
+import 'package:swf_app/src/profile/presentation/widgets/skill_branch_sheet.dart';
 import 'package:swf_app/src/profile/presentation/widgets/rune_slots.dart';
+import 'package:swf_app/src/profile/presentation/widgets/seasonal_campaign_banner.dart';
+import 'package:swf_app/src/profile/presentation/widgets/seasonal_campaign_card.dart';
+import 'package:swf_app/src/profile/presentation/widgets/seasonal_relic_section.dart';
 import 'package:swf_app/src/profile/presentation/widgets/section_divider.dart';
 import 'package:swf_app/src/profile/presentation/widgets/staggered_fade_slide.dart';
 import 'package:swf_app/src/profile/presentation/widgets/tome_counter.dart';
+import 'package:swf_app/src/profile/presentation/widgets/recommendation_forge_section.dart';
+import 'package:swf_app/src/profile/presentation/widgets/review_scroll_section.dart';
+import 'package:swf_app/src/profile/models/recommendation_pairing.dart';
+import 'package:swf_app/src/profile/models/review.dart' as review_model;
+import 'package:swf_app/src/profile/presentation/forge_editor_page.dart';
+import 'package:swf_app/src/profile/presentation/review_editor_page.dart';
+import 'package:swf_app/src/profile/presentation/widgets/book_picker_sheet.dart';
+import 'package:swf_app/src/profile/data/preferences_provider.dart';
+import 'package:swf_app/src/profile/data/profile_repository.dart';
+import 'package:swf_app/src/profile/presentation/realm_rankings_page.dart';
+import 'package:swf_app/src/profile/presentation/widgets/theme_attunement_sheet.dart';
+import 'package:swf_app/src/profile/data/sigil_compendium.dart';
+import 'package:swf_app/src/profile/data/title_compendium.dart';
+import 'package:swf_app/src/profile/models/sigil_config.dart';
+import 'package:swf_app/src/profile/presentation/widgets/sigil_builder_sheet.dart';
+import 'package:swf_app/src/profile/presentation/widgets/title_picker_sheet.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
+import 'package:swf_app/src/oath/presentation/widgets/oath_stone_card.dart';
+import 'package:swf_app/src/oath/presentation/swear_oath_page.dart';
+import 'package:swf_app/src/oath/presentation/oath_page.dart';
+import 'package:swf_app/src/oath/models/book_oath.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({
@@ -45,6 +74,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late final AuthRepository? _authRepository;
   late final SessionStore? _sessionStore;
+  late final ProfileRepository _profileRepository;
+  late final ProfilePreferencesProvider _preferencesProvider;
 
   User? _user;
   bool _isLoading = true;
@@ -60,16 +91,39 @@ class _ProfilePageState extends State<ProfilePage> {
   ReadingStats _readingStats = const ReadingStats();
   List<DailyReadingEntry> _dailyEntries = const [];
 
+  // Reviews & recommendations
+  List<review_model.Review> _reviews = [];
+  List<RecommendationPairing> _pairings = [];
+  bool _reviewsLoading = true;
+  bool _pairingsLoading = true;
+  final Set<String> _expandedReviewIds = <String>{};
+
+  // Oath
+  BookOath? _oath;
+  bool _oathLoading = true;
+
   // Rune configuration state
   bool _arcEnabled = false;
   final Set<String> _selectedGenres = <String>{};
   final Set<String> _enabledNotifications = <String>{};
+
+  // Skill tree
+  SkillTree? _skillTree;
+
+  // Seasonal campaigns
+  List<QuestCampaign> _seasonalCampaigns = <QuestCampaign>[];
+  final Map<String, Set<String>> _seasonalCompletedObjectives = <String, Set<String>>{};
+  final Map<String, Set<String>> _seasonalRevealedRewards = <String, Set<String>>{};
+  bool _seasonalBannerExpanded = false;
 
   // ---------------------------------------------------------------------------
   // Computed properties
   // ---------------------------------------------------------------------------
 
   QuestCampaign get _campaign => campaignForRole(_user?.role);
+
+  Color get _accentColor =>
+      resolveAccentColor(_preferencesProvider.accentColorKey);
 
   int get _totalObjectives =>
       _campaign.scrolls.fold(0, (sum, s) => sum + s.objectives.length);
@@ -147,6 +201,34 @@ class _ProfilePageState extends State<ProfilePage> {
     return allRewardIds.where(_revealedRewardIds.contains).length;
   }
 
+  // Seasonal campaign helpers
+  List<QuestCampaign> get _activeSeasonalCampaigns =>
+      _seasonalCampaigns.where((c) => c.isActive).toList();
+
+  int _seasonalTotalObjectives(QuestCampaign campaign) =>
+      campaign.scrolls.fold(0, (sum, s) => sum + s.objectives.length);
+
+  int _seasonalCompletedObjectiveCount(QuestCampaign campaign) {
+    final ids = _seasonalCompletedObjectives[campaign.seasonId];
+    if (ids == null) return 0;
+    return ids.length;
+  }
+
+  bool _isSeasonalScrollComplete(QuestCampaign campaign, QuestScroll scroll) {
+    final ids = _seasonalCompletedObjectives[campaign.seasonId] ?? const <String>{};
+    return scroll.objectives.every((obj) => ids.contains(obj.id));
+  }
+
+  ScrollState _seasonalScrollState(QuestCampaign campaign, int index) {
+    final scroll = campaign.scrolls[index];
+    if (_isSeasonalScrollComplete(campaign, scroll)) return ScrollState.sealed;
+    final firstIncomplete = campaign.scrolls.indexWhere(
+      (s) => !_isSeasonalScrollComplete(campaign, s),
+    );
+    if (index == firstIncomplete) return ScrollState.active;
+    return ScrollState.locked;
+  }
+
   // ---------------------------------------------------------------------------
   // Lifecycle
   // ---------------------------------------------------------------------------
@@ -156,10 +238,28 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     _authRepository = widget.authRepository ?? ServiceLocator.authRepository;
     _sessionStore = widget.sessionStore ?? ServiceLocator.sessionStore;
+    _profileRepository = ServiceLocator.profileRepository;
+    _preferencesProvider = ServiceLocator.preferencesProvider;
+    _preferencesProvider.addListener(_onPreferencesChanged);
 
     _loadProfile();
     _loadReadingStats();
+    _loadSeasonalCampaigns();
+    _loadReviews();
+    _loadPairings();
+    _loadOath();
   }
+
+  @override
+  void dispose() {
+    _preferencesProvider.removeListener(_onPreferencesChanged);
+    super.dispose();
+  }
+
+  void _onPreferencesChanged() {
+    if (mounted) setState(() {});
+  }
+
 
   Future<void> _loadReadingStats() async {
     final repo = ServiceLocator.readingStatsRepository;
@@ -170,6 +270,35 @@ class _ProfilePageState extends State<ProfilePage> {
       _readingStats = stats;
       _dailyEntries = entries;
     });
+  }
+
+  Future<void> _loadOath() async {
+    final result = await ServiceLocator.oathRepository.fetchMyOath();
+    if (!mounted) return;
+    result.when(
+      success: (oath) => setState(() {
+        _oath = oath;
+        _oathLoading = false;
+      }),
+      failure: (_, _) => setState(() => _oathLoading = false),
+    );
+  }
+
+  void _openOathPage() {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(builder: (_) => const OathPage()),
+    ).then((_) => _loadOath());
+  }
+
+  void _openSwearOath() async {
+    final created = await Navigator.push<BookOath>(
+      context,
+      MaterialPageRoute<BookOath>(builder: (_) => const SwearOathPage()),
+    );
+    if (created != null && mounted) {
+      setState(() => _oath = created);
+    }
   }
 
   Future<void> _loadProfile() async {
@@ -193,7 +322,9 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           _user = user;
           _isLoading = false;
+          _skillTree = defaultSkillTree();
         });
+        _loadPreferences();
       },
       failure: (message, statusCode) {
         setState(() {
@@ -202,6 +333,209 @@ class _ProfilePageState extends State<ProfilePage> {
           _isLoading = false;
         });
       },
+    );
+  }
+
+  Future<void> _loadSeasonalCampaigns() async {
+    // Try API first, fall back to mock data
+    final campaigns = mockSeasonalCampaigns()
+        .map((c) => c.isSeasonal ? summerReadingExpedition : c)
+        .where((c) => c.isActive)
+        .toList();
+    if (!mounted) return;
+    setState(() => _seasonalCampaigns = campaigns);
+  }
+
+  void _toggleSeasonalObjective(
+    QuestCampaign campaign,
+    QuestScroll scroll,
+    QuestObjective objective,
+  ) {
+    final seasonId = campaign.seasonId ?? '';
+    final completed = _seasonalCompletedObjectives.putIfAbsent(
+      seasonId,
+      () => <String>{},
+    );
+    final revealed = _seasonalRevealedRewards.putIfAbsent(
+      seasonId,
+      () => <String>{},
+    );
+    final wasComplete = completed.contains(objective.id);
+
+    setState(() {
+      if (wasComplete) {
+        completed.remove(objective.id);
+      } else {
+        completed.add(objective.id);
+      }
+    });
+
+    if (wasComplete) return;
+
+    final newlyUnlockedRewards = <QuestReward>[];
+    if (_isSeasonalScrollComplete(campaign, scroll) &&
+        revealed.add(scroll.reward.id)) {
+      newlyUnlockedRewards.add(scroll.reward);
+    }
+    final allDone = campaign.scrolls.every(
+      (s) => _isSeasonalScrollComplete(campaign, s),
+    );
+    if (allDone &&
+        campaign.finalReward != null &&
+        revealed.add(campaign.finalReward!.id)) {
+      newlyUnlockedRewards.add(campaign.finalReward!);
+    }
+
+    for (final reward in newlyUnlockedRewards) {
+      Future<void>.microtask(() async {
+        if (!mounted) return;
+        await showRewardReveal(
+          context,
+          reward: reward,
+          accentColor: campaign.accentColor,
+          isGrandReward: campaign.finalReward?.id == reward.id,
+        );
+      });
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Reviews & Recommendations
+  // ---------------------------------------------------------------------------
+
+  Future<void> _loadReviews() async {
+    final result = await ServiceLocator.reviewRepository.fetchMyReviews();
+    if (!mounted) return;
+    result.when(
+      success: (reviews) => setState(() {
+            _reviews = reviews;
+            _reviewsLoading = false;
+          }),
+      failure: (_, __) => setState(() => _reviewsLoading = false),
+    );
+  }
+
+  Future<void> _loadPairings() async {
+    final result =
+        await ServiceLocator.recommendationRepository.fetchMyPairings();
+    if (!mounted) return;
+    result.when(
+      success: (pairings) => setState(() {
+            _pairings = pairings;
+            _pairingsLoading = false;
+          }),
+      failure: (_, __) => setState(() => _pairingsLoading = false),
+    );
+  }
+
+  void _toggleReviewExpanded(String reviewId) {
+    setState(() {
+      if (_expandedReviewIds.contains(reviewId)) {
+        _expandedReviewIds.remove(reviewId);
+      } else {
+        _expandedReviewIds.add(reviewId);
+      }
+    });
+  }
+
+  Future<void> _navigateToReviewEditor({
+    required Book book,
+    review_model.Review? existing,
+  }) async {
+    final created = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ReviewEditorPage(
+          book: book,
+          existingReview: existing,
+        ),
+      ),
+    );
+    if (created == true && mounted) {
+      _loadReviews();
+    }
+  }
+
+  void _onInscribeNewReview() {
+    showBookPicker(
+      context,
+      onBookSelected: (book) => _navigateToReviewEditor(book: book),
+    );
+  }
+
+  Future<void> _deleteReview(review_model.Review review) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Review'),
+        content: const Text('Remove this review permanently?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    await ServiceLocator.reviewRepository.deleteReview(review.id);
+    if (mounted) _loadReviews();
+  }
+
+  Future<void> _navigateToForgeEditor() async {
+    final created = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => const ForgeEditorPage()),
+    );
+    if (created == true && mounted) {
+      _loadPairings();
+    }
+  }
+
+  Future<void> _deletePairing(RecommendationPairing pairing) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Recommendation'),
+        content: const Text('Remove this pairing permanently?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    await ServiceLocator.recommendationRepository.deletePairing(pairing.id);
+    if (mounted) _loadPairings();
+  }
+
+  void _sharePairing(RecommendationPairing pairing) {
+    final url = 'https://stuffwithfantasy.com/recommendations/${pairing.id}';
+    final text =
+        'If you liked "${pairing.sourceTitle}", try "${pairing.targetTitle}"! $url';
+    Share.share(text);
+  }
+
+  Future<void> _loadPreferences() async {
+    final result = await _profileRepository.fetchPreferences();
+    if (!mounted) return;
+    result.when(
+      success: (data) => _preferencesProvider.mergeFromServer(data),
+      failure: (_, _) {},
     );
   }
 
@@ -349,11 +683,29 @@ class _ProfilePageState extends State<ProfilePage> {
         await showRewardReveal(
           context,
           reward: reward,
-          accentColor: _campaign.accentColor,
+          accentColor: _accentColor,
           isGrandReward: _campaign.finalReward?.id == reward.id,
         );
       });
     }
+  }
+
+  void _onSkillTierTapped(String branchId, String tierId) {
+    final tree = _skillTree;
+    if (tree == null) return;
+
+    final branch = tree.branches.where((b) => b.id == branchId).firstOrNull;
+    if (branch == null) return;
+
+    showSkillBranchSheet(
+      context,
+      branch: branch,
+      accentColor: _accentColor,
+      onRuneTapped: (runeId) {
+        Navigator.of(context).pop();
+        _onRuneTapped(runeId);
+      },
+    );
   }
 
   void _onRuneTapped(String runeId) {
@@ -361,14 +713,14 @@ class _ProfilePageState extends State<ProfilePage> {
       case 'reader-arc-shield':
         showArcShieldConfig(
           context,
-          accentColor: _campaign.accentColor,
+          accentColor: _accentColor,
           isArcEnabled: _arcEnabled,
           onChanged: (value) => setState(() => _arcEnabled = value),
         );
       case 'reader-genre-attunement':
         showGenreAttunementConfig(
           context,
-          accentColor: _campaign.accentColor,
+          accentColor: _accentColor,
           selectedGenres: _selectedGenres,
           onChanged: (genres) =>
               setState(() {
@@ -380,7 +732,7 @@ class _ProfilePageState extends State<ProfilePage> {
       case 'reader-event-watchtower':
         showEventWatchtowerConfig(
           context,
-          accentColor: _campaign.accentColor,
+          accentColor: _accentColor,
           enabledNotifications: _enabledNotifications,
           onChanged: (notifs) =>
               setState(() {
@@ -396,6 +748,54 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         );
     }
+  }
+
+  Future<void> _openThemeAttunement() async {
+    final result = await showThemeAttunementSheet(
+      context,
+      currentKey: _preferencesProvider.accentColorKey,
+      accentColor: _accentColor,
+    );
+    if (!mounted) return;
+    await _preferencesProvider.setAccentColorKey(result);
+    _profileRepository.updatePreferences({'accentColorKey': result});
+  }
+
+  Future<void> _openTitlePicker() async {
+    final scrollObjectives = <String, List<String>>{
+      for (final scroll in _campaign.scrolls)
+        scroll.id: scroll.objectives.map((o) => o.id).toList(),
+    };
+    final unlocked = evaluateUnlockedTitles(
+      completedObjectiveIds: _completedObjectiveIds,
+      revealedRewardIds: _revealedRewardIds,
+      selectedGenres: _selectedGenres,
+      hasConfiguredRune: _arcEnabled || _selectedGenres.isNotEmpty || _enabledNotifications.isNotEmpty,
+      leaderboardOptIn: false,
+      scrollObjectives: scrollObjectives,
+    );
+    final result = await showTitlePickerSheet(
+      context,
+      selectedTitleId: _preferencesProvider.selectedTitleId,
+      unlockedTitles: unlocked,
+      accentColor: _accentColor,
+    );
+    if (!mounted) return;
+    await _preferencesProvider.setSelectedTitleId(result);
+    _profileRepository.updatePreferences({'selectedTitleId': result});
+  }
+
+  Future<void> _openSigilBuilder() async {
+    final current = _preferencesProvider.sigilConfig ?? defaultSigilConfig;
+    final result = await showSigilBuilderSheet(
+      context,
+      currentConfig: current,
+      accentColor: _accentColor,
+      revealedRewardIds: _revealedRewardIds,
+    );
+    if (!mounted || result == null) return;
+    await _preferencesProvider.setSigilConfig(result);
+    _profileRepository.updatePreferences({'sigilConfig': result.toJson()});
   }
 
   void _toggleScrollExpanded(String scrollId) {
@@ -427,6 +827,25 @@ class _ProfilePageState extends State<ProfilePage> {
             letterSpacing: 0.5,
           ),
         ),
+        actions: [
+          if (!_isGuestState && _user != null)
+            IconButton(
+              icon: Icon(
+                Icons.auto_awesome_rounded,
+                color: _accentColor,
+              ),
+              tooltip: 'Theme Attunement',
+              onPressed: _openThemeAttunement,
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.military_tech_rounded,
+                color: _accentColor,
+              ),
+              tooltip: 'Choose Title',
+              onPressed: _openTitlePicker,
+            ),
+        ],
       ),
       body: _buildBody(context),
     );
@@ -482,6 +901,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 activeScrollObjectivesDone: activeDone,
                 activeScrollObjectivesTotal:
                     active?.objectives.length ?? 0,
+                customTitle: titleById(_preferencesProvider.selectedTitleId)?.label,
+                sigilConfig: _preferencesProvider.sigilConfig,
+                onSigilTapped: _openSigilBuilder,
               ),
             ),
           ),
@@ -491,10 +913,41 @@ class _ProfilePageState extends State<ProfilePage> {
             SliverToBoxAdapter(
               child: _InlineNotice(
                 message: _errorMessage!,
-                accentColor: _campaign.accentColor,
+                accentColor: _accentColor,
                 onRetry: _loadProfile,
               ),
             ),
+
+          // ── Oath Stone ──
+          if (!_oathLoading)
+            SliverToBoxAdapter(
+              child: StaggeredFadeSlide(
+                delay: const Duration(milliseconds: 200),
+                child: Column(
+                  children: [
+                    SectionDivider(
+                      title: l10n.oathSectionTitle,
+                      subtitle: l10n.oathSectionSubtitle,
+                    ),
+                    if (_oath != null)
+                      OathStoneCard(
+                        oath: _oath!,
+                        accentColor: _accentColor,
+                        onTap: _openOathPage,
+                      )
+                    else
+                      OathSwearCta(
+                        accentColor: _accentColor,
+                        onTap: _openSwearOath,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+
+
+          // ── Seasonal Campaign ──
+          ..._buildSeasonalCampaignSlivers(l10n),
 
           // ── Rune Slots ──
           SliverToBoxAdapter(
@@ -503,14 +956,20 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 children: [
                   SectionDivider(
-                    title: l10n.profileSectionRunes,
-                    subtitle: l10n.profileSectionRunesSubtitle,
+                    title: _skillTree != null
+                        ? l10n.skillTreeSectionTitle
+                        : l10n.profileSectionRunes,
+                    subtitle: _skillTree != null
+                        ? l10n.skillTreeSectionSubtitle
+                        : l10n.profileSectionRunesSubtitle,
                   ),
                   RuneSlots(
                     runes: runes,
                     completedScrollIds: _completedScrollIds,
-                    accentColor: _campaign.accentColor,
+                    accentColor: _accentColor,
                     onRuneTapped: _onRuneTapped,
+                    skillTree: _skillTree,
+                    onTierTapped: _onSkillTierTapped,
                   ),
                 ],
               ),
@@ -548,7 +1007,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: QuestScrollCard(
                         scroll: scroll,
                         scrollState: state,
-                        accentColor: _campaign.accentColor,
+                        accentColor: _accentColor,
                         borderColor: _campaign.borderColor,
                         parchmentColor: _campaign.scrollColor,
                         completedObjectiveIds: _completedObjectiveIds,
@@ -581,7 +1040,48 @@ class _ProfilePageState extends State<ProfilePage> {
                     campaign: _campaign,
                     unlockedRewardIds: _revealedRewardIds,
                   ),
+                  // Seasonal relics
+                  ...(_activeSeasonalCampaigns.map((sc) => Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: SeasonalRelicSection(
+                      campaign: sc,
+                      unlockedRewardIds: _seasonalRevealedRewards[sc.seasonId] ?? const <String>{},
+                    ),
+                  ))),
                 ],
+              ),
+            ),
+          ),
+
+          // ── Realm Rankings ──
+          SliverToBoxAdapter(
+            child: StaggeredFadeSlide(
+              delay: const Duration(milliseconds: 925),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: _accentColor,
+                    side: BorderSide(color: _accentColor.withAlpha(80)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => const RealmRankingsPage(),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.emoji_events_rounded, color: _accentColor),
+                  label: Text(l10n.realmRankingsTitle),
+                ),
               ),
             ),
           ),
@@ -599,7 +1099,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ReadingChronicle(
                     entries: _dailyEntries,
                     stats: _readingStats,
-                    accentColor: _campaign.accentColor,
+                    accentColor: _accentColor,
                   ),
                 ],
               ),
@@ -618,7 +1118,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   TomeCounter(
                     stats: _readingStats,
-                    accentColor: _campaign.accentColor,
+                    accentColor: _accentColor,
                   ),
                 ],
               ),
@@ -637,7 +1137,67 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   AchievementSigils(
                     stats: _readingStats,
-                    accentColor: _campaign.accentColor,
+                    accentColor: _accentColor,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+
+          // ── Scroll of Reviews ──
+          SliverToBoxAdapter(
+            child: StaggeredFadeSlide(
+              delay: const Duration(milliseconds: 1425),
+              child: Column(
+                children: [
+                  const SectionDivider(
+                    title: 'Scroll of Reviews',
+                    subtitle: 'Your inscribed judgments',
+                  ),
+                  ReviewScrollSection(
+                    reviews: _reviews,
+                    accentColor: _accentColor,
+                    expandedReviewIds: _expandedReviewIds,
+                    onToggleExpand: _toggleReviewExpanded,
+                    onInscribeNew: _onInscribeNewReview,
+                    onEdit: (review) {
+                      final book = Book.minimal(
+                        id: review.bookId,
+                        title: review.bookTitle,
+                        authorName: review.bookAuthor,
+                        imageUrl: review.bookImageUrl,
+                      );
+                      _navigateToReviewEditor(
+                        book: book,
+                        existing: review,
+                      );
+                    },
+                    onDelete: _deleteReview,
+                    isLoading: _reviewsLoading,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // ── Recommendation Forge ──
+          SliverToBoxAdapter(
+            child: StaggeredFadeSlide(
+              delay: const Duration(milliseconds: 1500),
+              child: Column(
+                children: [
+                  const SectionDivider(
+                    title: 'Recommendation Forge',
+                    subtitle: 'Books you have bound together',
+                  ),
+                  RecommendationForgeSection(
+                    pairings: _pairings,
+                    accentColor: _accentColor,
+                    onLightTheForge: _navigateToForgeEditor,
+                    onShare: _sharePairing,
+                    onDelete: _deletePairing,
+                    isLoading: _pairingsLoading,
                   ),
                 ],
               ),
@@ -655,13 +1215,17 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   CharacterSheet(
                     name: _displayName(user),
+                    customTitle: titleById(_preferencesProvider.selectedTitleId)?.label,
                     rank: _rankTitle,
                     questsCompleted: _completedScrollCount,
                     questsTotal: _campaign.scrolls.length,
                     relicsCollected: _relicsCollected,
                     relicsTotal: _relicsTotal,
                     signal: user.email,
-                    accentColor: _campaign.accentColor,
+                    accentColor: _accentColor,
+                    realmRankPosition: 42,
+                    realmRankTotal: 1200,
+                    isLeaderboardOptedIn: true,
                   ),
                 ],
               ),
@@ -673,7 +1237,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: StaggeredFadeSlide(
               delay: const Duration(milliseconds: 1650),
               child: _LanguagePicker(
-                accentColor: _campaign.accentColor,
+                accentColor: _accentColor,
               ),
             ),
           ),
@@ -747,6 +1311,92 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildSeasonalCampaignSlivers(AppLocalizations l10n) {
+    final campaigns = _activeSeasonalCampaigns;
+    if (campaigns.isEmpty) return const <Widget>[];
+
+    final slivers = <Widget>[];
+
+    for (final campaign in campaigns) {
+      final totalObj = _seasonalTotalObjectives(campaign);
+      final completedObj = _seasonalCompletedObjectiveCount(campaign);
+      final completedIds =
+          _seasonalCompletedObjectives[campaign.seasonId] ?? const <String>{};
+
+      // Banner
+      slivers.add(
+        SliverToBoxAdapter(
+          child: StaggeredFadeSlide(
+            delay: const Duration(milliseconds: 300),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: SeasonalCampaignBanner(
+                campaign: campaign,
+                completedObjectiveCount: completedObj,
+                totalObjectiveCount: totalObj,
+                isExpanded: _seasonalBannerExpanded,
+                onToggleExpand: () => setState(
+                  () => _seasonalBannerExpanded = !_seasonalBannerExpanded,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Expanded seasonal scrolls
+      if (_seasonalBannerExpanded) {
+        slivers.add(
+          SliverToBoxAdapter(
+            child: StaggeredFadeSlide(
+              delay: const Duration(milliseconds: 350),
+              child: SectionDivider(
+                title: l10n.profileSectionSeasonalQuests,
+                subtitle: l10n.profileSectionSeasonalQuestsSubtitle,
+              ),
+            ),
+          ),
+        );
+
+        slivers.add(
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final scroll = campaign.scrolls[index];
+                  final state = _seasonalScrollState(campaign, index);
+
+                  return StaggeredFadeSlide(
+                    delay: Duration(milliseconds: 400 + index * 100),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        bottom: index == campaign.scrolls.length - 1 ? 0 : 12,
+                      ),
+                      child: SeasonalCampaignCard(
+                        campaign: campaign,
+                        scroll: scroll,
+                        scrollState: state,
+                        completedObjectiveIds: completedIds,
+                        onToggleObjective: (obj) =>
+                            _toggleSeasonalObjective(campaign, scroll, obj),
+                        isExpanded: _expandedScrollIds.contains(scroll.id),
+                        onToggleExpand: () => _toggleScrollExpanded(scroll.id),
+                      ),
+                    ),
+                  );
+                },
+                childCount: campaign.scrolls.length,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    return slivers;
   }
 
   String _displayName(User user) {

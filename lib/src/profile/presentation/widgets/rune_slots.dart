@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/profile/models/ability_rune.dart';
+import 'package:swf_app/src/profile/models/skill_tree.dart';
+import 'package:swf_app/src/profile/presentation/widgets/skill_tree_view.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
-/// Displays a row of ability rune nodes — unlocked runes glow with the
-/// role accent, locked runes are dim outlines. Tapping a rune opens
-/// a bottom sheet with its details.
+/// Displays ability runes either as a skill tree visualization or as a
+/// flat row of rune nodes.
+///
+/// When [skillTree] is provided, renders [SkillTreeView] instead of the
+/// flat rune row. The flat row is kept as a fallback when [skillTree] is null.
 class RuneSlots extends StatelessWidget {
   const RuneSlots({
     super.key,
@@ -13,6 +17,8 @@ class RuneSlots extends StatelessWidget {
     required this.completedScrollIds,
     required this.accentColor,
     this.onRuneTapped,
+    this.skillTree,
+    this.onTierTapped,
   });
 
   final List<AbilityRune> runes;
@@ -22,8 +28,22 @@ class RuneSlots extends StatelessWidget {
   /// Called when an unlocked rune is tapped. The rune ID is passed.
   final ValueChanged<String>? onRuneTapped;
 
+  /// If non-null, show the skill tree view instead of the flat rune row.
+  final SkillTree? skillTree;
+
+  /// Called when a tier node is tapped in the skill tree.
+  final void Function(String branchId, String tierId)? onTierTapped;
+
   @override
   Widget build(BuildContext context) {
+    if (skillTree != null) {
+      return SkillTreeView(
+        skillTree: skillTree!,
+        accentColor: accentColor,
+        onTierTapped: onTierTapped,
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(

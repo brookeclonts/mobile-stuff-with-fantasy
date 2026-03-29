@@ -4,6 +4,7 @@ import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/reader/models/readable_book.dart';
 import 'package:swf_app/src/reader/presentation/reader_launcher.dart';
+import 'package:swf_app/src/oath/models/book_oath.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -28,6 +29,15 @@ class _BookDetailPageState extends State<BookDetailPage> {
   BookReadAccess? _readAccess;
   bool _readBusy = false;
   bool _saveBusy = false;
+  bool _oathLogBusy = false;
+
+  BookOath? get _activeOath => ServiceLocator.oathRepository.cachedOath;
+
+  bool get _isLoggedToOath {
+    final oath = _activeOath;
+    if (oath == null) return false;
+    return oath.entries.any((e) => e.bookId == _book.id);
+  }
 
   @override
   void initState() {
@@ -147,6 +157,45 @@ class _BookDetailPageState extends State<BookDetailPage> {
     setState(() => _readBusy = false);
   }
 
+  Future<void> _logToOath() async {
+    final oath = _activeOath;
+    if (oath == null || _oathLogBusy) return;
+
+    final l10n = AppLocalizations.of(context)!;
+
+    if (_isLoggedToOath) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.oathAlreadyLogged)),
+      );
+      return;
+    }
+
+    setState(() => _oathLogBusy = true);
+
+    final result = await ServiceLocator.oathRepository.logEntry(
+      oath.id,
+      bookId: _book.id,
+      bookTitle: _book.title,
+    );
+
+    if (!mounted) return;
+
+    result.when(
+      success: (_) {
+        setState(() => _oathLogBusy = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.oathEntryLogged)),
+        );
+      },
+      failure: (message, _) {
+        setState(() => _oathLogBusy = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      },
+    );
+  }
+
   void _showSignUpPrompt() {
     final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -239,6 +288,15 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     isLoading: _saveBusy,
                     onPressed: _toggleReadingList,
                   ),
+
+                  // Log toward Oath (only if user has an active, incomplete oath)
+                  if (_activeOath != null && !_activeOath!.isComplete && !_isLoggedToOath) ...[
+                    const SizedBox(height: 8),
+                    _OathLogButton(
+                      isLoading: _oathLogBusy,
+                      onPressed: _logToOath,
+                    ),
+                  ],
                   const SizedBox(height: 12),
 
                   // Action buttons
@@ -792,6 +850,42 @@ class _SimilarBookCard extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: colors,
         ),
+      ),
+    );
+  }
+}
+
+class _OathLogButton extends StatelessWidget {
+  const _OathLogButton({
+    required this.isLoading,
+    required this.onPressed,
+  });
+
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: isLoading ? null : onPressed,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: SwfColors.secondaryAccent,
+          side: BorderSide(color: SwfColors.secondaryAccent.withAlpha(100)),
+        ),
+        icon: isLoading
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: SwfColors.secondaryAccent,
+                ),
+              )
+            : const Icon(Icons.auto_stories_rounded, size: 18),
+        label: Text(l10n.oathLogBookAction),
       ),
     );
   }

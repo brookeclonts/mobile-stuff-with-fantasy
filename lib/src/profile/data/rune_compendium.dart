@@ -16,6 +16,7 @@ const _readerRunes = <AbilityRune>[
         'Mark yourself as open to Advanced Reader Copies. Authors and publishers can find you when they need early readers.',
     icon: Icons.shield_rounded,
     unlocksAfterScrollId: 'reader-taste',
+    unlocksAtTierId: 'epic-t2',
   ),
   AbilityRune(
     id: 'reader-genre-attunement',
@@ -24,6 +25,7 @@ const _readerRunes = <AbilityRune>[
         'Set the genres and tropes that pull you in. The realm learns what to surface for you.',
     icon: Icons.auto_awesome_rounded,
     unlocksAfterScrollId: 'reader-taste',
+    unlocksAtTierId: 'romantasy-t1',
   ),
   AbilityRune(
     id: 'reader-event-watchtower',
@@ -32,6 +34,7 @@ const _readerRunes = <AbilityRune>[
         'Receive push notifications when events, drops, and new campaigns launch in the realm.',
     icon: Icons.notifications_active_rounded,
     unlocksAfterScrollId: 'reader-hunt',
+    unlocksAtTierId: 'dark-t2',
   ),
 ];
 

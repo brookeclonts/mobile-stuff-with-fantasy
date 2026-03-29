@@ -2003,6 +2003,708 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start reading 10 different books.'**
   String get achievementRealmWalkerDesc;
+
+  /// No description provided for @oathAppBarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Oath Stone'**
+  String get oathAppBarTitle;
+
+  /// No description provided for @oathSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Oath Stone'**
+  String get oathSectionTitle;
+
+  /// No description provided for @oathSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sworn reading pledge'**
+  String get oathSectionSubtitle;
+
+  /// No description provided for @oathSwearCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Swear an Oath'**
+  String get oathSwearCta;
+
+  /// No description provided for @oathSwearSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a public reading goal and track your progress'**
+  String get oathSwearSubtitle;
+
+  /// No description provided for @oathSwearPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Inscribe Your Oath'**
+  String get oathSwearPageTitle;
+
+  /// No description provided for @oathFieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your pledge'**
+  String get oathFieldTitle;
+
+  /// No description provided for @oathFieldTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'I will read 24 books in 2026'**
+  String get oathFieldTitleHint;
+
+  /// No description provided for @oathFieldTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Target books'**
+  String get oathFieldTarget;
+
+  /// No description provided for @oathFieldYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get oathFieldYear;
+
+  /// No description provided for @oathFieldPublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Public oath'**
+  String get oathFieldPublic;
+
+  /// No description provided for @oathFieldPublicSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible on the Lore Board'**
+  String get oathFieldPublicSubtitle;
+
+  /// No description provided for @oathSwearButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Swear This Oath'**
+  String get oathSwearButton;
+
+  /// No description provided for @oathSwearing.
+  ///
+  /// In en, this message translates to:
+  /// **'Inscribing...'**
+  String get oathSwearing;
+
+  /// No description provided for @oathProgressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} of {target}'**
+  String oathProgressLabel(int current, int target);
+
+  /// No description provided for @oathProgressComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Oath Fulfilled!'**
+  String get oathProgressComplete;
+
+  /// No description provided for @oathEntryLogged.
+  ///
+  /// In en, this message translates to:
+  /// **'Rune carved!'**
+  String get oathEntryLogged;
+
+  /// No description provided for @oathEntryRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry removed'**
+  String get oathEntryRemoved;
+
+  /// No description provided for @oathDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Break This Oath?'**
+  String get oathDeleteConfirmTitle;
+
+  /// No description provided for @oathDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently remove your oath and all logged entries.'**
+  String get oathDeleteConfirmBody;
+
+  /// No description provided for @oathDeleteCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep Oath'**
+  String get oathDeleteCancel;
+
+  /// No description provided for @oathDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Break Oath'**
+  String get oathDeleteConfirm;
+
+  /// No description provided for @oathDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Oath broken'**
+  String get oathDeleted;
+
+  /// No description provided for @oathCompleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'OATH FULFILLED'**
+  String get oathCompleteTitle;
+
+  /// No description provided for @oathCompleteHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Oath is Sealed'**
+  String get oathCompleteHeadline;
+
+  /// No description provided for @oathCompleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You have honored your pledge. The runes are complete.'**
+  String get oathCompleteBody;
+
+  /// No description provided for @oathCompleteContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get oathCompleteContinue;
+
+  /// No description provided for @oathEmptyEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'No books logged yet'**
+  String get oathEmptyEntries;
+
+  /// No description provided for @oathLogBookAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Log toward Oath'**
+  String get oathLogBookAction;
+
+  /// No description provided for @oathLogBookConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Log \"{title}\" toward your oath?'**
+  String oathLogBookConfirm(String title);
+
+  /// No description provided for @oathLogBookButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Log It'**
+  String get oathLogBookButton;
+
+  /// No description provided for @oathAlreadyLogged.
+  ///
+  /// In en, this message translates to:
+  /// **'Already logged toward your oath'**
+  String get oathAlreadyLogged;
+
+  /// No description provided for @oathEditButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Oath'**
+  String get oathEditButton;
+
+  /// No description provided for @oathUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Oath updated'**
+  String get oathUpdated;
+
+  /// No description provided for @oathErrorCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create oath'**
+  String get oathErrorCreate;
+
+  /// No description provided for @oathErrorLoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load oath'**
+  String get oathErrorLoad;
+
+  /// No description provided for @oathGuestHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'The Oath Stone Awaits'**
+  String get oathGuestHeadline;
+
+  /// No description provided for @oathGuestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account to swear a reading oath and track your progress.'**
+  String get oathGuestBody;
+
+  /// No description provided for @seasonalCampaignLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Seasonal Campaign'**
+  String get seasonalCampaignLabel;
+
+  /// No description provided for @seasonalCampaignExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expedition ended'**
+  String get seasonalCampaignExpired;
+
+  /// No description provided for @seasonalCampaignLastDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Last day!'**
+  String get seasonalCampaignLastDay;
+
+  /// No description provided for @seasonalCampaignCountdownDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{1 day remaining} other{{days} days remaining}}'**
+  String seasonalCampaignCountdownDays(int days);
+
+  /// No description provided for @seasonalCampaignCountdownMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'{months, plural, =1{1 month remaining} other{{months} months remaining}}'**
+  String seasonalCampaignCountdownMonths(int months);
+
+  /// No description provided for @seasonalCampaignCountdownMonthsDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{months, plural, =1{1 month} other{{months} months}}, {days, plural, =1{1 day remaining} other{{days} days remaining}}'**
+  String seasonalCampaignCountdownMonthsDays(int months, int days);
+
+  /// No description provided for @seasonalRelicSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Seasonal Relics'**
+  String get seasonalRelicSectionTitle;
+
+  /// No description provided for @profileSectionSeasonalQuests.
+  ///
+  /// In en, this message translates to:
+  /// **'Seasonal Quests'**
+  String get profileSectionSeasonalQuests;
+
+  /// No description provided for @profileSectionSeasonalQuestsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time-limited expeditions with exclusive relics.'**
+  String get profileSectionSeasonalQuestsSubtitle;
+
+  /// No description provided for @realmRankingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Realm Rankings'**
+  String get realmRankingsTitle;
+
+  /// No description provided for @leaderboardMetricQuests.
+  ///
+  /// In en, this message translates to:
+  /// **'Quests'**
+  String get leaderboardMetricQuests;
+
+  /// No description provided for @leaderboardMetricBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Books'**
+  String get leaderboardMetricBooks;
+
+  /// No description provided for @leaderboardMetricRelics.
+  ///
+  /// In en, this message translates to:
+  /// **'Relics'**
+  String get leaderboardMetricRelics;
+
+  /// No description provided for @leaderboardTotalParticipants.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 adventurer ranked} other{{count} adventurers ranked}}'**
+  String leaderboardTotalParticipants(int count);
+
+  /// No description provided for @leaderboardYourPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR POSITION'**
+  String get leaderboardYourPosition;
+
+  /// No description provided for @leaderboardPositionOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'#{position} of {total}'**
+  String leaderboardPositionOfTotal(int position, int total);
+
+  /// No description provided for @leaderboardErrorHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'The rankings failed to load'**
+  String get leaderboardErrorHeadline;
+
+  /// No description provided for @leaderboardOptInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Realm Rankings'**
+  String get leaderboardOptInTitle;
+
+  /// No description provided for @leaderboardOptInDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Compete with fellow adventurers by joining the realm leaderboard. Your ranking is based on quests sealed, books read, and relics collected.'**
+  String get leaderboardOptInDescription;
+
+  /// No description provided for @leaderboardOptInPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Only your display name and rank are visible to others.'**
+  String get leaderboardOptInPrivacy;
+
+  /// No description provided for @leaderboardOptInActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Ranked in the realm'**
+  String get leaderboardOptInActive;
+
+  /// No description provided for @leaderboardOptInInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Not ranked'**
+  String get leaderboardOptInInactive;
+
+  /// No description provided for @leaderboardOptInJoinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the Rankings'**
+  String get leaderboardOptInJoinButton;
+
+  /// No description provided for @leaderboardOptInLeaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave the Rankings'**
+  String get leaderboardOptInLeaveButton;
+
+  /// No description provided for @characterSheetStatRealmRank.
+  ///
+  /// In en, this message translates to:
+  /// **'Realm'**
+  String get characterSheetStatRealmRank;
+
+  /// No description provided for @characterSheetRealmRankJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Rankings'**
+  String get characterSheetRealmRankJoin;
+
+  /// No description provided for @skillTreeSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Skill Tree'**
+  String get skillTreeSectionTitle;
+
+  /// No description provided for @skillTreeSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Grow your genre mastery through reading.'**
+  String get skillTreeSectionSubtitle;
+
+  /// No description provided for @skillTreeXpProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} / {next} XP'**
+  String skillTreeXpProgress(int current, int next);
+
+  /// No description provided for @skillTreeXpLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{xp} XP'**
+  String skillTreeXpLabel(int xp);
+
+  /// No description provided for @skillTreeTiersLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiers'**
+  String get skillTreeTiersLabel;
+
+  /// No description provided for @skillTreeTierUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'UNLOCKED'**
+  String get skillTreeTierUnlocked;
+
+  /// No description provided for @skillTreeTierCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'IN PROGRESS'**
+  String get skillTreeTierCurrent;
+
+  /// No description provided for @skillTreeTierLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'LOCKED'**
+  String get skillTreeTierLocked;
+
+  /// No description provided for @skillTreeRuneUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Rune Unlocked: {runeTitle}'**
+  String skillTreeRuneUnlocked(String runeTitle);
+
+  /// No description provided for @skillTreeRuneLockedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocks: {runeTitle}'**
+  String skillTreeRuneLockedAt(String runeTitle);
+
+  /// No description provided for @loreBoardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lore Board'**
+  String get loreBoardTitle;
+
+  /// No description provided for @loreBoardGlobalTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Global'**
+  String get loreBoardGlobalTab;
+
+  /// No description provided for @loreBoardFriendsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get loreBoardFriendsTab;
+
+  /// No description provided for @loreBoardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'The board is bare... no tales have been posted yet.'**
+  String get loreBoardEmpty;
+
+  /// No description provided for @loreBoardTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Lore Board'**
+  String get loreBoardTooltip;
+
+  /// No description provided for @guildHubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Guild Hall'**
+  String get guildHubTitle;
+
+  /// No description provided for @guildHubEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t joined any guilds yet. Found your own or discover existing ones.'**
+  String get guildHubEmpty;
+
+  /// No description provided for @guildCreateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Found a New Guild'**
+  String get guildCreateButton;
+
+  /// No description provided for @guildDiscoverButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover Guilds'**
+  String get guildDiscoverButton;
+
+  /// No description provided for @guildDetailCompanions.
+  ///
+  /// In en, this message translates to:
+  /// **'Companions'**
+  String get guildDetailCompanions;
+
+  /// No description provided for @guildDetailLedger.
+  ///
+  /// In en, this message translates to:
+  /// **'Party Ledger'**
+  String get guildDetailLedger;
+
+  /// No description provided for @guildDetailLedgerEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No books in the ledger yet.'**
+  String get guildDetailLedgerEmpty;
+
+  /// No description provided for @guildJoinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Guild'**
+  String get guildJoinButton;
+
+  /// No description provided for @guildJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'You have joined the guild!'**
+  String get guildJoined;
+
+  /// No description provided for @guildLeaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Guild'**
+  String get guildLeaveButton;
+
+  /// No description provided for @guildLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'You have left the guild.'**
+  String get guildLeft;
+
+  /// No description provided for @guildDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Disband This Guild?'**
+  String get guildDeleteConfirmTitle;
+
+  /// No description provided for @guildDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently remove the guild and all its data. This cannot be undone.'**
+  String get guildDeleteConfirmBody;
+
+  /// No description provided for @guildDeleteCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep Guild'**
+  String get guildDeleteCancel;
+
+  /// No description provided for @guildDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Disband Guild'**
+  String get guildDeleteConfirm;
+
+  /// No description provided for @guildDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Guild disbanded'**
+  String get guildDeleted;
+
+  /// No description provided for @guildCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Guild founded!'**
+  String get guildCreated;
+
+  /// No description provided for @guildUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Guild updated'**
+  String get guildUpdated;
+
+  /// No description provided for @guildCreatePageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Found a Guild'**
+  String get guildCreatePageTitle;
+
+  /// No description provided for @guildFieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Guild Name'**
+  String get guildFieldName;
+
+  /// No description provided for @guildFieldNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The Fellowship of Pages'**
+  String get guildFieldNameHint;
+
+  /// No description provided for @guildFieldDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get guildFieldDescription;
+
+  /// No description provided for @guildFieldDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What is your guild about?'**
+  String get guildFieldDescriptionHint;
+
+  /// No description provided for @guildFieldPublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Public guild'**
+  String get guildFieldPublic;
+
+  /// No description provided for @guildFieldPublicSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible on the Guild Board for anyone to join'**
+  String get guildFieldPublicSubtitle;
+
+  /// No description provided for @guildCreateSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Found This Guild'**
+  String get guildCreateSubmit;
+
+  /// No description provided for @guildCreating.
+  ///
+  /// In en, this message translates to:
+  /// **'Founding...'**
+  String get guildCreating;
+
+  /// No description provided for @guildDiscoverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Guild Board'**
+  String get guildDiscoverTitle;
+
+  /// No description provided for @guildDiscoverEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No guilds to discover yet.'**
+  String get guildDiscoverEmpty;
+
+  /// No description provided for @guildMemberCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 companion} other{{count} companions}}'**
+  String guildMemberCountLabel(int count);
+
+  /// No description provided for @guildRoleGuildmaster.
+  ///
+  /// In en, this message translates to:
+  /// **'Guildmaster'**
+  String get guildRoleGuildmaster;
+
+  /// No description provided for @guildRoleCompanion.
+  ///
+  /// In en, this message translates to:
+  /// **'Companion'**
+  String get guildRoleCompanion;
+
+  /// No description provided for @guildGuestHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'The Guild Hall Awaits'**
+  String get guildGuestHeadline;
+
+  /// No description provided for @guildGuestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account to found guilds, join reading parties, and build ledgers with fellow adventurers.'**
+  String get guildGuestBody;
+
+  /// No description provided for @guildAddToLedger.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Ledger'**
+  String get guildAddToLedger;
+
+  /// No description provided for @guildBookAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Book added to the ledger!'**
+  String get guildBookAdded;
+
+  /// No description provided for @guildBookRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Book removed from the ledger.'**
+  String get guildBookRemoved;
+
+  /// No description provided for @guildAlreadyMember.
+  ///
+  /// In en, this message translates to:
+  /// **'You are already a member of this guild.'**
+  String get guildAlreadyMember;
 }
 
 class _AppLocalizationsDelegate

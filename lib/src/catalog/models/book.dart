@@ -24,6 +24,25 @@ class Book {
     this.favoritedBy = const [],
   });
 
+  /// Create a minimal Book with just display info (for use in review editing).
+  factory Book.minimal({
+    required String id,
+    required String title,
+    required String authorName,
+    required String imageUrl,
+  }) {
+    return Book(
+      id: id,
+      title: title,
+      authorName: authorName,
+      imageUrl: imageUrl,
+      subgenres: const [],
+      tropes: const [],
+      spiceLevel: SpiceLevel.none,
+      ageCategory: '',
+    );
+  }
+
   /// Parse a book from the catalog list response.
   ///
   /// Taxonomy fields come as raw ObjectId strings from `/api/filter/books/all`.

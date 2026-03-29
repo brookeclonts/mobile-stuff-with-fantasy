@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/profile/models/quest_campaign.dart';
+import 'package:swf_app/src/profile/models/sigil_config.dart';
+import 'package:swf_app/src/profile/presentation/widgets/sigil_avatar.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
 /// The hero map showing the user's rank progression as a journey path.
@@ -21,6 +23,9 @@ class RealmMap extends StatelessWidget {
     this.activeScrollTitle,
     this.activeScrollObjectivesDone = 0,
     this.activeScrollObjectivesTotal = 0,
+    this.customTitle,
+    this.sigilConfig,
+    this.onSigilTapped,
   });
 
   final QuestCampaign campaign;
@@ -32,6 +37,15 @@ class RealmMap extends StatelessWidget {
   final String? activeScrollTitle;
   final int activeScrollObjectivesDone;
   final int activeScrollObjectivesTotal;
+
+  /// Optional custom title to display below the rank (e.g. "Keeper of Cozy Fantasy").
+  final String? customTitle;
+
+  /// The user's sigil config, or `null` for initials fallback.
+  final SigilConfig? sigilConfig;
+
+  /// Called when the user taps the sigil avatar to open the builder.
+  final VoidCallback? onSigilTapped;
 
   static const _parchment = Color(0xFFF4F0E8);
   static const _parchmentDark = Color(0xFFE8E0D4);
@@ -71,6 +85,9 @@ class RealmMap extends StatelessWidget {
             rankTitle: rankTitle,
             accentColor: campaign.accentColor,
             roleIcon: _roleIcon(campaign.role),
+            customTitle: customTitle,
+            sigilConfig: sigilConfig,
+            onSigilTapped: onSigilTapped,
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
@@ -433,12 +450,18 @@ class _UserBanner extends StatelessWidget {
     required this.rankTitle,
     required this.accentColor,
     required this.roleIcon,
+    this.customTitle,
+    this.sigilConfig,
+    this.onSigilTapped,
   });
 
   final String userName;
   final String rankTitle;
   final Color accentColor;
   final IconData roleIcon;
+  final String? customTitle;
+  final SigilConfig? sigilConfig;
+  final VoidCallback? onSigilTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -455,26 +478,14 @@ class _UserBanner extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
       child: Row(
         children: [
-          // Guild emblem
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: accentColor.withAlpha(20),
-              border: Border.all(
-                color: accentColor.withAlpha(80),
-                width: 1.5,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                initials.isEmpty ? '?' : initials,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: accentColor,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+          // Guild emblem — sigil or initials fallback
+          GestureDetector(
+            onTap: onSigilTapped,
+            child: SigilAvatar(
+              config: sigilConfig,
+              accentColor: accentColor,
+              size: 48,
+              initials: initials.isEmpty ? '?' : initials,
             ),
           ),
           const SizedBox(width: 14),
@@ -502,6 +513,16 @@ class _UserBanner extends StatelessWidget {
                     ),
                   ],
                 ),
+                if (customTitle != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    customTitle!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: RealmMap._inkFaded,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

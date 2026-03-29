@@ -93,6 +93,23 @@ class ApiClient {
     );
   }
 
+  /// PATCH request with a JSON body.
+  Future<ApiResult<T>> patch<T>(
+    String path, {
+    required T Function(Object json) fromJson,
+    Object? body,
+    Map<String, String>? headers,
+  }) async {
+    return _request(
+      () => _http.patch(
+        _buildUri(path),
+        headers: {..._defaultHeaders, ...?headers},
+        body: body != null ? jsonEncode(body) : null,
+      ),
+      fromJson: fromJson,
+    );
+  }
+
   /// DELETE request.
   Future<ApiResult<T>> delete<T>(
     String path, {

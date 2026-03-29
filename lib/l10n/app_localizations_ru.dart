@@ -1037,4 +1037,428 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get achievementRealmWalkerDesc => 'Start reading 10 different books.';
+
+  @override
+  String get oathAppBarTitle => 'Oath Stone';
+
+  @override
+  String get oathSectionTitle => 'Oath Stone';
+
+  @override
+  String get oathSectionSubtitle => 'Your sworn reading pledge';
+
+  @override
+  String get oathSwearCta => 'Swear an Oath';
+
+  @override
+  String get oathSwearSubtitle =>
+      'Set a public reading goal and track your progress';
+
+  @override
+  String get oathSwearPageTitle => 'Inscribe Your Oath';
+
+  @override
+  String get oathFieldTitle => 'Your pledge';
+
+  @override
+  String get oathFieldTitleHint => 'I will read 24 books in 2026';
+
+  @override
+  String get oathFieldTarget => 'Target books';
+
+  @override
+  String get oathFieldYear => 'Year';
+
+  @override
+  String get oathFieldPublic => 'Public oath';
+
+  @override
+  String get oathFieldPublicSubtitle => 'Visible on the Lore Board';
+
+  @override
+  String get oathSwearButton => 'Swear This Oath';
+
+  @override
+  String get oathSwearing => 'Inscribing...';
+
+  @override
+  String oathProgressLabel(int current, int target) {
+    return '$current of $target';
+  }
+
+  @override
+  String get oathProgressComplete => 'Oath Fulfilled!';
+
+  @override
+  String get oathEntryLogged => 'Rune carved!';
+
+  @override
+  String get oathEntryRemoved => 'Entry removed';
+
+  @override
+  String get oathDeleteConfirmTitle => 'Break This Oath?';
+
+  @override
+  String get oathDeleteConfirmBody =>
+      'This will permanently remove your oath and all logged entries.';
+
+  @override
+  String get oathDeleteCancel => 'Keep Oath';
+
+  @override
+  String get oathDeleteConfirm => 'Break Oath';
+
+  @override
+  String get oathDeleted => 'Oath broken';
+
+  @override
+  String get oathCompleteTitle => 'OATH FULFILLED';
+
+  @override
+  String get oathCompleteHeadline => 'Your Oath is Sealed';
+
+  @override
+  String get oathCompleteBody =>
+      'You have honored your pledge. The runes are complete.';
+
+  @override
+  String get oathCompleteContinue => 'Continue';
+
+  @override
+  String get oathEmptyEntries => 'No books logged yet';
+
+  @override
+  String get oathLogBookAction => 'Log toward Oath';
+
+  @override
+  String oathLogBookConfirm(String title) {
+    return 'Log \"$title\" toward your oath?';
+  }
+
+  @override
+  String get oathLogBookButton => 'Log It';
+
+  @override
+  String get oathAlreadyLogged => 'Already logged toward your oath';
+
+  @override
+  String get oathEditButton => 'Edit Oath';
+
+  @override
+  String get oathUpdated => 'Oath updated';
+
+  @override
+  String get oathErrorCreate => 'Failed to create oath';
+
+  @override
+  String get oathErrorLoad => 'Failed to load oath';
+
+  @override
+  String get oathGuestHeadline => 'The Oath Stone Awaits';
+
+  @override
+  String get oathGuestBody =>
+      'Create an account to swear a reading oath and track your progress.';
+
+  @override
+  String get seasonalCampaignLabel => 'Seasonal Campaign';
+
+  @override
+  String get seasonalCampaignExpired => 'Expedition ended';
+
+  @override
+  String get seasonalCampaignLastDay => 'Last day!';
+
+  @override
+  String seasonalCampaignCountdownDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days remaining',
+      one: '1 day remaining',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String seasonalCampaignCountdownMonths(int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months months remaining',
+      one: '1 month remaining',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String seasonalCampaignCountdownMonthsDays(int months, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months months',
+      one: '1 month',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days remaining',
+      one: '1 day remaining',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get seasonalRelicSectionTitle => 'Seasonal Relics';
+
+  @override
+  String get profileSectionSeasonalQuests => 'Seasonal Quests';
+
+  @override
+  String get profileSectionSeasonalQuestsSubtitle =>
+      'Time-limited expeditions with exclusive relics.';
+
+  @override
+  String get realmRankingsTitle => 'Realm Rankings';
+
+  @override
+  String get leaderboardMetricQuests => 'Quests';
+
+  @override
+  String get leaderboardMetricBooks => 'Books';
+
+  @override
+  String get leaderboardMetricRelics => 'Relics';
+
+  @override
+  String leaderboardTotalParticipants(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count adventurers ranked',
+      one: '1 adventurer ranked',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get leaderboardYourPosition => 'YOUR POSITION';
+
+  @override
+  String leaderboardPositionOfTotal(int position, int total) {
+    return '#$position of $total';
+  }
+
+  @override
+  String get leaderboardErrorHeadline => 'The rankings failed to load';
+
+  @override
+  String get leaderboardOptInTitle => 'Realm Rankings';
+
+  @override
+  String get leaderboardOptInDescription =>
+      'Compete with fellow adventurers by joining the realm leaderboard. Your ranking is based on quests sealed, books read, and relics collected.';
+
+  @override
+  String get leaderboardOptInPrivacy =>
+      'Only your display name and rank are visible to others.';
+
+  @override
+  String get leaderboardOptInActive => 'Ranked in the realm';
+
+  @override
+  String get leaderboardOptInInactive => 'Not ranked';
+
+  @override
+  String get leaderboardOptInJoinButton => 'Join the Rankings';
+
+  @override
+  String get leaderboardOptInLeaveButton => 'Leave the Rankings';
+
+  @override
+  String get characterSheetStatRealmRank => 'Realm';
+
+  @override
+  String get characterSheetRealmRankJoin => 'Join Rankings';
+
+  @override
+  String get skillTreeSectionTitle => 'Skill Tree';
+
+  @override
+  String get skillTreeSectionSubtitle =>
+      'Grow your genre mastery through reading.';
+
+  @override
+  String skillTreeXpProgress(int current, int next) {
+    return '$current / $next XP';
+  }
+
+  @override
+  String skillTreeXpLabel(int xp) {
+    return '$xp XP';
+  }
+
+  @override
+  String get skillTreeTiersLabel => 'Tiers';
+
+  @override
+  String get skillTreeTierUnlocked => 'UNLOCKED';
+
+  @override
+  String get skillTreeTierCurrent => 'IN PROGRESS';
+
+  @override
+  String get skillTreeTierLocked => 'LOCKED';
+
+  @override
+  String skillTreeRuneUnlocked(String runeTitle) {
+    return 'Rune Unlocked: $runeTitle';
+  }
+
+  @override
+  String skillTreeRuneLockedAt(String runeTitle) {
+    return 'Unlocks: $runeTitle';
+  }
+
+  @override
+  String get loreBoardTitle => 'Lore Board';
+
+  @override
+  String get loreBoardGlobalTab => 'Global';
+
+  @override
+  String get loreBoardFriendsTab => 'Friends';
+
+  @override
+  String get loreBoardEmpty =>
+      'The board is bare... no tales have been posted yet.';
+
+  @override
+  String get loreBoardTooltip => 'Lore Board';
+
+  @override
+  String get guildHubTitle => 'Guild Hall';
+
+  @override
+  String get guildHubEmpty =>
+      'You haven\'t joined any guilds yet. Found your own or discover existing ones.';
+
+  @override
+  String get guildCreateButton => 'Found a New Guild';
+
+  @override
+  String get guildDiscoverButton => 'Discover Guilds';
+
+  @override
+  String get guildDetailCompanions => 'Companions';
+
+  @override
+  String get guildDetailLedger => 'Party Ledger';
+
+  @override
+  String get guildDetailLedgerEmpty => 'No books in the ledger yet.';
+
+  @override
+  String get guildJoinButton => 'Join Guild';
+
+  @override
+  String get guildJoined => 'You have joined the guild!';
+
+  @override
+  String get guildLeaveButton => 'Leave Guild';
+
+  @override
+  String get guildLeft => 'You have left the guild.';
+
+  @override
+  String get guildDeleteConfirmTitle => 'Disband This Guild?';
+
+  @override
+  String get guildDeleteConfirmBody =>
+      'This will permanently remove the guild and all its data. This cannot be undone.';
+
+  @override
+  String get guildDeleteCancel => 'Keep Guild';
+
+  @override
+  String get guildDeleteConfirm => 'Disband Guild';
+
+  @override
+  String get guildDeleted => 'Guild disbanded';
+
+  @override
+  String get guildCreated => 'Guild founded!';
+
+  @override
+  String get guildUpdated => 'Guild updated';
+
+  @override
+  String get guildCreatePageTitle => 'Found a Guild';
+
+  @override
+  String get guildFieldName => 'Guild Name';
+
+  @override
+  String get guildFieldNameHint => 'The Fellowship of Pages';
+
+  @override
+  String get guildFieldDescription => 'Description';
+
+  @override
+  String get guildFieldDescriptionHint => 'What is your guild about?';
+
+  @override
+  String get guildFieldPublic => 'Public guild';
+
+  @override
+  String get guildFieldPublicSubtitle =>
+      'Visible on the Guild Board for anyone to join';
+
+  @override
+  String get guildCreateSubmit => 'Found This Guild';
+
+  @override
+  String get guildCreating => 'Founding...';
+
+  @override
+  String get guildDiscoverTitle => 'Guild Board';
+
+  @override
+  String get guildDiscoverEmpty => 'No guilds to discover yet.';
+
+  @override
+  String guildMemberCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count companions',
+      one: '1 companion',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get guildRoleGuildmaster => 'Guildmaster';
+
+  @override
+  String get guildRoleCompanion => 'Companion';
+
+  @override
+  String get guildGuestHeadline => 'The Guild Hall Awaits';
+
+  @override
+  String get guildGuestBody =>
+      'Create an account to found guilds, join reading parties, and build ledgers with fellow adventurers.';
+
+  @override
+  String get guildAddToLedger => 'Add to Ledger';
+
+  @override
+  String get guildBookAdded => 'Book added to the ledger!';
+
+  @override
+  String get guildBookRemoved => 'Book removed from the ledger.';
+
+  @override
+  String get guildAlreadyMember => 'You are already a member of this guild.';
 }

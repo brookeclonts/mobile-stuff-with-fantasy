@@ -12,6 +12,7 @@ class AbilityRune {
     required this.description,
     required this.icon,
     required this.unlocksAfterScrollId,
+    this.unlocksAtTierId,
   });
 
   final String id;
@@ -21,4 +22,7 @@ class AbilityRune {
 
   /// The quest scroll ID that must be completed to unlock this rune.
   final String unlocksAfterScrollId;
+
+  /// The skill tree tier ID where this rune is unlocked, if any.
+  final String? unlocksAtTierId;
 }
