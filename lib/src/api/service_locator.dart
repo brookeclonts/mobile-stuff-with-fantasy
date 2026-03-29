@@ -6,6 +6,7 @@ import 'package:swf_app/src/catalog/data/book_repository.dart';
 import 'package:swf_app/src/creators/data/creator_repository.dart';
 import 'package:swf_app/src/events/data/event_repository.dart';
 import 'package:swf_app/src/profile/data/profile_repository.dart';
+import 'package:swf_app/src/reader/data/reader_access_repository.dart';
 import 'package:swf_app/src/reader/data/reader_repository.dart';
 import 'package:swf_app/src/reader/data/reading_list_repository.dart';
 
@@ -24,6 +25,7 @@ abstract final class ServiceLocator {
   static late final CreatorRepository _creatorRepository;
   static late final EventRepository _eventRepository;
   static late final ProfileRepository _profileRepository;
+  static late final ReaderAccessRepository _readerAccessRepository;
   static late final ReaderRepository _readerRepository;
   static late final ReadingListRepository _readingListRepository;
 
@@ -34,6 +36,8 @@ abstract final class ServiceLocator {
   static SessionStore get sessionStore => _sessionStore;
   static AuthRepository get authRepository => _authRepository;
   static ProfileRepository get profileRepository => _profileRepository;
+  static ReaderAccessRepository get readerAccessRepository =>
+      _readerAccessRepository;
   static ReaderRepository get readerRepository => _readerRepository;
   static ReadingListRepository get readingListRepository =>
       _readingListRepository;
@@ -52,6 +56,7 @@ abstract final class ServiceLocator {
       sessionStore: _sessionStore,
     );
     _profileRepository = ProfileRepository(apiClient: _apiClient);
+    _readerAccessRepository = ReaderAccessRepository(apiClient: _apiClient);
     _readerRepository = ReaderRepository();
     _readingListRepository = ReadingListRepository(apiClient: _apiClient);
   }

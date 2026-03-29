@@ -17,6 +17,7 @@ class Book {
     this.languageLevel = LanguageLevel.clean,
     this.kindleUnlimited = false,
     this.hasAudiobook = false,
+    this.distribution,
     this.userId,
     this.favoritedBy = const [],
   });
@@ -35,7 +36,8 @@ class Book {
     String? resolve(Object? id) {
       final key = id is String ? id : '';
       if (key.isEmpty) return null;
-      return nameIndex[key] ?? (RegExp(r'^[0-9a-f]{24}$').hasMatch(key) ? null : key);
+      return nameIndex[key] ??
+          (RegExp(r'^[0-9a-f]{24}$').hasMatch(key) ? null : key);
     }
 
     List<String> resolveList(Object? raw) {
@@ -63,6 +65,7 @@ class Book {
       languageLevel: _parseLanguageLevel(json['languageLevel']),
       kindleUnlimited: json['kindleUnlimited'] as bool? ?? false,
       hasAudiobook: audiobookLink.isNotEmpty,
+      distribution: BookDistributionInfo.fromJson(json['distribution']),
       userId: json['user'] as String?,
       favoritedBy: (json['favoritedBy'] as List?)?.cast<String>() ?? const [],
     );
@@ -102,6 +105,7 @@ class Book {
       languageLevel: _parseLanguageLevel(json['languageLevel']),
       kindleUnlimited: json['kindleUnlimited'] as bool? ?? false,
       hasAudiobook: audiobookLink.isNotEmpty,
+      distribution: BookDistributionInfo.fromJson(json['distribution']),
       userId: _extractUserId(json['userId']),
       favoritedBy: (json['favoritedBy'] as List?)?.cast<String>() ?? const [],
     );
@@ -124,6 +128,7 @@ class Book {
   final LanguageLevel languageLevel;
   final bool kindleUnlimited;
   final bool hasAudiobook;
+  final BookDistributionInfo? distribution;
   final String? userId;
   final List<String> favoritedBy;
 
@@ -153,6 +158,33 @@ class Book {
   static String? _extractUserId(Object? raw) {
     if (raw is Map<String, Object?>) return raw['_id'] as String?;
     return raw as String?;
+  }
+}
+
+class BookDistributionInfo {
+  const BookDistributionInfo({
+    this.enabled = false,
+    this.price,
+    this.epubUrl = '',
+    this.pdfUrl = '',
+  });
+
+  final bool enabled;
+  final double? price;
+  final String epubUrl;
+  final String pdfUrl;
+
+  bool get hasEpub => epubUrl.isNotEmpty;
+  bool get hasPdf => pdfUrl.isNotEmpty;
+
+  factory BookDistributionInfo.fromJson(Object? json) {
+    if (json is! Map<String, Object?>) return const BookDistributionInfo();
+    return BookDistributionInfo(
+      enabled: json['enabled'] as bool? ?? false,
+      price: (json['price'] as num?)?.toDouble(),
+      epubUrl: json['epubUrl'] as String? ?? '',
+      pdfUrl: json['pdfUrl'] as String? ?? '',
+    );
   }
 }
 

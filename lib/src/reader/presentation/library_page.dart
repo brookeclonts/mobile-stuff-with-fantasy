@@ -4,79 +4,143 @@ import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/catalog/presentation/book_detail_page.dart';
 import 'package:swf_app/src/catalog/presentation/widgets/book_tile.dart';
+import 'package:swf_app/src/reader/data/reader_access_repository.dart';
 import 'package:swf_app/src/reader/data/reading_list_repository.dart';
+import 'package:swf_app/src/reader/models/readable_book.dart';
+import 'package:swf_app/src/reader/presentation/reader_launcher.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
-/// The user's saved books.
-class LibraryPage extends StatefulWidget {
-  const LibraryPage({super.key, this.repository});
+enum LibraryTab { myBooks, readingList }
 
+/// The user's saved and readable books.
+class LibraryPage extends StatefulWidget {
+  const LibraryPage({
+    super.key,
+    this.initialTab = LibraryTab.myBooks,
+    this.repository,
+    this.readerAccessRepository,
+  });
+
+  final LibraryTab initialTab;
   final ReadingListRepository? repository;
+  final ReaderAccessRepository? readerAccessRepository;
 
   @override
   State<LibraryPage> createState() => _LibraryPageState();
 }
 
 class _LibraryPageState extends State<LibraryPage> {
-  late final ReadingListRepository _repo;
-  List<Book> _books = [];
-  bool _isLoading = true;
-  String? _error;
+  late final ReadingListRepository _readingListRepo;
+  late final ReaderAccessRepository _readerAccessRepo;
+
+  List<Book> _readingListBooks = [];
+  List<ReadableBook> _myBooks = [];
+
+  bool _readingListLoading = true;
+  bool _myBooksLoading = true;
+
+  String? _readingListError;
+  String? _myBooksError;
 
   bool get _isAuthenticated => ServiceLocator.sessionStore.isAuthenticated;
 
   @override
   void initState() {
     super.initState();
-    _repo = widget.repository ?? ServiceLocator.readingListRepository;
+    _readingListRepo =
+        widget.repository ?? ServiceLocator.readingListRepository;
+    _readerAccessRepo =
+        widget.readerAccessRepository ?? ServiceLocator.readerAccessRepository;
     _loadReadingList(forceRefresh: true);
+    _loadMyBooks(forceRefresh: true);
   }
 
   Future<void> _loadReadingList({bool forceRefresh = false}) async {
     if (!_isAuthenticated) {
       if (!mounted) return;
       setState(() {
-        _books = const [];
-        _isLoading = false;
-        _error = null;
+        _readingListBooks = const [];
+        _readingListLoading = false;
+        _readingListError = null;
       });
       return;
     }
 
     setState(() {
-      _isLoading = true;
-      _error = null;
+      _readingListLoading = true;
+      _readingListError = null;
     });
 
-    final result = await _repo.fetchReadingList(forceRefresh: forceRefresh);
+    final result = await _readingListRepo.fetchReadingList(
+      forceRefresh: forceRefresh,
+    );
     if (!mounted) return;
 
     result.when(
       success: (books) {
         setState(() {
-          _books = books;
-          _isLoading = false;
-          _error = null;
+          _readingListBooks = books;
+          _readingListLoading = false;
+          _readingListError = null;
         });
       },
       failure: (message, _) {
         setState(() {
-          _books = const [];
-          _isLoading = false;
-          _error = message;
+          _readingListBooks = const [];
+          _readingListLoading = false;
+          _readingListError = message;
+        });
+      },
+    );
+  }
+
+  Future<void> _loadMyBooks({bool forceRefresh = false}) async {
+    if (!_isAuthenticated) {
+      if (!mounted) return;
+      setState(() {
+        _myBooks = const [];
+        _myBooksLoading = false;
+        _myBooksError = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _myBooksLoading = true;
+      _myBooksError = null;
+    });
+
+    final result = await _readerAccessRepo.fetchMyBooks(
+      forceRefresh: forceRefresh,
+    );
+    if (!mounted) return;
+
+    result.when(
+      success: (books) {
+        setState(() {
+          _myBooks = books;
+          _myBooksLoading = false;
+          _myBooksError = null;
+        });
+      },
+      failure: (message, _) {
+        setState(() {
+          _myBooks = const [];
+          _myBooksLoading = false;
+          _myBooksError = message;
         });
       },
     );
   }
 
   Future<void> _removeFromReadingList(Book book) async {
-    final result = await _repo.remove(book.id);
+    final result = await _readingListRepo.remove(book.id);
     if (!mounted) return;
 
     result.when(
       success: (_) {
         setState(() {
-          _books = _repo.books;
+          _readingListBooks = _readingListRepo.books;
         });
       },
       failure: (message, _) {
@@ -87,116 +151,120 @@ class _LibraryPageState extends State<LibraryPage> {
     );
   }
 
-  Future<void> _openBook(Book book) async {
+  Future<void> _openReadingListBook(Book book) async {
     await Navigator.push<void>(
       context,
       MaterialPageRoute<void>(builder: (_) => BookDetailPage(book: book)),
     );
     if (!mounted) return;
-    await _loadReadingList(forceRefresh: true);
+    await Future.wait([
+      _loadReadingList(forceRefresh: true),
+      _loadMyBooks(forceRefresh: true),
+    ]);
+  }
+
+  Future<void> _openReadableBook(ReadableBook readableBook) async {
+    await openBookReader(context, book: readableBook.book);
+    if (!mounted) return;
+    await _loadMyBooks(forceRefresh: true);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Reading List',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 19,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-            letterSpacing: 0.5,
+    return DefaultTabController(
+      initialIndex: widget.initialTab.index,
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Library',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 19,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              letterSpacing: 0.5,
+            ),
+          ),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'My Books'),
+              Tab(text: 'Reading List'),
+            ],
           ),
         ),
-      ),
-      body: switch ((_isAuthenticated, _isLoading, _error, _books.isEmpty)) {
-        (_, true, _, _) => const Center(child: CircularProgressIndicator()),
-        (false, _, _, _) => _buildGuestState(theme),
-        (_, _, final String error, _) => _ErrorState(
-          message: error,
-          onRetry: () => _loadReadingList(forceRefresh: true),
-        ),
-        (_, _, _, true) => _buildEmptyState(theme),
-        _ => RefreshIndicator(
-          onRefresh: () => _loadReadingList(forceRefresh: true),
-          color: SwfColors.color4,
-          child: _buildGrid(),
-        ),
-      },
-    );
-  }
-
-  Widget _buildGuestState(ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.bookmarks_outlined,
-              size: 72,
-              color: theme.colorScheme.onSurfaceVariant.withAlpha(100),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              'Sign in to start a reading list',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Open your profile to create an account, then save books from the catalog.',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
+        body: TabBarView(
+          children: [_buildMyBooksTab(theme), _buildReadingListTab(theme)],
         ),
       ),
     );
   }
 
-  Widget _buildEmptyState(ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.menu_book_outlined,
-              size: 72,
-              color: theme.colorScheme.onSurfaceVariant.withAlpha(100),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              'Nothing saved yet',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Save books from the catalog to build your reading list.',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
+  Widget _buildMyBooksTab(ThemeData theme) {
+    return switch ((
+      _isAuthenticated,
+      _myBooksLoading,
+      _myBooksError,
+      _myBooks.isEmpty,
+    )) {
+      (_, true, _, _) => const Center(child: CircularProgressIndicator()),
+      (false, _, _, _) => _EmptyState(
+        icon: Icons.auto_stories_outlined,
+        title: 'Sign in to unlock My Books',
+        message:
+            'Books you buy, claim, or upload will appear here once they can be read in the app.',
       ),
-    );
+      (_, _, final String error, _) => _ErrorState(
+        message: error,
+        onRetry: () => _loadMyBooks(forceRefresh: true),
+      ),
+      (_, _, _, true) => _EmptyState(
+        icon: Icons.library_books_outlined,
+        title: 'No readable books yet',
+        message:
+            'Books you buy, claim, or upload will show up here when they are ready to read.',
+      ),
+      _ => RefreshIndicator(
+        onRefresh: () => _loadMyBooks(forceRefresh: true),
+        color: SwfColors.color4,
+        child: _buildMyBooksGrid(),
+      ),
+    };
   }
 
-  Widget _buildGrid() {
+  Widget _buildReadingListTab(ThemeData theme) {
+    return switch ((
+      _isAuthenticated,
+      _readingListLoading,
+      _readingListError,
+      _readingListBooks.isEmpty,
+    )) {
+      (_, true, _, _) => const Center(child: CircularProgressIndicator()),
+      (false, _, _, _) => _EmptyState(
+        icon: Icons.bookmarks_outlined,
+        title: 'Sign in to start a reading list',
+        message:
+            'Open your profile to create an account, then save books from the catalog.',
+      ),
+      (_, _, final String error, _) => _ErrorState(
+        message: error,
+        onRetry: () => _loadReadingList(forceRefresh: true),
+      ),
+      (_, _, _, true) => _EmptyState(
+        icon: Icons.menu_book_outlined,
+        title: 'Nothing saved yet',
+        message: 'Save books from the catalog to build your reading list.',
+      ),
+      _ => RefreshIndicator(
+        onRefresh: () => _loadReadingList(forceRefresh: true),
+        color: SwfColors.color4,
+        child: _buildReadingListGrid(),
+      ),
+    };
+  }
+
+  Widget _buildMyBooksGrid() {
     return LayoutBuilder(
       builder: (context, constraints) {
         final crossAxisCount = switch (constraints.maxWidth) {
@@ -214,18 +282,140 @@ class _LibraryPageState extends State<LibraryPage> {
             crossAxisSpacing: 12,
             childAspectRatio: 0.48,
           ),
-          itemCount: _books.length,
+          itemCount: _myBooks.length,
           itemBuilder: (context, index) {
-            final book = _books[index];
-            return BookTile(
-              book: book,
-              isSaved: true,
-              onSaveTap: () => _removeFromReadingList(book),
-              onTap: () => _openBook(book),
+            final readableBook = _myBooks[index];
+            return _ReadableBookTile(
+              readableBook: readableBook,
+              onTap: () => _openReadableBook(readableBook),
             );
           },
         );
       },
+    );
+  }
+
+  Widget _buildReadingListGrid() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount = switch (constraints.maxWidth) {
+          >= 900 => 4,
+          >= 600 => 3,
+          _ => 2,
+        };
+
+        return GridView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 0.48,
+          ),
+          itemCount: _readingListBooks.length,
+          itemBuilder: (context, index) {
+            final book = _readingListBooks[index];
+            return BookTile(
+              book: book,
+              isSaved: true,
+              onSaveTap: () => _removeFromReadingList(book),
+              onTap: () => _openReadingListBook(book),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _ReadableBookTile extends StatelessWidget {
+  const _ReadableBookTile({required this.readableBook, required this.onTap});
+
+  final ReadableBook readableBook;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: BookTile(book: readableBook.book, onTap: onTap),
+        ),
+        Positioned(
+          left: 10,
+          top: 10,
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: SwfColors.color7.withAlpha(210),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                child: Text(
+                  readableBook.accessLabel,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 72,
+              color: theme.colorScheme.onSurfaceVariant.withAlpha(100),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              title,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

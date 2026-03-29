@@ -13,13 +13,20 @@ class ReaderBook {
   });
 
   /// Create a [ReaderBook] from a catalog [Book].
-  factory ReaderBook.fromBook(Book book, {required String epubUrl}) {
+  factory ReaderBook.fromBook(
+    Book book, {
+    required String epubUrl,
+    String? lastCfi,
+    double progress = 0.0,
+  }) {
     return ReaderBook(
       id: book.id,
       title: book.title,
       author: book.authorName,
       coverUrl: book.imageUrl,
       epubUrl: epubUrl,
+      lastCfi: lastCfi,
+      progress: progress,
     );
   }
 
@@ -35,10 +42,7 @@ class ReaderBook {
   /// Reading progress from 0.0 to 1.0.
   final double progress;
 
-  ReaderBook copyWith({
-    String? lastCfi,
-    double? progress,
-  }) {
+  ReaderBook copyWith({String? lastCfi, double? progress}) {
     return ReaderBook(
       id: id,
       title: title,

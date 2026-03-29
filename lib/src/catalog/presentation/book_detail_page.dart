@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
+import 'package:swf_app/src/reader/models/readable_book.dart';
+import 'package:swf_app/src/reader/presentation/reader_launcher.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -22,6 +24,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
   List<Book> _similarBooks = [];
   bool _descriptionExpanded = false;
   bool _isSaved = false;
+  BookReadAccess? _readAccess;
+  bool _readBusy = false;
   bool _saveBusy = false;
 
   @override
@@ -31,6 +35,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
     _loadFullDetail();
     _loadSimilarBooks();
     _syncReadingListState();
+    _loadReadAccess();
   }
 
   Future<void> _loadFullDetail() async {
@@ -77,6 +82,22 @@ class _BookDetailPageState extends State<BookDetailPage> {
     );
   }
 
+  Future<void> _loadReadAccess() async {
+    if (!ServiceLocator.sessionStore.isAuthenticated) return;
+
+    final result = await ServiceLocator.readerAccessRepository.checkAccess(
+      widget.book.id,
+    );
+    if (!mounted) return;
+
+    result.when(
+      success: (access) {
+        setState(() => _readAccess = access);
+      },
+      failure: (_, _) {},
+    );
+  }
+
   Future<void> _toggleReadingList() async {
     if (!ServiceLocator.sessionStore.isAuthenticated) {
       _showSignUpPrompt();
@@ -107,6 +128,15 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ).showSnackBar(SnackBar(content: Text(message)));
       },
     );
+  }
+
+  Future<void> _openReader() async {
+    if (_readAccess?.hasAccess != true || _readBusy) return;
+
+    setState(() => _readBusy = true);
+    await openBookReader(context, book: _book);
+    if (!mounted) return;
+    setState(() => _readBusy = false);
   }
 
   void _showSignUpPrompt() {
@@ -187,6 +217,14 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   // Quick stats row
                   _StatsRow(book: _book),
                   const SizedBox(height: 20),
+
+                  if (_readAccess?.hasAccess == true) ...[
+                    _ReadInAppButton(
+                      isLoading: _readBusy,
+                      onPressed: _openReader,
+                    ),
+                    const SizedBox(height: 12),
+                  ],
 
                   _ReadingListButton(
                     isSaved: _isSaved,
@@ -553,6 +591,34 @@ class _ReadingListButton extends StatelessWidget {
                   : const Icon(Icons.bookmark_add_outlined, size: 18),
               label: Text(isLoading ? 'Saving...' : 'Save to Reading List'),
             ),
+    );
+  }
+}
+
+class _ReadInAppButton extends StatelessWidget {
+  const _ReadInAppButton({required this.isLoading, required this.onPressed});
+
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton.icon(
+        onPressed: isLoading ? null : onPressed,
+        icon: isLoading
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : const Icon(Icons.auto_stories_rounded, size: 18),
+        label: Text(isLoading ? 'Opening...' : 'Read in App'),
+      ),
     );
   }
 }

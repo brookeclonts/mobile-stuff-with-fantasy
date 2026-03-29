@@ -224,9 +224,7 @@ class _CatalogPageState extends State<CatalogPage> {
   void _openEventDetail(Event event) {
     Navigator.push<void>(
       context,
-      MaterialPageRoute<void>(
-        builder: (_) => EventDetailPage(event: event),
-      ),
+      MaterialPageRoute<void>(builder: (_) => EventDetailPage(event: event)),
     );
   }
 
@@ -390,8 +388,8 @@ class _CatalogPageState extends State<CatalogPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.bookmarks_outlined, size: 22),
-            tooltip: 'Reading list',
+            icon: const Icon(Icons.local_library_outlined, size: 22),
+            tooltip: 'Library',
             color: SwfColors.color8,
             onPressed: () => Navigator.push<void>(
               context,
