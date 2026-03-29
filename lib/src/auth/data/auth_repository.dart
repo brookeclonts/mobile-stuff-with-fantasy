@@ -133,30 +133,16 @@ class AuthRepository {
         return Failure(error, statusCode: response.statusCode);
       }
 
-      // The full session token lives in the set-cookie header as
-      // __Secure-better-auth.session_token=TOKEN.HASH
-      // The body only has the short token (without the hash), which
-      // won't authenticate on subsequent requests.
-      String? token;
-
-      final cookies = response.headers['set-cookie'] ?? '';
-      final cookieMatch = RegExp(
-        r'(?:__Secure-)?better-auth\.session_token=([^;]+)',
-      ).firstMatch(cookies);
-      if (cookieMatch != null) {
-        token = Uri.decodeFull(cookieMatch.group(1)!);
-      }
-
-      // Fallback: try body (session.token or top-level token)
-      if (token == null || token.isEmpty) {
-        final sessionData = body['session'] as Map<String, Object?>?;
-        token = sessionData?['token'] as String?;
-        token ??= body['token'] as String?;
-      }
+      // Extract the session token from the response body.
+      // We use Bearer auth (not cookies), so the body token is what we need.
+      final sessionData = body['session'] as Map<String, Object?>?;
+      String? token = sessionData?['token'] as String?;
+      token ??= body['token'] as String?;
 
       debugPrint(
         'AuthRepository.signUp response keys: ${body.keys.toList()}, '
-        'token found: ${token != null && token.isNotEmpty}',
+        'token found: ${token != null && token.isNotEmpty}, '
+        'token length: ${token?.length ?? 0}',
       );
 
       final userData = body['user'] as Map<String, Object?>?;
@@ -211,8 +197,7 @@ class AuthRepository {
         Uri.parse(url),
         headers: {
           ..._jsonHeaders,
-          HttpHeaders.cookieHeader:
-              '__Secure-better-auth.session_token=$token',
+          HttpHeaders.authorizationHeader: 'Bearer $token',
         },
         body: jsonEncode({'role': role.apiValue}),
       );
@@ -273,8 +258,7 @@ class AuthRepository {
         Uri.parse('$_baseUrl/api/auth/sign-out'),
         headers: {
           ..._jsonHeaders,
-          HttpHeaders.cookieHeader:
-              '__Secure-better-auth.session_token=$token',
+          HttpHeaders.authorizationHeader: 'Bearer $token',
         },
       );
 
