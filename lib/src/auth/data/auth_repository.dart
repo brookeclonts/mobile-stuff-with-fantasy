@@ -68,14 +68,14 @@ class AuthRepository {
     if (result is Failure<User> &&
         result.message == 'Invalid response from server') {
       print('[AUTH] getCurrentUser: no session (null response)');
-      _clearSession();
+      await _clearSession();
       return const Failure('Not authenticated', statusCode: 401);
     }
 
     if (result is Success<User>) {
       print('[AUTH] getCurrentUser: SUCCESS ${result.value.email}');
       if (token != null && token.isNotEmpty) {
-        _sessionStore.save(token: token, user: result.value);
+        await _sessionStore.save(token: token, user: result.value);
       }
       return result;
     }
@@ -84,7 +84,7 @@ class AuthRepository {
       print('[AUTH] getCurrentUser: FAILED ${result.statusCode} — '
           '${result.message}');
       if (result.statusCode == 401) {
-        _clearSession();
+        await _clearSession();
       }
     }
 
@@ -182,7 +182,7 @@ class AuthRepository {
         return const Failure('Sign up succeeded, but no session was returned');
       }
 
-      _sessionStore.save(token: token, user: user);
+      await _sessionStore.save(token: token, user: user);
       _apiClient.setSessionToken(token);
 
       return Success(user);
@@ -205,7 +205,7 @@ class AuthRepository {
     );
 
     if (result is Success<void>) {
-      _clearSession();
+      await _clearSession();
     }
 
     return result;
@@ -216,7 +216,7 @@ class AuthRepository {
 
     // Always clear local session first — sign-out must never leave the user
     // stuck in an authenticated state regardless of server response.
-    _clearSession();
+    await _clearSession();
 
     if (token == null || token.isEmpty) {
       return const Success<void>(null);
@@ -247,8 +247,8 @@ class AuthRepository {
     return null;
   }
 
-  void _clearSession() {
-    _sessionStore.clear();
+  Future<void> _clearSession() async {
+    await _sessionStore.clear();
     _apiClient.setSessionToken(null);
   }
 

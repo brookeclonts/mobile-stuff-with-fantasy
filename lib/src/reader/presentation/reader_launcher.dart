@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_epub_viewer/flutter_epub_viewer.dart';
+import 'package:http/http.dart' as http;
+import 'package:pretext/pretext.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
 import 'package:swf_app/src/reader/presentation/reader_page.dart';
@@ -19,33 +20,62 @@ Future<void> openBookReader(BuildContext context, {required Book book}) async {
     book.id,
   );
 
-  if (context.mounted) {
-    Navigator.of(context, rootNavigator: true).pop();
-  }
-
   if (!context.mounted) return;
 
-  result.when(
-    success: (signedBookFile) {
+  await result.when(
+    success: (signedBookFile) async {
+      // Download the EPUB bytes.
+      final response = await http.get(Uri.parse(signedBookFile.url));
+
+      if (!context.mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+
+      if (response.statusCode != 200) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to download book')),
+          );
+        }
+        return;
+      }
+
+      // Parse the EPUB.
+      final EpubLoadResult epubResult;
+      try {
+        epubResult = loadEpub(response.bodyBytes);
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to open book: $e')),
+          );
+        }
+        return;
+      }
+
       final readerBook = ServiceLocator.readerRepository.cacheBook(
         book,
         epubUrl: signedBookFile.url,
       );
 
-      Navigator.push<void>(
+      if (!context.mounted) return;
+
+      unawaited(Navigator.push<void>(
         context,
         MaterialPageRoute<void>(
           builder: (_) => ReaderPage(
             book: readerBook,
-            epubSource: EpubSource.fromUrl(signedBookFile.url),
+            epubResult: epubResult,
           ),
         ),
-      );
+      ));
     },
     failure: (message, _) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      }
     },
   );
 }

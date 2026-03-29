@@ -1,18 +1,20 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_epub_viewer/flutter_epub_viewer.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pretext/pretext.dart';
 import 'package:swf_app/l10n/app_localizations.dart';
 import 'package:swf_app/src/api/service_locator.dart';
 import 'package:swf_app/src/reader/models/reader_book.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
-/// Full-screen EPUB reading experience.
+/// Full-screen EPUB reading experience powered by pretext.
 class ReaderPage extends StatefulWidget {
-  const ReaderPage({super.key, required this.book, required this.epubSource});
+  const ReaderPage({super.key, required this.book, required this.epubResult});
 
   final ReaderBook book;
-  final EpubSource epubSource;
+  final EpubLoadResult epubResult;
 
   @override
   State<ReaderPage> createState() => _ReaderPageState();
@@ -21,19 +23,60 @@ class ReaderPage extends StatefulWidget {
 class _ReaderPageState extends State<ReaderPage> {
   static const double _minFontSize = 15;
   static const double _maxFontSize = 22;
-  static const double _tapThreshold = 0.03;
 
-  final EpubController _epubController = EpubController();
-  List<EpubChapter> _chapters = const [];
+  final _readerKey = GlobalKey<PagedReaderState>();
   late _ReaderAppearance _appearance;
-  Offset? _touchDownPosition;
   double _fontSize = 17;
   double _progress = 0.0;
   double _scrubProgress = 0.0;
-  bool _isLoaded = false;
   bool _isScrubbing = false;
   bool _showChrome = true;
   bool _appearanceInitialized = false;
+
+  /// Decoded images from the EPUB, lazily populated.
+  final _imageCache = <String, ui.Image?>{};
+
+  DocumentCursor? get _initialCursor {
+    final cfi = widget.book.lastCfi;
+    if (cfi == null || cfi.isEmpty) return null;
+    return DocumentCursor.deserialize(cfi);
+  }
+
+  LayoutConfig get _layoutConfig {
+    final baseFontFamily =
+        GoogleFonts.playfairDisplay().fontFamily ?? 'Georgia';
+    final bodyFontFamily = GoogleFonts.inter().fontFamily ?? 'sans-serif';
+
+    return LayoutConfig(
+      baseTextStyle: TextStyle(
+        color: _appearance.pageTextColor,
+        fontSize: _fontSize,
+        fontFamily: bodyFontFamily,
+        height: 1.65,
+      ),
+      lineHeight: _fontSize * 1.65,
+      blockSpacing: _fontSize * 0.8,
+      margins: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+      enableDropCaps: true,
+      dropCapLines: 3,
+      headingMaxLines: 3,
+      headingStyleResolver: (level) {
+        final scale = switch (level) {
+          1 => 1.8,
+          2 => 1.4,
+          3 => 1.2,
+          _ => 1.1,
+        };
+        return TextStyle(
+          color: _appearance.pageTextColor,
+          fontSize: _fontSize * scale,
+          fontFamily: baseFontFamily,
+          fontWeight: FontWeight.bold,
+          height: 1.3,
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -70,9 +113,8 @@ class _ReaderPageState extends State<ReaderPage> {
         systemNavigationBarColor: Colors.transparent,
         statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-        systemNavigationBarIconBrightness: isDark
-            ? Brightness.light
-            : Brightness.dark,
+        systemNavigationBarIconBrightness:
+            isDark ? Brightness.light : Brightness.dark,
       ),
     );
     super.dispose();
@@ -89,18 +131,14 @@ class _ReaderPageState extends State<ReaderPage> {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        systemNavigationBarColor: _showChrome
-            ? _appearance.chromeColor
-            : Colors.transparent,
-        statusBarBrightness: _appearance.isDark
-            ? Brightness.dark
-            : Brightness.light,
-        statusBarIconBrightness: _appearance.isDark
-            ? Brightness.light
-            : Brightness.dark,
-        systemNavigationBarIconBrightness: _appearance.isDark
-            ? Brightness.light
-            : Brightness.dark,
+        systemNavigationBarColor:
+            _showChrome ? _appearance.chromeColor : Colors.transparent,
+        statusBarBrightness:
+            _appearance.isDark ? Brightness.dark : Brightness.light,
+        statusBarIconBrightness:
+            _appearance.isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarIconBrightness:
+            _appearance.isDark ? Brightness.light : Brightness.dark,
       ),
     );
   }
@@ -111,46 +149,18 @@ class _ReaderPageState extends State<ReaderPage> {
     _applySystemUi();
   }
 
-  void _handleTouchDown(double x, double y) {
-    _touchDownPosition = Offset(x, y);
-  }
-
-  void _handleTouchUp(double x, double y) {
-    final touchDownPosition = _touchDownPosition;
-    _touchDownPosition = null;
-    if (!_isLoaded || touchDownPosition == null) return;
-
-    final deltaX = (touchDownPosition.dx - x).abs();
-    final deltaY = (touchDownPosition.dy - y).abs();
-    final isTap = deltaX <= _tapThreshold && deltaY <= _tapThreshold;
-    final isCenterTap = x >= 0.2 && x <= 0.8 && y >= 0.15 && y <= 0.85;
-
-    if (isTap && isCenterTap) {
-      _setChromeVisible(!_showChrome);
-    }
-  }
-
   void _adjustFontSize(double delta) {
     final nextSize =
         ((_fontSize + delta).clamp(_minFontSize, _maxFontSize) as num)
             .toDouble();
     if (nextSize == _fontSize) return;
-
     setState(() => _fontSize = nextSize);
-    if (_isLoaded) {
-      _epubController.setFontSize(fontSize: nextSize);
-    }
   }
 
   void _setAppearance(_ReaderAppearance appearance) {
     if (_appearance == appearance) return;
-
     setState(() => _appearance = appearance);
     _applySystemUi();
-
-    if (_isLoaded) {
-      _epubController.updateTheme(theme: _appearance.epubTheme);
-    }
   }
 
   void _jumpToProgress(double progress) {
@@ -160,9 +170,34 @@ class _ReaderPageState extends State<ReaderPage> {
       _progress = normalized;
       _scrubProgress = normalized;
     });
-    if (_isLoaded) {
-      _epubController.toProgressPercentage(normalized);
+
+    // Estimate page from progress.
+    final reader = _readerKey.currentState;
+    if (reader == null) return;
+    final totalPages = reader.totalPages;
+    if (totalPages != null && totalPages > 0) {
+      reader.goToPage((normalized * (totalPages - 1)).round());
     }
+  }
+
+  ui.Image? _resolveImage(String src) {
+    if (_imageCache.containsKey(src)) return _imageCache[src];
+
+    final bytes = widget.epubResult.images[src];
+    if (bytes == null) {
+      _imageCache[src] = null;
+      return null;
+    }
+
+    // Decode asynchronously and cache.
+    ui.decodeImageFromList(bytes, (image) {
+      if (mounted) {
+        setState(() => _imageCache[src] = image);
+      }
+    });
+
+    _imageCache[src] = null; // placeholder while decoding
+    return null;
   }
 
   void _showSettings() {
@@ -194,7 +229,8 @@ class _ReaderPageState extends State<ReaderPage> {
   }
 
   void _showChapterList() {
-    if (_chapters.isEmpty) return;
+    final toc = widget.epubResult.tableOfContents;
+    if (toc.isEmpty) return;
 
     showModalBottomSheet<void>(
       context: context,
@@ -202,10 +238,22 @@ class _ReaderPageState extends State<ReaderPage> {
       isScrollControlled: true,
       builder: (context) => _ChapterSheet(
         appearance: _appearance,
-        chapters: _chapters,
-        onSelected: (chapter) {
-          _epubController.display(cfi: chapter.href);
+        entries: toc,
+        onSelected: (entry) {
           Navigator.pop(context);
+          // Navigate to the chapter by index.
+          final doc = widget.epubResult.document;
+          // Find the chapter matching the TOC entry href.
+          for (int i = 0; i < doc.chapters.length; i++) {
+            if (doc.chapters[i].title == entry.title || i.toString() == entry.href) {
+              _readerKey.currentState?.goToCursor(DocumentCursor(
+                chapterIndex: i,
+                blockIndex: 0,
+                textOffset: 0,
+              ));
+              break;
+            }
+          }
         },
       ),
     );
@@ -222,48 +270,49 @@ class _ReaderPageState extends State<ReaderPage> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          EpubViewer(
-            epubSource: widget.epubSource,
-            epubController: _epubController,
-            displaySettings: EpubDisplaySettings(
-              fontSize: _fontSize.round(),
-              flow: EpubFlow.paginated,
-              snap: true,
-              theme: _appearance.epubTheme,
+          // Pretext PagedReader
+          GestureDetector(
+            onTapUp: (details) {
+              final size = MediaQuery.sizeOf(context);
+              final x = details.localPosition.dx / size.width;
+              final y = details.localPosition.dy / size.height;
+              final isCenterTap =
+                  x >= 0.2 && x <= 0.8 && y >= 0.15 && y <= 0.85;
+              if (isCenterTap) {
+                _setChromeVisible(!_showChrome);
+              }
+            },
+            child: PagedReader(
+              key: _readerKey,
+              document: widget.epubResult.document,
+              config: _layoutConfig,
+              initialCursor: _initialCursor,
+              backgroundColor: _appearance.pageColor,
+              imageResolver: _resolveImage,
+              onProgressChanged: (progress) {
+                final normalized = _normalizeProgress(progress);
+                setState(() {
+                  _progress = normalized;
+                  if (!_isScrubbing) {
+                    _scrubProgress = normalized;
+                  }
+                });
+                ServiceLocator.readingStatsRepository.recordProgress(
+                  widget.book.id,
+                  normalized,
+                );
+              },
+              onCursorChanged: (cursor) {
+                ServiceLocator.readerRepository.updateProgress(
+                  widget.book.id,
+                  cfi: cursor.serialize(),
+                  progress: _progress,
+                );
+              },
             ),
-            initialCfi: widget.book.lastCfi,
-            onTouchDown: _handleTouchDown,
-            onTouchUp: _handleTouchUp,
-            onChaptersLoaded: (chapters) {
-              if (!mounted) return;
-              setState(() => _chapters = chapters);
-            },
-            onEpubLoaded: () {
-              if (!mounted) return;
-              setState(() => _isLoaded = true);
-              _epubController.setFontSize(fontSize: _fontSize);
-              _epubController.updateTheme(theme: _appearance.epubTheme);
-            },
-            onRelocated: (location) {
-              if (!mounted) return;
-              final normalized = _normalizeProgress(location.progress);
-              setState(() {
-                _progress = normalized;
-                if (!_isScrubbing) {
-                  _scrubProgress = normalized;
-                }
-              });
-              ServiceLocator.readerRepository.updateProgress(
-                widget.book.id,
-                cfi: location.startCfi,
-                progress: normalized,
-              );
-              ServiceLocator.readingStatsRepository.recordProgress(
-                widget.book.id,
-                normalized,
-              );
-            },
           ),
+
+          // Gradient scrims
           IgnorePointer(
             child: AnimatedOpacity(
               opacity: _showChrome ? 1 : 0,
@@ -285,6 +334,8 @@ class _ReaderPageState extends State<ReaderPage> {
               ),
             ),
           ),
+
+          // Top chrome
           Positioned(
             left: 0,
             right: 0,
@@ -331,7 +382,9 @@ class _ReaderPageState extends State<ReaderPage> {
                                   const SizedBox(height: 2),
                                   Text(
                                     widget.book.author,
-                                    style: Theme.of(context).textTheme.bodySmall
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
                                         ?.copyWith(
                                           color: _appearance.chromeMutedColor,
                                           fontWeight: FontWeight.w500,
@@ -347,9 +400,10 @@ class _ReaderPageState extends State<ReaderPage> {
                               appearance: _appearance,
                               tooltip: l10n.readerTooltipChapters,
                               icon: Icons.list_rounded,
-                              onPressed: _chapters.isEmpty
-                                  ? null
-                                  : _showChapterList,
+                              onPressed:
+                                  widget.epubResult.tableOfContents.isEmpty
+                                      ? null
+                                      : _showChapterList,
                             ),
                             const SizedBox(width: 8),
                             _ReaderControlButton(
@@ -367,6 +421,8 @@ class _ReaderPageState extends State<ReaderPage> {
               ),
             ),
           ),
+
+          // Bottom chrome
           Positioned(
             left: 0,
             right: 0,
@@ -394,7 +450,9 @@ class _ReaderPageState extends State<ReaderPage> {
                               children: [
                                 Text(
                                   l10n.readerProgressRead(progressLabel),
-                                  style: Theme.of(context).textTheme.labelLarge
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelLarge
                                       ?.copyWith(
                                         color: _appearance.chromeTextColor,
                                         fontWeight: FontWeight.w700,
@@ -402,10 +460,10 @@ class _ReaderPageState extends State<ReaderPage> {
                                 ),
                                 const Spacer(),
                                 Text(
-                                  _isLoaded
-                                      ? l10n.readerHintSwipeToTurn
-                                      : l10n.readerHintOpeningBook,
-                                  style: Theme.of(context).textTheme.bodySmall
+                                  l10n.readerHintSwipeToTurn,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
                                       ?.copyWith(
                                         color: _appearance.chromeMutedColor,
                                       ),
@@ -423,15 +481,13 @@ class _ReaderPageState extends State<ReaderPage> {
                               ),
                               child: Slider(
                                 value: currentProgress,
-                                onChanged: _isLoaded
-                                    ? (value) {
-                                        setState(() {
-                                          _isScrubbing = true;
-                                          _scrubProgress = value;
-                                        });
-                                      }
-                                    : null,
-                                onChangeEnd: _isLoaded ? _jumpToProgress : null,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isScrubbing = true;
+                                    _scrubProgress = value;
+                                  });
+                                },
+                                onChangeEnd: _jumpToProgress,
                               ),
                             ),
                             Row(
@@ -441,14 +497,21 @@ class _ReaderPageState extends State<ReaderPage> {
                                   tooltip: l10n.readerTooltipPreviousPage,
                                   icon: Icons.chevron_left_rounded,
                                   label: l10n.readerButtonPrev,
-                                  onPressed: _isLoaded
-                                      ? () => _epubController.prev()
-                                      : null,
+                                  onPressed: () {
+                                    final reader = _readerKey.currentState;
+                                    if (reader != null &&
+                                        reader.currentPageIndex > 0) {
+                                      reader.goToPage(
+                                          reader.currentPageIndex - 1);
+                                    }
+                                  },
                                 ),
                                 const Spacer(),
                                 Text(
                                   l10n.readerHintTapToHide,
-                                  style: Theme.of(context).textTheme.bodySmall
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
                                       ?.copyWith(
                                         color: _appearance.chromeMutedColor,
                                       ),
@@ -459,9 +522,13 @@ class _ReaderPageState extends State<ReaderPage> {
                                   tooltip: l10n.readerTooltipNextPage,
                                   icon: Icons.chevron_right_rounded,
                                   label: l10n.readerButtonNext,
-                                  onPressed: _isLoaded
-                                      ? () => _epubController.next()
-                                      : null,
+                                  onPressed: () {
+                                    final reader = _readerKey.currentState;
+                                    if (reader != null) {
+                                      reader.goToPage(
+                                          reader.currentPageIndex + 1);
+                                    }
+                                  },
                                 ),
                               ],
                             ),
@@ -474,6 +541,8 @@ class _ReaderPageState extends State<ReaderPage> {
               ),
             ),
           ),
+
+          // Always-visible thin progress bar
           Positioned(
             left: 0,
             right: 0,
@@ -487,8 +556,6 @@ class _ReaderPageState extends State<ReaderPage> {
               ),
             ),
           ),
-          if (!_isLoaded)
-            Center(child: CircularProgressIndicator(color: SwfColors.color4)),
         ],
       ),
     );
@@ -502,13 +569,47 @@ class _ReaderPageState extends State<ReaderPage> {
 class _ChapterSheet extends StatelessWidget {
   const _ChapterSheet({
     required this.appearance,
-    required this.chapters,
+    required this.entries,
     required this.onSelected,
   });
 
   final _ReaderAppearance appearance;
-  final List<EpubChapter> chapters;
-  final ValueChanged<EpubChapter> onSelected;
+  final List<TocEntry> entries;
+  final ValueChanged<TocEntry> onSelected;
+
+  List<Widget> _buildEntries(
+    BuildContext context,
+    List<TocEntry> entries,
+    int depth,
+  ) {
+    final widgets = <Widget>[];
+    for (final entry in entries) {
+      widgets.add(
+        ListTile(
+          dense: depth > 0,
+          contentPadding:
+              EdgeInsets.only(left: 20.0 + depth * 16.0, right: 16),
+          title: Text(
+            entry.title,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: appearance.chromeTextColor,
+                ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Icon(
+            Icons.chevron_right_rounded,
+            color: appearance.chromeMutedColor,
+          ),
+          onTap: () => onSelected(entry),
+        ),
+      );
+      if (entry.children.isNotEmpty) {
+        widgets.addAll(_buildEntries(context, entry.children, depth + 1));
+      }
+    }
+    return widgets;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -539,35 +640,16 @@ class _ChapterSheet extends StatelessWidget {
             child: Text(
               AppLocalizations.of(context)!.readerChaptersTitle,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: appearance.chromeTextColor,
-              ),
+                    fontWeight: FontWeight.w700,
+                    color: appearance.chromeTextColor,
+                  ),
             ),
           ),
           Divider(height: 1, color: appearance.dividerColor),
           Flexible(
-            child: ListView.builder(
+            child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: chapters.length,
-              itemBuilder: (context, index) {
-                final chapter = chapters[index];
-                return ListTile(
-                  dense: true,
-                  title: Text(
-                    chapter.title,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: appearance.chromeTextColor,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: Icon(
-                    Icons.chevron_right_rounded,
-                    color: appearance.chromeMutedColor,
-                  ),
-                  onTap: () => onSelected(chapter),
-                );
-              },
+              children: _buildEntries(context, entries, 0),
             ),
           ),
         ],
@@ -575,6 +657,10 @@ class _ChapterSheet extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Settings bottom sheet
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _ReaderSettingsSheet extends StatelessWidget {
   const _ReaderSettingsSheet({
@@ -696,7 +782,8 @@ class _ReaderSettingsSheet extends StatelessWidget {
                 children: _ReaderAppearance.values.map((readerAppearance) {
                   final selected = readerAppearance == currentAppearance;
                   return ChoiceChip(
-                    label: Text(_localizedAppearanceLabel(l10n, readerAppearance)),
+                    label:
+                        Text(_localizedAppearanceLabel(l10n, readerAppearance)),
                     selected: selected,
                     labelStyle: theme.textTheme.bodyMedium?.copyWith(
                       color: selected
@@ -724,6 +811,10 @@ class _ReaderSettingsSheet extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared chrome widgets
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _ReaderChromeCard extends StatelessWidget {
   const _ReaderChromeCard({required this.appearance, required this.child});
@@ -807,6 +898,10 @@ class _ReaderControlButton extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Reader appearance (theme)
+// ─────────────────────────────────────────────────────────────────────────────
+
 class _ReaderAppearance {
   const _ReaderAppearance._({
     required this.label,
@@ -820,7 +915,6 @@ class _ReaderAppearance {
     required this.chromeMutedColor,
     required this.progressTrackColor,
     required this.dividerColor,
-    required this.selectionColor,
   });
 
   static const paper = _ReaderAppearance._(
@@ -835,7 +929,6 @@ class _ReaderAppearance {
     chromeMutedColor: SwfColors.mediumGray,
     progressTrackColor: Color(0xFFCFC5BC),
     dividerColor: Color(0xFFD9D0C9),
-    selectionColor: '#B96D9A55',
   );
 
   static const sepia = _ReaderAppearance._(
@@ -850,7 +943,6 @@ class _ReaderAppearance {
     chromeMutedColor: Color(0xFF6B5848),
     progressTrackColor: Color(0xFFD9C7AF),
     dividerColor: Color(0xFFD9C6AE),
-    selectionColor: '#BC8D6050',
   );
 
   static const night = _ReaderAppearance._(
@@ -865,7 +957,6 @@ class _ReaderAppearance {
     chromeMutedColor: Color(0xFFB7C0C8),
     progressTrackColor: Color(0xFF314251),
     dividerColor: Color(0xFF314251),
-    selectionColor: '#82B1A155',
   );
 
   static const values = [paper, sepia, night];
@@ -881,31 +972,4 @@ class _ReaderAppearance {
   final Color chromeMutedColor;
   final Color progressTrackColor;
   final Color dividerColor;
-  final String selectionColor;
-
-  EpubTheme get epubTheme => EpubTheme.custom(
-    foregroundColor: pageTextColor,
-    customCss: {
-      'html': {'background-color': _cssColor(pageColor)},
-      'body': {
-        'background-color': '${_cssColor(pageColor)} !important',
-        'color': '${_cssColor(pageTextColor)} !important',
-        'font-family': '"Iowan Old Style", "Palatino Linotype", Georgia, serif',
-        'line-height': '1.65',
-        '-webkit-font-smoothing': 'antialiased',
-      },
-      'p': {'line-height': '1.65'},
-      'img': {'max-width': '100%', 'height': 'auto'},
-      'a': {'color': 'inherit !important', 'text-decoration': 'none'},
-      'a:link': {'color': 'inherit !important'},
-      '::selection': {'background-color': selectionColor},
-    },
-  );
-}
-
-String _cssColor(Color color) {
-  final red = color.r.toInt().toRadixString(16).padLeft(2, '0');
-  final green = color.g.toInt().toRadixString(16).padLeft(2, '0');
-  final blue = color.b.toInt().toRadixString(16).padLeft(2, '0');
-  return '#$red$green$blue';
 }

@@ -15,6 +15,7 @@ import 'package:swf_app/src/profile/data/profile_repository.dart';
 import 'package:swf_app/src/profile/data/reading_stats_repository.dart';
 import 'package:swf_app/src/profile/data/recommendation_repository.dart';
 import 'package:swf_app/src/profile/data/review_repository.dart';
+import 'package:swf_app/src/reader/data/local_book_repository.dart';
 import 'package:swf_app/src/reader/data/reader_access_repository.dart';
 import 'package:swf_app/src/reader/data/reader_repository.dart';
 import 'package:swf_app/src/reader/data/reading_list_repository.dart';
@@ -46,6 +47,7 @@ abstract final class ServiceLocator {
   static late final LeaderboardRepository _leaderboardRepository;
   static late final LoreBoardRepository _loreBoardRepository;
   static late final GuildRepository _guildRepository;
+  static late final LocalBookRepository _localBookRepository;
 
   static ApiClient get apiClient => _apiClient;
   static BookRepository get bookRepository => _bookRepository;
@@ -73,6 +75,7 @@ abstract final class ServiceLocator {
   static LoreBoardRepository get loreBoardRepository =>
       _loreBoardRepository;
   static GuildRepository get guildRepository => _guildRepository;
+  static LocalBookRepository get localBookRepository => _localBookRepository;
 
   /// Initialize all shared services. Call from `main()` before `runApp`.
   static void init({String? baseUrl}) {
@@ -101,6 +104,7 @@ abstract final class ServiceLocator {
     _leaderboardRepository = LeaderboardRepository(apiClient: _apiClient);
     _loreBoardRepository = LoreBoardRepository(apiClient: _apiClient);
     _guildRepository = GuildRepository(apiClient: _apiClient);
+    _localBookRepository = LocalBookRepository();
   }
 
   /// Tear down. Useful in tests.

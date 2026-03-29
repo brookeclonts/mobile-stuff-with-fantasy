@@ -1,3 +1,7 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swf_app/l10n/app_localizations.dart';
@@ -10,8 +14,10 @@ import 'package:swf_app/src/catalog/presentation/widgets/book_tile.dart';
 import 'package:swf_app/src/profile/presentation/profile_page.dart';
 import 'package:swf_app/src/reader/data/reader_access_repository.dart';
 import 'package:swf_app/src/reader/data/reading_list_repository.dart';
+import 'package:swf_app/src/reader/models/reader_book.dart';
 import 'package:swf_app/src/reader/models/readable_book.dart';
 import 'package:swf_app/src/reader/presentation/reader_launcher.dart';
+import 'package:swf_app/src/reader/presentation/reader_page.dart';
 import 'package:swf_app/src/theme/swf_colors.dart';
 
 enum LibraryTab { myBooks, readingList }
@@ -173,6 +179,59 @@ class _LibraryPageState extends State<LibraryPage> {
     await _loadMyBooks(forceRefresh: true);
   }
 
+  Future<void> _openLocalBook(ReaderBook book) async {
+    final epubResult =
+        ServiceLocator.localBookRepository.getEpubResult(book.id);
+    if (epubResult == null) return;
+
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => ReaderPage(book: book, epubResult: epubResult),
+      ),
+    );
+  }
+
+  Future<void> _importEpub() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['epub'],
+    );
+    if (result == null || result.files.isEmpty) return;
+
+    final file = result.files.first;
+    if (file.bytes == null && file.path == null) return;
+
+    final bytes = file.bytes ?? await _readFileBytes(file.path!);
+    if (bytes == null) return;
+
+    if (!mounted) return;
+
+    final readerBook = await ServiceLocator.localBookRepository.importEpub(
+      filename: file.name,
+      bytes: bytes,
+    );
+
+    if (!mounted) return;
+
+    if (readerBook == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open this EPUB file')),
+      );
+      return;
+    }
+
+    setState(() {}); // refresh to show new import
+  }
+
+  Future<Uint8List?> _readFileBytes(String path) async {
+    try {
+      return await File(path).readAsBytes();
+    } catch (_) {
+      return null;
+    }
+  }
+
   AuthRepository? _resolveAuthRepository() {
     try {
       return ServiceLocator.authRepository;
@@ -226,6 +285,13 @@ class _LibraryPageState extends State<LibraryPage> {
               letterSpacing: 0.5,
             ),
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add_rounded, size: 22),
+              tooltip: 'Import EPUB',
+              onPressed: _importEpub,
+            ),
+          ],
           bottom: TabBar(
             tabs: [
               Tab(text: l10n.libraryTabMyBooks),
@@ -242,34 +308,47 @@ class _LibraryPageState extends State<LibraryPage> {
 
   Widget _buildMyBooksTab(ThemeData theme) {
     final l10n = AppLocalizations.of(context)!;
-    return switch ((
-      _isAuthenticated,
-      _myBooksLoading,
-      _myBooksError,
-      _myBooks.isEmpty,
-    )) {
-      (_, true, _, _) => const Center(child: CircularProgressIndicator()),
-      (false, _, _, _) => _SignInEmptyState(
+    final localBooks = ServiceLocator.localBookRepository.books;
+    final hasLocalBooks = localBooks.isNotEmpty;
+
+    // If not authenticated and no local books, show sign-in prompt with import option.
+    if (!_isAuthenticated && !hasLocalBooks && !_myBooksLoading) {
+      return _SignInEmptyState(
         icon: Icons.auto_stories_outlined,
         title: l10n.libraryMyBooksSignInTitle,
         message: l10n.libraryMyBooksSignInMessage,
         onSignIn: _openSignIn,
-      ),
-      (_, _, final String error, _) => _ErrorState(
-        message: error,
+        onImport: _importEpub,
+      );
+    }
+
+    if (_myBooksLoading && !hasLocalBooks) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_myBooksError != null && !hasLocalBooks && _myBooks.isEmpty) {
+      return _ErrorState(
+        message: _myBooksError!,
         onRetry: () => _loadMyBooks(forceRefresh: true),
-      ),
-      (_, _, _, true) => _EmptyState(
+      );
+    }
+
+    final hasAnyBooks = _myBooks.isNotEmpty || hasLocalBooks;
+
+    if (!hasAnyBooks) {
+      return _EmptyState(
         icon: Icons.library_books_outlined,
         title: l10n.libraryMyBooksEmptyTitle,
         message: l10n.libraryMyBooksEmptyMessage,
-      ),
-      _ => RefreshIndicator(
-        onRefresh: () => _loadMyBooks(forceRefresh: true),
-        color: SwfColors.color4,
-        child: _buildMyBooksGrid(),
-      ),
-    };
+        onImport: _importEpub,
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => _loadMyBooks(forceRefresh: true),
+      color: SwfColors.color4,
+      child: _buildMyBooksGrid(localBooks: localBooks),
+    );
   }
 
   Widget _buildReadingListTab(ThemeData theme) {
@@ -304,7 +383,10 @@ class _LibraryPageState extends State<LibraryPage> {
     };
   }
 
-  Widget _buildMyBooksGrid() {
+  Widget _buildMyBooksGrid({List<ReaderBook> localBooks = const []}) {
+    final totalApiBooks = _myBooks.length;
+    final totalItems = totalApiBooks + localBooks.length;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final crossAxisCount = switch (constraints.maxWidth) {
@@ -322,12 +404,21 @@ class _LibraryPageState extends State<LibraryPage> {
             crossAxisSpacing: 12,
             childAspectRatio: 0.48,
           ),
-          itemCount: _myBooks.length,
+          itemCount: totalItems,
           itemBuilder: (context, index) {
-            final readableBook = _myBooks[index];
-            return _ReadableBookTile(
-              readableBook: readableBook,
-              onTap: () => _openReadableBook(readableBook),
+            // API books first, then local imports.
+            if (index < totalApiBooks) {
+              final readableBook = _myBooks[index];
+              return _ReadableBookTile(
+                readableBook: readableBook,
+                onTap: () => _openReadableBook(readableBook),
+              );
+            }
+
+            final localBook = localBooks[index - totalApiBooks];
+            return _LocalBookTile(
+              book: localBook,
+              onTap: () => _openLocalBook(localBook),
             );
           },
         );
@@ -412,16 +503,83 @@ class _ReadableBookTile extends StatelessWidget {
   }
 }
 
+class _LocalBookTile extends StatelessWidget {
+  const _LocalBookTile({required this.book, required this.onTap});
+
+  final ReaderBook book;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: SwfColors.color2.withAlpha(20),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: SwfColors.color2.withAlpha(40)),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    book.title,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: SwfColors.color2,
+                    ),
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            book.title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          if (book.author.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Text(
+              book.author,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _EmptyState extends StatelessWidget {
   const _EmptyState({
     required this.icon,
     required this.title,
     required this.message,
+    this.onImport,
   });
 
   final IconData icon;
   final String title;
   final String message;
+  final VoidCallback? onImport;
 
   @override
   Widget build(BuildContext context) {
@@ -461,6 +619,17 @@ class _EmptyState extends StatelessWidget {
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
+            if (onImport != null) ...[
+              const SizedBox(height: 20),
+              TextButton.icon(
+                onPressed: onImport,
+                icon: const Icon(Icons.file_open_outlined, size: 18),
+                label: const Text('Import EPUB file'),
+                style: TextButton.styleFrom(
+                  foregroundColor: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -474,12 +643,14 @@ class _SignInEmptyState extends StatelessWidget {
     required this.title,
     required this.message,
     required this.onSignIn,
+    this.onImport,
   });
 
   final IconData icon;
   final String title;
   final String message;
   final VoidCallback onSignIn;
+  final VoidCallback? onImport;
 
   @override
   Widget build(BuildContext context) {
@@ -550,6 +721,17 @@ class _SignInEmptyState extends StatelessWidget {
                 ),
               ),
             ),
+            if (onImport != null) ...[
+              const SizedBox(height: 16),
+              TextButton.icon(
+                onPressed: onImport,
+                icon: const Icon(Icons.file_open_outlined, size: 18),
+                label: const Text('or import an EPUB file'),
+                style: TextButton.styleFrom(
+                  foregroundColor: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
           ],
         ),
       ),

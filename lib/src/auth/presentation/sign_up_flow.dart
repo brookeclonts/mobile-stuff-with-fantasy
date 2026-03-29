@@ -80,9 +80,8 @@ class _SignUpFlowState extends State<SignUpFlow> {
   }
 
   void _onGetStarted() {
-    // Pop back to the profile page (Guild Hall) so the user stays there
-    // after creating an account, rather than being sent to the catalog.
-    Navigator.pop(context);
+    // Pop all the way back to the catalog so the user can start browsing.
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   void _skipToCatalog() {

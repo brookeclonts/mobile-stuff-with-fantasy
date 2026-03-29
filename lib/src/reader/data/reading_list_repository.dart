@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:swf_app/src/api/api_client.dart';
 import 'package:swf_app/src/api/api_result.dart';
 import 'package:swf_app/src/catalog/models/book.dart';
@@ -66,19 +67,25 @@ class ReadingListRepository {
       return Success(books);
     }
 
+    debugPrint('[READING_LIST] fetching, forceRefresh=$forceRefresh');
+
     final result = await _api.get<ReadingListSnapshot>(
       '/api/user/reading-list',
       fromJson: ReadingListSnapshot.fromJson,
     );
 
-    if (result is Failure<ReadingListSnapshot> && result.statusCode == 401) {
-      clear();
-      _hasLoaded = true;
-      return const Success(<Book>[]);
+    if (result is Failure<ReadingListSnapshot>) {
+      debugPrint('[READING_LIST] fetch failed: ${result.message} (${result.statusCode})');
+      if (result.statusCode == 401) {
+        clear();
+        _hasLoaded = true;
+        return const Success(<Book>[]);
+      }
     }
 
     return result.when(
       success: (snapshot) {
+        debugPrint('[READING_LIST] fetch success: ${snapshot.books.length} books, ${snapshot.ids.length} ids');
         _replaceCache(snapshot.books);
         _savedIds
           ..clear()
@@ -92,13 +99,16 @@ class ReadingListRepository {
   }
 
   Future<ApiResult<bool>> save(Book book) async {
+    debugPrint('[READING_LIST] saving book ${book.id}');
     final result = await _api.post<ReadingListMutation>(
       '/api/books/${book.id}/reading-list',
       fromJson: ReadingListMutation.fromJson,
     );
 
+    debugPrint('[READING_LIST] save result: $result');
     return result.when(
       success: (mutation) {
+        debugPrint('[READING_LIST] save success: bookId=${mutation.bookId}, saved=${mutation.saved}');
         _cacheBook(book, toFront: true);
         _savedIds.add(mutation.bookId.isEmpty ? book.id : mutation.bookId);
         _hasLoaded = true;
