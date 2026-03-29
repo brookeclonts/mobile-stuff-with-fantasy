@@ -47,8 +47,10 @@ Build the Flutter iOS app and upload to App Store Connect for TestFlight distrib
 - **API Issuer ID:** `119abbe0-5bda-4086-aa55-fd7781f0b3b3`
 - **API Key Path:** `~/.private_keys/AuthKey_JJZ779Q67V.p8`
 - **pubspec.yaml:** `pubspec.yaml`
+- **Auto-manage build numbers:** disabled in `ios/ExportOptions.plist`
 
 ## Notes
 
 - The `XLDQ97MTSN` key can authenticate, but it does not map to the `com.secondstar.stuffwithfantasy` app in App Store Connect.
 - The `JJZ779Q67V` key is the verified working key for TestFlight uploads for this bundle ID.
+- Keep `manageAppVersionAndBuildNumber` set to `false` so the exported IPA matches the Flutter build number you set.
