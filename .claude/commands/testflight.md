@@ -29,10 +29,11 @@ Build the Flutter iOS app and upload to App Store Connect for TestFlight distrib
    ```bash
    xcrun altool --upload-app --type ios \
      -f /Users/seth/repositories/swf-app/build/ios/ipa/swf_app.ipa \
-     --apiKey XLDQ97MTSN \
-     --apiIssuer 43411856-265a-4af2-8a58-caaf3291c764
+     --api-key JJZ779Q67V \
+     --api-issuer 119abbe0-5bda-4086-aa55-fd7781f0b3b3 \
+     --p8-file-path ~/.private_keys/AuthKey_JJZ779Q67V.p8
    ```
-   Timeout: 5 minutes. The API key file is at `~/.private_keys/AuthKey_XLDQ97MTSN.p8`.
+   Timeout: 5 minutes. Use the Second Star App Store Connect key for this app.
 
 6. **Report the result** — version number, build number, and whether the upload succeeded.
 
@@ -46,3 +47,8 @@ Build the Flutter iOS app and upload to App Store Connect for TestFlight distrib
 - **API Issuer ID:** `119abbe0-5bda-4086-aa55-fd7781f0b3b3`
 - **API Key Path:** `~/.private_keys/AuthKey_JJZ779Q67V.p8`
 - **pubspec.yaml:** `pubspec.yaml`
+
+## Notes
+
+- The `XLDQ97MTSN` key can authenticate, but it does not map to the `com.secondstar.stuffwithfantasy` app in App Store Connect.
+- The `JJZ779Q67V` key is the verified working key for TestFlight uploads for this bundle ID.
